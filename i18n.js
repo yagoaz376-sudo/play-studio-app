@@ -6,7 +6,7 @@
   const PT = {
     // navigation and top bar
     "Stage": "Palco", "Effects": "Efeitos", "Setup": "Ajustes", "Mapper": "Mapeador", "Offline": "Desconectado",
-    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…",
+    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…", "Saved": "Salvo",
     "Sections": "Seções", "Connection and MIDI monitor": "Conexão e monitor MIDI", "Previous preset": "Preset anterior",
     "All presets": "Todos os presets", "Next preset": "Próximo preset",
     "Save this preset on the pedal (presses STORE, then STORE again to confirm)": "Salvar este preset no pedal (aperta STORE e STORE de novo pra confirmar)",

@@ -786,3 +786,68 @@ body.talking #talk2[aria-pressed="true"] { box-shadow: var(--hl), 0 0 0 2px var(
 .pnl-col .pbtn { height: 100%; }
 .pnl-fsw { grid-template-columns: auto 1fr 1fr 1.2fr 1.2fr; }
 @media (max-width: 700px) { .pnl-fsw { grid-template-columns: 1fr 1fr; } }
+
+/* ── Save + Favorite ───────────────────────────────────────────────────────
+   One family: glass pills of the same height. Save is quiet until there is something to save, then it turns
+   accent-blue with a pulsing dot (this replaces the separate "edited" tag), spins while saving and flashes a green
+   "Saved". The star sits right after the preset name, gold when the preset is a Favorite. */
+:root { --gold: #f0a500; }
+:root[data-theme="dark"], :root:not([data-theme="light"]) { --gold: #ffc23d; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --gold: #f0a500; } }
+
+.preset-info { flex: 0 1 auto; }
+.preset .favstar { margin-right: auto; }
+.preset-info .edited, .stage-edit .edited { display: none !important; }
+
+.favstar { width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--faint); box-shadow: none;
+  display: grid; place-items: center; cursor: pointer; transition: color .2s, background-color .2s; }
+.favstar:hover { color: var(--text); background: color-mix(in srgb, currentColor 9%, transparent); }
+.favstar svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; transition: fill .2s; }
+.favstar[aria-pressed="true"] { color: var(--gold); background: none; }
+.favstar[aria-pressed="true"] svg, .favpill[aria-pressed="true"] svg { fill: currentColor; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold) 55%, transparent)); }
+.favstar.busy, .favpill.busy { opacity: .45; pointer-events: none; }
+.favstar.pop svg, .favpill.pop svg { animation: favpop .45s var(--spring, cubic-bezier(.34, 1.56, .64, 1)); }
+@keyframes favpop { 0% { transform: scale(.55); } 60% { transform: scale(1.22); } 100% { transform: scale(1); } }
+
+.savebtn, .favpill { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px 0 12px;
+  border: 0; border-radius: 999px; cursor: pointer; font: 600 13px/1 inherit; letter-spacing: .01em; white-space: nowrap;
+  color: var(--muted); background: var(--glass); box-shadow: var(--hl), 0 1px 3px rgba(0, 0, 0, .08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+  transition: background .25s, color .25s, box-shadow .3s, transform .35s var(--spring, ease); }
+.savebtn:hover, .favpill:hover { color: var(--text); }
+.savebtn:active, .favpill:active { transform: scale(.95); }
+.savebtn[hidden] { display: none; }
+.savebtn:disabled { cursor: default; }
+.favpill svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.favpill[aria-pressed="true"] { color: var(--text); background: color-mix(in srgb, var(--gold) 18%, var(--glass)); }
+.favpill[aria-pressed="true"] svg { color: var(--gold); }
+
+.savebtn .sv-ico { position: relative; width: 18px; height: 18px; display: grid; place-items: center; }
+.savebtn .sv-ico > * { grid-area: 1 / 1; }
+.savebtn .sv-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  transition: opacity .2s, transform .35s var(--spring, ease); }
+.savebtn .ic-check { opacity: 0; transform: scale(.4); }
+.savebtn .sv-spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; opacity: 0; }
+.savebtn .sv-dot { display: none; }
+
+.savebtn.dirty { color: #fff; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 82%, #fff), var(--accent));
+  box-shadow: var(--hl), 0 6px 20px color-mix(in srgb, var(--accent) 45%, transparent); }
+.savebtn.dirty .sv-dot { display: block; position: absolute; top: -1px; right: -1px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--warn); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 70%, #000), 0 0 10px var(--warn); animation: svpulse 1.8s ease-in-out infinite; }
+.savebtn.saving { color: var(--text); }
+.savebtn.saving .ic-save { opacity: 0; transform: scale(.5); }
+.savebtn.saving .sv-spin { opacity: 1; animation: svspin .7s linear infinite; }
+.savebtn.done { color: #fff; background: var(--on); box-shadow: var(--hl), 0 6px 20px color-mix(in srgb, var(--on) 40%, transparent); }
+.savebtn.done .ic-save { opacity: 0; transform: scale(.4); }
+.savebtn.done .ic-check { opacity: 1; transform: scale(1); }
+@keyframes svspin { to { transform: rotate(360deg); } }
+@keyframes svpulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.72); opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .savebtn.dirty .sv-dot, .favstar.pop svg, .favpill.pop svg { animation: none; } .savebtn.saving .sv-spin { animation-duration: 1.6s; } }
+
+/* Stage: the pair sits under the preset name */
+.stage-edit:not([hidden]) { display: flex; align-items: center; justify-content: center; gap: 8px; }
+@media (max-width: 700px) {
+  .savebtn, .favpill { height: 32px; padding: 0 13px 0 10px; font-size: 12px; gap: 6px; }
+  .savebtn .sv-ico, .savebtn .sv-ico svg { width: 16px; height: 16px; }
+  .favstar { width: 30px; height: 30px; }
+}

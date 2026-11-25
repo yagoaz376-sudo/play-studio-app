@@ -200,6 +200,7 @@
       await L.press(0x00); await delay(450);
       const info = await L.presetInfo(); if (!info) return;
       P.fav = info.fav;
+      for (const b of $$("[data-fav]")) { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); }
       if (P.num != null && lib.presets[P.num]) { lib.presets[P.num].fav = info.fav; saveLib(); paintPicker(); }
       if (was != null && info.fav === was) toast("The pedal didn't confirm the change: check FAV on its screen", "warn", 4000);
       else toast(info.fav ? "★ Added to favorites" : "Removed from favorites");
@@ -459,9 +460,10 @@
     $("#p-edited").hidden = !P.edited;
     // Save is always there while connected (edits made on the pedal itself aren't seen by the app); it stands out
     // once something was edited here.
-    $("#s-edit").hidden = !ready; $("#s-edit .edited").hidden = !P.edited;
+    $("#s-edit").hidden = !ready;
     for (const b of $$("[data-fav]")) { b.hidden = !ready || P.name == null; b.setAttribute("aria-pressed", String(P.fav === true)); b.classList.toggle("busy", favBusy); }
-    for (const b of $$("[data-save]")) { b.hidden = b.closest("#s-edit") ? false : !ready; b.classList.toggle("quiet", !P.edited); b.disabled = saving; b.textContent = saving ? "Saving…" : "Save"; }
+    for (const b of $$("[data-save]")) { b.hidden = b.closest("#s-edit") ? false : !ready; b.classList.toggle("dirty", P.edited && !saving && !justSaved); b.classList.toggle("saving", saving); b.classList.toggle("done", justSaved && !saving); b.disabled = saving;
+      const lb = b.querySelector(".sv-lbl"); if (lb) lb.textContent = saving ? "Saving…" : justSaved ? "Saved" : "Save"; }
     const hitC = CELLS.get(ID.HIT), hitId = rid(hitC), hv = hitId == null ? undefined : V.get(hitId);
     for (const b of [$("#hit"), $("#hit2")]) if (b) { b.setAttribute("aria-pressed", hv === 1); popOnChange(b, hv == null ? "unk" : String(hv)); b.title = hitId == null ? "Sends a HIT footswitch press (state unknown on this pedal)" : "HIT on / off"; }
     document.body.classList.toggle("talking", ready && talkOn);   // TALK on: everything greys out except TALK
@@ -708,6 +710,7 @@
   // Same as on the hardware: STORE opens the store screen with the current preset as the destination, a second STORE
   // confirms. BACK afterwards is harmless on the preset screen and cancels if the pedal is still on the store screen.
   let saving = false;
+  let justSaved = false, justSavedT = 0;   // a short green "Saved" on the button after a save
   async function savePreset() {
     if (!L.ready) return notConnected(); if (saving || walking || stepping) return;
     saving = true; paintChrome(); flush();
@@ -718,6 +721,7 @@
       await L.press(L.EVT.back); await delay(300);
       P.edited = false; fresh = true; clearHistory();
       lib.storeAt = Date.now(); saveLib();
+      justSaved = true; clearTimeout(justSavedT); justSavedT = setTimeout(() => { justSaved = false; paintChrome(); }, 1800);
       toast(MODE === "pe" ? "Saved: pressed STORE twice (experimental on the Play Electric). Check the pedal's screen." : "Saved on the pedal (STORE, STORE). Check the pedal's screen.", "", 3500);
       syncSoon(50);   // re-read; a fresh, unedited read also refreshes this preset in the library
     } finally { saving = false; paintChrome(); }
