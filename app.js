@@ -505,13 +505,13 @@
   const blankLib = () => ({ presets: {}, storeAt: 0, pcOffset: null, pcWorks: null, readAt: 0, wraps: null });
   let lib = blankLib();
   function loadLib() {
-    const raw = store.get(LIB_KEY(), null); lib = blankLib();
+    const raw = store.get(LIB_KEY(), null); lib = blankLib(); const okIds = new Set(presetIds());
     if (!raw || typeof raw.presets !== "object" || !raw.presets) return;
     for (const [k, e] of Object.entries(raw.presets)) {
       const n = Number(k);
       if (!Number.isInteger(n) || n < 0 || n > 65535 || !e || !Array.isArray(e.vals)) continue;
       lib.presets[n] = { name: typeof e.name === "string" ? e.name.slice(0, 15) : "", t: Number(e.t) || 0,
-        vals: e.vals.filter(p => Array.isArray(p) && Number.isInteger(p[0]) && Number.isInteger(p[1]) && CELLS.has(p[0]) && !GLOBAL.has(p[0])) };
+        vals: e.vals.filter(p => Array.isArray(p) && Number.isInteger(p[0]) && Number.isInteger(p[1]) && okIds.has(p[0])) };
     }
     lib.storeAt = Number(raw.storeAt) || 0; lib.readAt = Number(raw.readAt) || 0;
     lib.pcOffset = Number.isInteger(raw.pcOffset) ? raw.pcOffset : null;
@@ -520,7 +520,9 @@
   }
   const saveLib = () => store.set(LIB_KEY(), lib);
   const libEntry = n => { const e = lib.presets[n]; return e && e.t > lib.storeAt ? e : null; };
-  const presetVals = () => [...CELLS.keys()].filter(id => !GLOBAL.has(id) && V.has(id)).map(id => [id, V.get(id)]);
+  const presetIds = () => MODE === "pe" ? [...new Set([...paToDev].filter(([pa]) => !GLOBAL.has(pa)).map(([, dev]) => dev))]
+    : [...CELLS.keys()].filter(id => !GLOBAL.has(id) && id <= MAX_ID);
+  const presetVals = () => presetIds().filter(id => V.has(id)).map(id => [id, V.get(id)]);
   function libPut(n, name, vals) { lib.presets[n] = { name: name || "", t: Date.now(), vals }; saveLib(); paintPicker(); }
 
   // fresh = the pedal just loaded a preset and nothing was edited since: what we read is the stored preset
@@ -546,19 +548,20 @@
     if (MODE === "pe" && !walking && P.name && nm && nm !== P.name) { presetChanged(null); return; }
     P.name = nm ?? ""; paintChrome();   // "" = no name / no answer
     const got = await L.getBatch(readIds(), { alive, each: (id, v) => { if (!recent(id)) { V.set(id, v); schedulePaint(); } } });
-    if (got && alive() && fresh && n != null) libPut(n, P.name, MODE === "pa" ? presetVals() : []);   // keep it for next time (Electric: name only)
+    if (got && alive() && fresh && n != null) libPut(n, P.name, presetVals());   // keep it for next time
   }
   let syncT = 0; const syncSoon = ms => { clearTimeout(syncT); syncT = setTimeout(syncAll, ms); };
   // a preset change on the pedal: show it from the library if we have it, else "··"; then read it from the pedal
-  function presetChanged(prog) {
+  // a preset change on the pedal: show it from the saved list at once when its number is known (from the Program
+  // Change, or because the app went there itself), else "··"; then read it from the pedal to confirm
+  function presetChanged(prog, knownNum = null) {
     gen++; resetWrites(); P.edited = false; P.name = null; clearHistory(); fresh = true; lastOn.clear(); numOk = true;
-    if (MODE === "pe") P.num = null;
-    for (const id of [...V.keys()]) if (MODE === "pe" || !GLOBAL.has(id)) V.delete(id);
-    if (MODE === "pa") {
-      P.num = null;
-      const num = prog != null && lib.pcOffset != null ? prog + lib.pcOffset : null, e = num != null ? libEntry(num) : null;
-      if (e) { P.num = num; P.name = e.name; for (const [id, v] of e.vals) V.set(id, v); }
-    }
+    const keep = new Set(presetIds());
+    for (const id of [...V.keys()]) if (keep.has(id) || MODE !== "pe" && !GLOBAL.has(id)) V.delete(id);
+    P.num = null;
+    const num = knownNum ?? (MODE === "pa" && prog != null && lib.pcOffset != null ? prog + lib.pcOffset : null), e = num != null ? libEntry(num) : null;
+    if (num != null) P.num = num;
+    if (e) { P.name = e.name; for (const [id, v] of e.vals) V.set(id, v); }
     render(); syncSoon(30);
   }
   let stepping = false;
@@ -584,10 +587,10 @@
       const name0 = MODE === "pe" ? await L.presetName() : null;
       const changed = async w => { if ((await w) != null) return true; if (MODE !== "pe") return false; const n = await L.presetName(); return n != null && n !== name0; };
       let w = waitProgram(900); await L.press(code);
-      if (await changed(w)) { if (MODE === "pe") presetChanged(null); return; }
+      if (await changed(w)) { if (MODE === "pe") presetChanged(null, await L.get(PRESET_REG())); return; }
       // no preset change: the pedal is probably inside a menu, where ◀ ▶ change pages. BACK, then try once more.
       w = waitProgram(900); await L.press(L.EVT.back); await delay(150); await L.press(code);
-      if (await changed(w)) { if (MODE === "pe") presetChanged(null); return; }
+      if (await changed(w)) { if (MODE === "pe") presetChanged(null, await L.get(PRESET_REG())); return; }
       toast("The pedal didn't change preset. Is it on its preset screen?", "warn", 3500);
     } finally { stepping = false; }
   }
@@ -751,10 +754,11 @@
   async function gotoPreset(n) {
     if (!L.ready) return notConnected(); if (!MODE || walking || stepping) return;
     walking = true; LIB.busy = true; LIB.cancel = false; paintPicker();
+    let landed = null;
     try {
       if (!(await refreshNum())) toast("The pedal didn't change preset. Is it on its preset screen?", "warn", 3500);
-      else await moveTo(n);
-    } finally { walking = false; LIB.busy = false; lastProg = null; presetChanged(null); paintPicker(); }
+      else landed = await moveTo(n);
+    } finally { walking = false; LIB.busy = false; lastProg = null; presetChanged(null, landed); paintPicker(); }
   }
   // Read every preset's name (and, on the Play Acoustic, all its values) by stepping with ▶ until the list comes
   // round to the start, or, on a pedal that stops at its last preset, until the end and then with ◀ from the start
@@ -766,7 +770,7 @@
     const quit = msg => { walking = false; LIB.busy = false; paintPicker(); toast(msg, "warn", 3500); };
     if (!(await refreshNum())) return quit("The pedal didn't change preset. Is it on its preset screen?");
     const start = await L.get(PRESET_REG()); if (start == null) return quit("Couldn't read the preset number");
-    const t0 = performance.now(), known = Object.keys(lib.presets).length || null, seen = new Set(), ids = MODE === "pa" ? readIds().filter(id => CELLS.has(id) && !GLOBAL.has(id)) : [];   // Electric: names only
+    const t0 = performance.now(), known = Object.keys(lib.presets).length || null, seen = new Set(), ids = presetIds();
     let count = 0, cur = start, failed = false;
     const tell = () => {
       const per = count ? (performance.now() - t0) / count : null, left = known && per ? Math.max(0, known - count) * per / 1000 : null;
@@ -813,7 +817,7 @@
     } finally {
       walking = false;
       if (cur !== start && L.ready) { LIB.busy = false; await gotoPreset(start); }   // gotoPreset re-reads at the end
-      else { LIB.busy = false; lastProg = null; presetChanged(null); }
+      else { LIB.busy = false; lastProg = null; presetChanged(null, cur); }
       paintPicker();
       if (failed && !count) toast("The pedal didn't change preset. Is it on its preset screen?", "warn", 3500);
       else toast(LIB.cancel ? `Stopped after ${count} presets` : `Read ${count} presets in ${Math.round((performance.now() - t0) / 1000)} s`, "", 3500);
@@ -825,7 +829,7 @@
     const stale = ents.filter(([n]) => !libEntry(n)).length;
     $("#lib-info").textContent = !pa ? "" : ents.length ? `${ents.length} presets${stale ? ` · ${stale} may be outdated` : ""}${lib.readAt ? " · read " + new Date(lib.readAt).toLocaleDateString() : ""}` : "no presets read yet";
     $("#lib-read").hidden = !pa || LIB.busy;
-    $("#lib-export").hidden = LIB.busy || !ents.some(([, e]) => e.vals && e.vals.length);   // values are kept on the Play Acoustic $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
+    $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;   // shown once presets with values are saved $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
     if (!LIB.busy) $("#lib-status").textContent = ents.length ? "Tap a preset to go to it." : "Read all presets once (about 2 s each) to see every preset here and switch instantly.";
     $("#plist").innerHTML = ents.map(([n, e]) => `<button type="button" class="pitem" data-preset="${n}" ${n === P.num ? 'aria-current="true"' : ""} ${LIB.busy ? "disabled" : ""}>
       <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");

@@ -36,7 +36,7 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
   - **Read all presets** passa por todos os presets uma vez (uns 2 segundos cada) e guarda os valores neste aparelho. O app faz isso **sozinho a cada conexão** (o pedal passa por todos os presets e volta pro que estava; **Stop** na lista interrompe).
   - Depois disso, a lista mostra todos os presets: toque num pra ir direto pra ele. O app aperta as setas do pedal em sequência rápida (e dá a volta pelo fim da lista quando é mais perto), então chegar num preset distante leva um ou dois segundos.
   - O app ainda relê o pedal em seguida, pra confirmar os valores.
-  - Funciona no Play Acoustic e no Play Electric. No Electric a lista guarda só os nomes, e a leitura vai até o último preset e depois volta pelos primeiros (ele não dá a volta no fim da lista).
+  - Funciona no Play Acoustic e no Play Electric. A lista guarda os valores de cada preset (trocar de preset mostra tudo na hora, e o app confirma lendo o pedal em seguida). No Electric a leitura vai até o último preset e depois volta pelos primeiros (ele não dá a volta no fim da lista).
   - Pra chegar num preset, o pedal passa pelos presets do caminho (não existe comando de "ir direto"), então dá pra ouvir a voz mudando rapidinho durante o pulo.
   - Atenção: ler todos os presets troca o preset do pedal, então edições não salvas no preset atual se perdem. O app pergunta antes.
 - **Editar com o Claude** (na lista de presets, tocando no nome do preset):
@@ -44,7 +44,7 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
   2. Cole no Claude (no app do iPad, no celular ou no PC) e peça em português, por exemplo: "deixa esse preset com cara de balada, harmonia mais suave e reverb de igreja".
   3. Copie a resposta inteira do Claude, cole na caixa e toque em **Conferir mudanças**. O app mostra o que vai mudar ("Harmony · STYLE: HIGH → LOW") e ignora o que for inválido.
   4. **Aplicar no pedal** manda as mudanças. Ouça: se gostar, **Salvar**; se não, **Desfazer** volta tudo de uma vez.
-- **Exportar todos os presets** (na lista de presets, Play Acoustic): gera um arquivo `play-presets-play-acoustic-DATA.json` com todos os presets lidos (voz e guitarra). No iPad/celular abre o menu de compartilhar (WhatsApp, Arquivos, e-mail); no computador o arquivo é baixado. Só lê a lista salva, não muda nada no pedal.
+- **Exportar todos os presets** (na lista de presets, nos dois pedais; aparece depois da primeira leitura completa): gera um arquivo `play-presets-play-acoustic-DATA.json` com todos os presets lidos (voz e guitarra). No iPad/celular abre o menu de compartilhar (WhatsApp, Arquivos, e-mail); no computador o arquivo é baixado. Só lê a lista salva, não muda nada no pedal.
 - **Passar a voz de um pedal pro outro (Acoustic ↔ Electric):** no pedal de origem, **Editar com o Claude → Copiar preset para o Claude** e mande o texto (WhatsApp, e-mail…). No outro pedal, abra **Editar com o Claude**, cole o texto na caixa de baixo (não precisa passar pelo Claude), **Conferir mudanças**, **Aplicar no pedal** e **Salvar**. Entre modelos diferentes só os efeitos de voz vêm; os números (como o tempo do reverb) são convertidos pelo valor mostrado no pedal.
 - **EN | PT, ao lado do Save:** troca o idioma do app entre inglês e português. Os nomes dos efeitos, estilos e presets continuam como no pedal. A escolha fica salva neste navegador.
 - **Bolinha verde embaixo, à esquerda:** abre a conexão e o **monitor MIDI**, com tudo o que entra e sai.
