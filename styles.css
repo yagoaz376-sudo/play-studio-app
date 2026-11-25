@@ -851,3 +851,16 @@ body.talking #talk2[aria-pressed="true"] { box-shadow: var(--hl), 0 0 0 2px var(
   .savebtn .sv-ico, .savebtn .sv-ico svg { width: 16px; height: 16px; }
   .favstar { width: 30px; height: 30px; }
 }
+
+/* "Only favorites" as a switch (not the browser's checkbox), same glass family as Save / Favorite */
+.favchk { gap: 10px; height: 36px; padding: 0 14px 0 8px; border-radius: 999px; background: var(--glass); box-shadow: var(--hl), 0 1px 3px rgba(0, 0, 0, .08);
+  color: var(--muted); font-weight: 600; transition: color .2s, background .25s; }
+.favchk:hover { color: var(--text); }
+.favchk input { appearance: none; -webkit-appearance: none; margin: 0; flex: none; width: 36px; height: 22px; border-radius: 999px; cursor: pointer; position: relative;
+  background: color-mix(in srgb, currentColor 22%, transparent); transition: background .25s; }
+.favchk input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3); transition: transform .3s var(--spring, ease); }
+.favchk input:checked { background: var(--gold); }
+.favchk input:checked::after { transform: translateX(14px); }
+.favchk input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.favchk:has(input:checked) { color: var(--text); background: color-mix(in srgb, var(--gold) 14%, var(--glass)); }
