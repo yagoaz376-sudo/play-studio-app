@@ -894,20 +894,41 @@ ${JSON.stringify(data, null, 1)}
     const changes = data && typeof data === "object" ? (data.changes || data.effects || data) : null;
     if (!changes || typeof changes !== "object") { list.innerHTML = `<p class="warnline">No changes found in that text. Paste Claude's whole answer (with the json block).</p>`; return; }
     const idx = claudeIndex(), find = (m, k) => { const K = String(k).trim().toUpperCase(); for (const [n, x] of m) if (n.toUpperCase() === K) return [n, x]; return null; };
+    // A preset copied from the other model (Acoustic ↔ Electric): bring only the vocal effects (the guitar sections
+    // are different hardware), and convert numbers by what the pedal shows (e.g. "2.3 s"), since the raw steps differ.
+    const cross = typeof data.device === "string" && /^Play (Acoustic|Electric)$/.test(data.device) && data.device !== devName();
+    const num = s => {   // "470 ms" → {x: 0.47, unit: "s"}, "−14 dB" → {x: -14, unit: "dB"}
+      const m = String(s).replace("−", "-").match(/-?\d+(?:\.\d+)?/); if (!m) return null;
+      let x = +m[0], unit = String(s).replace(/[-−+\d.\s]/g, "");
+      if (unit === "ms") { x /= 1000; unit = "s"; } else if (unit === "kHz") { x *= 1000; unit = "Hz"; }
+      return { x, unit };
+    };
+    const byShows = (c, shows) => {
+      const want = num(shows); if (!want) return null;
+      let best = null, bd = Infinity;
+      for (let v = c.min; v <= c.max; v++) { const h = num(fmt(c, v)); if (!h || h.unit !== want.unit) continue; const d = Math.abs(h.x - want.x); if (d < bd) { bd = d; best = v; } }
+      return best;
+    };
     const rows = [], bad = [];
+    let skippedGtr = 0;
     for (const [fxName, params] of Object.entries(changes)) {
+      if (cross && /^guitar\b/i.test(fxName)) { skippedGtr++; continue; }
       const fx = find(idx, fxName);
       if (!fx || !params || typeof params !== "object") { bad.push(`${fxName}: not an effect this pedal has (or it isn't editable)`); continue; }
       for (const [pk, want0] of Object.entries(params)) {
         const p = find(fx[1], pk); if (!p) { bad.push(`${fx[0]} · ${pk}: unknown parameter`); continue; }
         const c = p[1], cur = V.get(rid(c)); let want = want0 && typeof want0 === "object" && "value" in want0 ? want0.value : want0, v;
         if (c.values) { const i = c.values.findIndex(s => s.trim().toUpperCase() === String(want).trim().toUpperCase()); if (i < 0) { bad.push(`${fx[0]} · ${p[0]}: "${want}" isn't an option`); continue; } v = c.min + i; }
-        else { v = Number(want); if (!Number.isInteger(v) || v < c.min || v > c.max) { bad.push(`${fx[0]} · ${p[0]}: ${want} is outside ${c.min}…${c.max}`); continue; } }
+        else {
+          v = cross && want0 && typeof want0 === "object" && want0.shows != null ? byShows(c, want0.shows) : Number(want);
+          if (!Number.isInteger(v) || v < c.min || v > c.max) { bad.push(`${fx[0]} · ${p[0]}: ${want} is outside ${c.min}…${c.max}`); continue; }
+        }
         if (v === cur) continue;
         claudePlan.push({ c, v }); rows.push(`<li><span>${esc(fx[0])} · <b>${esc(p[0])}</b></span><span class="mono">${esc(fmt(c, cur))} → <b>${esc(fmt(c, v))}</b></span></li>`);
       }
     }
-    const other = data.preset && P.name && String(data.preset).trim() !== P.name.trim() ? `<p class="warnline">That text was made for "${esc(data.preset)}"; the pedal is now on "${esc(P.name)}".</p>` : "";
+    const other = cross ? `<p class="warnline">Preset from a ${esc(data.device)} ("${esc(data.preset || "")}"): only the vocal effects are brought over.</p>`
+      : data.preset && P.name && String(data.preset).trim() !== P.name.trim() ? `<p class="warnline">That text was made for "${esc(data.preset)}"; the pedal is now on "${esc(P.name)}".</p>` : "";
     list.innerHTML = other + (rows.length ? `<p class="cap-lbl">${rows.length} changes</p><ul class="clist">${rows.join("")}</ul>` : `<p>Nothing to change: the pedal already has these values.</p>`)
       + (bad.length ? `<p class="cap-lbl">Ignored</p><ul class="clist bad">${bad.map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : "");
     $("#claude-apply").hidden = !claudePlan.length;

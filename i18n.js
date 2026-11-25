@@ -143,6 +143,7 @@
     [/^Read (\d+) presets in (\d+) s$/, "Li $1 presets em $2 s"],
     [/^(\d+) changes$/, "$1 mudanças"],
     [/^Applied (\d+) changes\. Listen, then press Save to keep them \(Undo goes back\)\.$/, "Apliquei $1 mudanças. Ouça e aperte Salvar pra guardar (Desfazer volta)."],
+    [/^Preset from a (Play \w+) \("(.*)"\): only the vocal effects are brought over\.$/, 'Preset de um $1 ("$2"): só os efeitos de voz são trazidos.'],
     [/^Applied (\d+) changes: press Save to keep them$/, "Apliquei $1 mudanças: aperte Salvar pra guardar"],
     [/^That text was made for "(.*)"; the pedal is now on "(.*)"\.$/, 'Esse texto foi feito pro preset "$1"; o pedal agora está no "$2".'],
     [/^(.+): not an effect this pedal has \(or it isn't editable\)$/, "$1: efeito que este pedal não tem (ou não é editável)"],
