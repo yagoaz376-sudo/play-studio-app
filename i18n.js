@@ -61,7 +61,7 @@
     "No changes found in that text. Paste Claude's whole answer (with the json block).": "Não achei mudanças nesse texto. Cole a resposta inteira do Claude (com o bloco json).",
     "Nothing to change: the pedal already has these values.": "Nada pra mudar: o pedal já está com esses valores.",
     // presets
-    "Presets": "Presets", "First connection: reading all presets for the list…": "Primeira conexão: lendo todos os presets pra montar a lista…", "Read all presets": "Ler todos os presets", "Stop": "Parar", "Couldn't read the preset number": "Não deu pra ler o número do preset",
+    "Presets": "Presets", "Connected: reading all presets for the list…": "Conectado: lendo todos os presets pra montar a lista…", "Read all presets": "Ler todos os presets", "Stop": "Parar", "Couldn't read the preset number": "Não deu pra ler o número do preset",
     "Reading all presets changes presets on the pedal, so unsaved edits on this preset will be lost. Continue?": "Ler todos os presets troca o preset do pedal, então as edições não salvas deste preset vão se perder. Continuar?",
     "Read all presets needs the preset number, which isn't verified on the Play Electric yet.": "Ler todos os presets precisa do número do preset, que ainda não foi verificado no Play Electric.",
     "The pedal didn't change preset. Is it on its preset screen?": "O pedal não trocou de preset. Ele está na tela de presets?",

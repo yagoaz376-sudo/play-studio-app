@@ -15,7 +15,8 @@
     vals.set(id, c.label === "CONTROL" ? Math.floor(seed(i, k) * (c.max + 1.6)) % (c.max + 1) : Math.round(c.min + seed(i + 3, k) * (c.max - c.min))); }));
   const global = new Map([[0x2A8, 0]]);
   const GLOBAL_IDS = new Set([0x2A8]);
-  const get = id => id === 0x2A4 ? cur + 1 : GLOBAL_IDS.has(id) ? global.get(id) : P[cur].get(id) ?? 0;
+  const get = id => id === 0x2A4 || (PID === 0x71 && id === 0x282) ? cur + 1 :   // PLAY STUDIO: 0x282 = preset number on the Electric
+    GLOBAL_IDS.has(id) ? global.get(id) : P[cur].get(id) ?? 0;
   const set = (id, v) => GLOBAL_IDS.has(id) ? global.set(id, v) : P[cur].set(id, v);
   const enc28 = v => { if (v < 0) v += (1 << 28); return [(v >> 21) & 0x7f, (v >> 14) & 0x7f, (v >> 7) & 0x7f, v & 0x7f]; };
   const dec28 = (p, o) => { let v = (p[o] << 21) | (p[o + 1] << 14) | (p[o + 2] << 7) | p[o + 3]; if (v >= (1 << 27)) v -= (1 << 28); return v; };
@@ -43,7 +44,11 @@
     if (cmd === 0x55 && d[7] === 0x02) { const v = dec28(d, 8);
       if (tunnel) reply([...H, 0x55, ...enc28(v), 0xF7]);
       const e1 = (v >> 8) & 0xFF, e2 = v & 0xFF;
-      if (e2 === 0x00 && (e1 === 0x04 || e1 === 0x05)) { cur = (cur + (e1 === 0x04 ? 1 : NAMES.length - 1)) % NAMES.length; reply([0xC0, cur]); }
+      if (e2 === 0x00 && (e1 === 0x04 || e1 === 0x05)) {
+        // PLAY STUDIO: the Play Electric stops at its first/last preset and sends no Program Change (seen on a real unit)
+        if (PID === 0x71) { const nx = cur + (e1 === 0x04 ? 1 : -1); if (nx >= 0 && nx < NAMES.length) cur = nx; }
+        else { cur = (cur + (e1 === 0x04 ? 1 : NAMES.length - 1)) % NAMES.length; reply([0xC0, cur]); }
+      }
       // PLAY STUDIO: like the hardware, a TAP of HIT toggles HIT and a HOLD (a stream of 02 "held" events) is TALK,
       // which leaves HIT alone. The original toggled HIT on every press, so a TALK hold lit HIT in the simulator.
       if (e1 === 0x0B && e2 === 0x00) { hitHeld = 0; window.simPedal.talk = window.simPedal.talk || false; }
