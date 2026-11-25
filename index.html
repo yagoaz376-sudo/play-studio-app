@@ -27,11 +27,12 @@
     <header class="top">
       <div class="preset">
         <button class="arrow" data-step="-1" aria-label="Previous preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <button type="button" class="preset-info" id="open-picker" title="All presets"><span class="preset-num mono" id="p-num">—</span><span class="preset-name" id="p-name">Not connected</span><span class="edited" id="p-edited" hidden>edited</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button type="button" class="preset-info" id="open-picker" title="All presets"><span class="preset-num mono" id="p-num">—</span><span class="preset-name" id="p-name" translate="no">Not connected</span><span class="edited" id="p-edited" hidden>edited</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
         <button class="arrow" data-step="1" aria-label="Next preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
       <div class="tools">
         <button class="btn save-btn" data-save="1" hidden title="Save this preset on the pedal (presses STORE, then STORE again to confirm)">Save</button>
+        <div class="lang-seg" role="group" aria-label="Language" translate="no"><button type="button" data-lang="en" aria-pressed="true" title="English">EN</button><button type="button" data-lang="pt" aria-pressed="false" title="Português">PT</button></div>
         <button class="icon-btn" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
         <button class="icon-btn" id="theme" title="Light / dark theme" aria-label="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
         <button class="hit" id="hit" aria-pressed="false"><i></i>HIT</button>
@@ -102,7 +103,7 @@
     <section class="view" id="v-palco" hidden>
       <div class="stage-preset">
         <button class="big-arrow" data-step="-1" aria-label="Previous preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <div class="stage-mid"><button type="button" class="stage-name" id="open-picker2" title="All presets"><div class="num mono" id="s-num">—</div><div class="name" id="s-name">Not connected</div></button>
+        <div class="stage-mid"><button type="button" class="stage-name" id="open-picker2" title="All presets"><div class="num mono" id="s-num">—</div><div class="name" id="s-name" translate="no">Not connected</div></button>
           <div class="stage-edit" id="s-edit" hidden><span class="edited">edited</span><button class="btn save-btn" data-save="1" title="Save this preset on the pedal (presses STORE, then STORE again to confirm)">Save</button></div></div>
         <button class="big-arrow" data-step="1" aria-label="Next preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
@@ -152,14 +153,14 @@
   <div class="row-btns"><button class="btn primary" id="drw-connect">Connect / retry</button><button class="btn" id="drw-resync">Re-read pedal</button></div>
   <h2 style="margin-top:4px">MIDI monitor</h2>
   <div class="row-btns"><button class="btn" id="log-pause">Pause</button><button class="btn" id="log-clear">Clear</button><button class="btn" id="log-copy">Copy</button></div>
-  <div class="log" id="log" aria-live="off"></div>
+  <div class="log" id="log" aria-live="off" translate="no"></div>
 </aside>
 <div class="picker" id="picker" hidden role="dialog" aria-modal="true" aria-labelledby="picker-title">
   <div class="picker-card glass">
     <header><h2 id="picker-title">Presets</h2><span class="cap-lbl" id="lib-info"></span><button class="icon-btn" id="pick-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
     <div class="lib-row"><button class="btn primary" id="lib-read">Read all presets</button><button class="btn" id="lib-cancel" hidden>Stop</button><p id="lib-status"></p></div>
     <div class="progress" id="lib-bar" hidden><i></i></div>
-    <div class="plist" id="plist"></div>
+    <div class="plist" id="plist" translate="no"></div>
   </div>
 </div>
 <div class="fxpop" id="fxpop" hidden role="dialog" aria-modal="true" aria-label="Edit effect">
@@ -178,6 +179,7 @@
 <script src="maps/builtin-maps.js"></script>
 <script>if (new URLSearchParams(location.search).has("sim")) document.write('<script src="vendor/sim-pedal.js"><\/script>');</script>
 <script src="vendor/pa-link.js"></script>
+<script src="i18n.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

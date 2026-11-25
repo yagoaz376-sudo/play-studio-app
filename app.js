@@ -14,6 +14,7 @@
   const hex = s => parseInt(s, 16), hx = n => "0x" + n.toString(16).toUpperCase().padStart(3, "0");
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const delay = ms => new Promise(r => setTimeout(r, ms));
+  const tt = s => (window.PSI18N ? window.PSI18N.t(s) : s);   // for text that never reaches the page (confirm dialogs); see i18n.js
   const SIM = new URLSearchParams(location.search).has("sim");
   const store = {
     get(k, d) { try { const v = JSON.parse(localStorage.getItem((SIM ? "ps-sim-" : "ps-") + k)); return v ?? d; } catch { return d; } },
@@ -700,7 +701,7 @@
   // The current preset's unsaved edits are lost (the pedal drops them on any preset change).
   async function readAllPresets() {
     if (!L.ready) return notConnected(); if (MODE !== "pa" || walking || stepping) return;
-    if (P.edited && !confirm("Reading all presets changes presets on the pedal, so unsaved edits on this preset will be lost. Continue?")) return;
+    if (P.edited && !confirm(tt("Reading all presets changes presets on the pedal, so unsaved edits on this preset will be lost. Continue?"))) return;
     const start = await L.get(ID.PRESET); if (start == null) return toast("Couldn't read the preset number", "warn");
     walking = true; LIB.busy = true; LIB.cancel = false; paintPicker();
     const t0 = performance.now(), known = Object.keys(lib.presets).length || null, seen = new Set(), ids = readIds().filter(id => CELLS.has(id) && !GLOBAL.has(id));
@@ -980,7 +981,7 @@
     const row = b.closest(".row[data-id]");
     if (row && b.dataset.act === "confirm") return confirmChange(row);
     if (row && b.dataset.act === "drop") { MAPS.changes.delete(+row.dataset.id); return renderMapper(); }
-    if (row && b.dataset.act === "unmap") { const id = +row.dataset.id; if (!confirm(`Remove ${hx(id)} from the map?`)) return; delete MAPD.entries[id]; MAPD.removed = [...new Set([...(MAPD.removed || []), id])]; saveMap(); if (MODE === "pe") V.delete(id); render(); return renderMapper(); }
+    if (row && b.dataset.act === "unmap") { const id = +row.dataset.id; if (!confirm(tt(`Remove ${hx(id)} from the map?`))) return; delete MAPD.entries[id]; MAPD.removed = [...new Set([...(MAPD.removed || []), id])]; saveMap(); if (MODE === "pe") V.delete(id); render(); return renderMapper(); }
     switch (b.id) {
       case "undo": return undo();
       case "theme": { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; try { localStorage.setItem("ps-theme", r.dataset.theme); } catch {} return; }

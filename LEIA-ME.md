@@ -37,6 +37,7 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
   - O app ainda relê o pedal em seguida, pra confirmar os valores.
   - Por enquanto, só funciona no Play Acoustic.
   - Atenção: ler todos os presets troca o preset do pedal, então edições não salvas no preset atual se perdem. O app pergunta antes.
+- **EN | PT, ao lado do Save:** troca o idioma do app entre inglês e português. Os nomes dos efeitos, estilos e presets continuam como no pedal. A escolha fica salva neste navegador.
 - **Bolinha verde embaixo, à esquerda:** abre a conexão e o **monitor MIDI**, com tudo o que entra e sai.
 
 ## Segurança (já vem embutida)
