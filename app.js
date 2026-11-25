@@ -625,7 +625,8 @@
       }
     } finally { talkSending = false; paintChrome(); }
     if (MODE === "pe" && !peTalkHint) { peTalkHint = true; toast("TALK: holds HIT for 1.3 s (experimental on the Play Electric)"); }
-    if (MODE === "pa" && L.ready) { await delay(300); const v = await L.get(ID.HIT); if (v != null && L.ready) { V.set(ID.HIT, v); paint(); } }   // in case the hold changed HIT
+    const hitId = rid(CELLS.get(ID.HIT));
+    if (hitId != null && L.ready) { await delay(300); const v = await L.get(hitId); if (v != null && L.ready) { V.set(hitId, v); paint(); } }   // in case the hold changed HIT
   }
 
   // ── Pedal view: the pedal's own buttons, knob and footswitches (front-panel event injection, SysEx 55) ──
@@ -705,19 +706,20 @@
   // The app never writes them, but the pedal's own knob (real or from the Pedal view) can. Reading is harmless,
   // so after controls are used the app reads both and shows a red warning while either is in a locking value.
   // (Play Acoustic IDs; on a Play Electric those IDs are unconfirmed, so the guard stays off there.)
-  const MIDI_CTRL = 0x278, MIDI_FILTER = 0x27B;
+  // read only: Acoustic 0x278 / 0x27B, Electric 0x255 / 0x258 (from its firmware; it has no MIDI page on the pedal)
+  const MIDI_CTRL = () => MODE === "pe" ? 0x255 : 0x278, MIDI_FILTER = () => MODE === "pe" ? 0x258 : 0x27B;
   const CTRL_NAMES = ["MERGE", "MIDI", "USB"], FILTER_NAMES = ["NONE", "PRGCHANGE", "SYSEX", "PC+SYSEX"];
   let guardBusy = false;
   async function checkMidiGuard() {
-    if (MODE !== "pa" || !L.ready || guardBusy) return; guardBusy = true;
+    if (!MODE || !L.ready || guardBusy) return; guardBusy = true;
     try {
-      const ctrl = await L.get(MIDI_CTRL), filt = await L.get(MIDI_FILTER);
+      const ctrl = await L.get(MIDI_CTRL()), filt = await L.get(MIDI_FILTER());
       const bad = [];
       if (ctrl === 1) bad.push(`MIDI CTRL is <b>MIDI</b> (set it back to USB or MERGE)`);
       if (filt === 2 || filt === 3) bad.push(`FILTER is <b>${FILTER_NAMES[filt]}</b> (set it back to NONE)`);
       const a = $("#midi-alarm");
       a.hidden = !bad.length;
-      if (bad.length) a.innerHTML = `<b>⚠ USB control will stop working after the pedal is switched off.</b> ${bad.join(" · ")}. Fix it on the pedal (SETUP › MIDI) before turning it off. <span class="cap-lbl">now: CTRL ${CTRL_NAMES[ctrl] ?? "?"} · FILTER ${FILTER_NAMES[filt] ?? "?"}</span>`;
+      if (bad.length) a.innerHTML = `<b>⚠ USB control will stop working after the pedal is switched off.</b> ${bad.join(" · ")}. ${MODE === "pe" ? "The Electric has no MIDI page: a factory reset (hold both arrows while powering up) restores it." : "Fix it on the pedal (SETUP › MIDI) before turning it off."} <span class="cap-lbl">now: CTRL ${CTRL_NAMES[ctrl] ?? "?"} · FILTER ${FILTER_NAMES[filt] ?? "?"}</span>`;
     } finally { guardBusy = false; }
   }
 
@@ -1016,8 +1018,9 @@ ${JSON.stringify(data, null, 1)}
       if (MODE === "pe" && e.e2 === 0x01) syncSoon(400);   // the Electric sends none, so re-read (a new name = new preset)
       return;
     }
-    if (MODE === "pa" && e.e0 === 0xDB && e.e1 === L.EVT.hit) {   // HIT on the unit: only HIT changes
-      clearTimeout(hitT); hitT = setTimeout(async () => { const v = await L.get(ID.HIT); if (v != null) { V.set(ID.HIT, v); paint(); } }, 150); return;
+    const hitId = rid(CELLS.get(ID.HIT));
+    if (hitId != null && e.e0 === 0xDB && e.e1 === L.EVT.hit) {   // HIT on the unit: only HIT changes
+      clearTimeout(hitT); hitT = setTimeout(async () => { const v = await L.get(hitId); if (v != null) { V.set(hitId, v); paint(); } }, 150); return;
     }
     syncSoon(e.e0 === 0xAE ? 500 : 250);   // a knob or another control was used on the pedal itself
     clearTimeout(guardT); guardT = setTimeout(checkMidiGuard, 900);   // …which could have been in SETUP › MIDI
