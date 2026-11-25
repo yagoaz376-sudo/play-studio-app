@@ -4,7 +4,7 @@ Editor para o **TC-Helicon Play Acoustic / Play Electric** pelo cabo USB, sem in
 Baseado no projeto [open-acoustic](https://github.com/michaelbeyhs/open-acoustic): os comandos MIDI, o mapa de menus e as imagens vêm de lá.
 
 ## O que precisa
-- Um PC ou Mac com **Chrome ou Edge**. Safari e navegadores de iPhone/iPad não têm Web MIDI.
+- Um PC ou Mac com **Chrome ou Edge**, um Android com **Chrome** (cabo OTG) ou um iPad/iPhone com o app **MidiWeb** (ative o SysEx nas configurações dele). Safari e os outros navegadores de iPhone/iPad não têm Web MIDI.
 - O pedal ligado no computador pelo cabo **USB**. O Play usa cabo mini-USB.
 - O **VoiceSupport fechado**, porque ele corrompe as mensagens.
 

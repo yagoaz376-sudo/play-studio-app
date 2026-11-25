@@ -1085,7 +1085,7 @@
   loadMap(); render(true); setView(["editor", "mix", "ajustes", "palco", "pedal", "mapa"].includes(view) ? view : "palco"); wirePedalPanel(); renderMapper(); renderDrawer();
   if (SIM) connect(true);
   else if (navigator.permissions && navigator.requestMIDIAccess) navigator.permissions.query({ name: "midi", sysex: true }).then(r => { if (r.state === "granted") connect(true); }).catch(() => {});
-  if (!navigator.requestMIDIAccess) $("#gate-status").textContent = "This browser has no Web MIDI. Use Chrome or Edge (desktop).";
+  if (!navigator.requestMIDIAccess) $("#gate-status").textContent = "This browser has no Web MIDI. Use Chrome or Edge, or the MidiWeb app on iPad / iPhone.";
   window.PlayStudio = { V, P, get MODE() { return MODE; }, MAPS, MAPD: () => MAPD, render, syncAll,
     saveMap: () => { saveMap(); render(true); renderMapper(); } };   // apply a map edited from the console without reloading   // for debugging in the console
 })();
