@@ -374,6 +374,17 @@ body { background: var(--wash), var(--bg); background-attachment: fixed; }
 .picker-card header .icon-btn { margin-left: auto; width: 36px; height: 36px; }
 .lib-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .lib-row p { margin: 0; color: var(--muted); font-size: 13px; flex: 1; min-width: 200px; }
+/* Edit with Claude */
+.claude-card { width: min(680px, 100%); overflow: auto; }
+.claude-card .steps { margin: 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.ctext { width: 100%; box-sizing: border-box; resize: vertical; min-height: 88px; border-radius: 14px; padding: 10px 12px; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--text); background: color-mix(in srgb, currentColor 6%, transparent); border: 1px solid color-mix(in srgb, currentColor 16%, transparent); }
+.ctext:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.claude-list p { margin: 4px 0; font-size: 13px; }
+.claude-list .warnline { color: var(--warn); }
+.clist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.clist li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 10px; border-radius: 10px; font-size: 13px; background: color-mix(in srgb, currentColor 5%, transparent); }
+.clist.bad li { color: var(--muted); }
 .plist { min-height: 0; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; padding: 2px; }
 .pitem { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 14px; text-align: left; background: var(--glass); border: 1px solid var(--stroke-2); }
 .pitem:hover { background: var(--glass-2); }

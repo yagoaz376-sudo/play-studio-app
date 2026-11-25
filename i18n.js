@@ -50,6 +50,16 @@
     "No MIDI ports: connect the pedal by USB": "Nenhuma porta MIDI: ligue o pedal pela USB",
     "No Web MIDI in this browser (iPad: use a Web MIDI browser app)": "Este navegador não tem Web MIDI (iPad: use um app de navegador com Web MIDI)",
     "Connected, but the pedal didn't identify itself: protected mode": "Conectado, mas o pedal não se identificou: modo protegido",
+    // edit with Claude
+    "Edit with Claude": "Editar com o Claude", "Copy this preset, paste it in Claude and say what you want.": "Copie este preset, cole no Claude e diga o que você quer.",
+    "Copy Claude's whole answer and paste it below.": "Copie a resposta inteira do Claude e cole aqui embaixo.",
+    "Check the list of changes, apply, listen. Save keeps them.": "Confira a lista de mudanças, aplique e ouça. O Salvar guarda no preset.",
+    "Copy preset for Claude": "Copiar preset para o Claude", "Paste Claude's answer here": "Cole aqui a resposta do Claude", "Claude's answer": "Resposta do Claude",
+    "Preset text": "Texto do preset", "Review changes": "Conferir mudanças", "Apply to the pedal": "Aplicar no pedal", "Ignored": "Ignorado",
+    "Copied. Paste it in Claude and say what you want.": "Copiado. Cole no Claude e diga o que você quer.",
+    "Select all the text below and copy it.": "Selecione todo o texto abaixo e copie.",
+    "No changes found in that text. Paste Claude's whole answer (with the json block).": "Não achei mudanças nesse texto. Cole a resposta inteira do Claude (com o bloco json).",
+    "Nothing to change: the pedal already has these values.": "Nada pra mudar: o pedal já está com esses valores.",
     // presets
     "Presets": "Presets", "Read all presets": "Ler todos os presets", "Stop": "Parar", "Couldn't read the preset number": "Não deu pra ler o número do preset",
     "Reading all presets changes presets on the pedal, so unsaved edits on this preset will be lost. Continue?": "Ler todos os presets troca o preset do pedal, então as edições não salvas deste preset vão se perder. Continuar?",
@@ -130,6 +140,14 @@
     [/^Stopped after (\d+) presets(.*)$/, "Parei depois de $1 presets$2"],
     [/^(\d+) presets(?: · (\d+) may be outdated)?(?: · read (.+))?$/, (m, n, s, d) => `${n} presets${s ? ` · ${s} podem estar desatualizados` : ""}${d ? ` · lidos em ${d}` : ""}`],
     [/^no presets read yet$/, "nenhum preset lido ainda"],
+    [/^(d+) changes$/, "$1 mudanças"],
+    [/^Applied (d+) changes. Listen, then press Save to keep them (Undo goes back).$/, "Apliquei $1 mudanças. Ouça e aperte Salvar pra guardar (Desfazer volta)."],
+    [/^Applied (d+) changes: press Save to keep them$/, "Apliquei $1 mudanças: aperte Salvar pra guardar"],
+    [/^That text was made for "(.*)"; the pedal is now on "(.*)".$/, 'Esse texto foi feito pro preset "$1"; o pedal agora está no "$2".'],
+    [/^(.+): not an effect this pedal has (or it isn't editable)$/, "$1: efeito que este pedal não tem (ou não é editável)"],
+    [/^(.+): unknown parameter$/, "$1: parâmetro desconhecido"],
+    [/^(.+): "(.*)" isn't an option$/, '$1: "$2" não é uma opção'],
+    [/^(.+): (.+) is outside (.+)…(.+)$/, "$1: $2 está fora de $3…$4"],
   ];
   const KEEP_ONLY = new Set(["Not connected", "Offline"]);   // inside translate="no" (preset names, MIDI log) only these status texts change
 

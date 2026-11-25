@@ -772,6 +772,96 @@
   }
   function openPicker() { if (!L.ready) return notConnected(); $("#picker").hidden = false; paintPicker(); }
 
+  // ── Edit with Claude: copy the preset as text, paste Claude's answer back, review, apply ──
+  // The text lists every parameter of this preset that the app may write, with its current value and the allowed
+  // options/range, so an AI (or a person) can answer with just the changes. Nothing reaches the pedal before the
+  // musician has reviewed the list; every change then goes through setParam (allowlist, range, read-before-write).
+  const devName = () => MODE === "pe" ? "Play Electric" : "Play Acoustic";
+  function claudeIndex() {   // "Vocal Harmony" → { "STYLE": cell, … }; the same order and names for export and import
+    const out = new Map(), seen = new Set();
+    for (const f of fxList()) {
+      const name = (f.side === "voz" ? "Vocal " : "Guitar ") + f.name, cells = new Map();
+      for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) {
+        if (!c || seen.has(hex(c.param))) continue;
+        const id = rid(c); if (id == null || !writable(id) || V.get(id) == null) continue;
+        seen.add(hex(c.param));
+        const base = c === f.style ? "STYLE" : c === f.control ? "CONTROL" : c.label.toUpperCase();   // same words on every effect
+        let k = base, n = 2; while (cells.has(k)) k = base + " " + n++;
+        cells.set(k, c);
+      }
+      if (cells.size) out.set(name, cells);
+    }
+    return out;
+  }
+  function claudeText() {
+    const fx = {};
+    for (const [name, cells] of claudeIndex()) {
+      fx[name] = {};
+      for (const [k, c] of cells) {
+        const v = V.get(rid(c));
+        fx[name][k] = c.values ? { value: c.values[v - c.min], options: c.values } : { value: v, range: [c.min, c.max], shows: fmt(c, v) };
+      }
+    }
+    const data = { device: devName(), preset: P.name || "", number: P.num, effects: fx };
+    return `PLAY STUDIO PRESET — ${devName()}${P.num != null ? " — preset " + P.num : ""} "${P.name || ""}"
+
+You are helping a musician edit this preset of a TC-Helicon ${devName()} (vocal + guitar effects pedal).
+Below is every parameter the editor can change, grouped by effect, with its current value.
+- List parameters: answer with one of the exact names in "options".
+- Number parameters: answer with a whole number inside "range" ("shows" is how the pedal displays the current value; DECAY, TIME and similar values are raw steps, not seconds).
+- CONTROL is the effect's state: OFF, ON or HIT (HIT = on only while the HIT footswitch is active).
+Talk to the musician in their language. Explain your idea briefly, then give ONE json code block with ONLY what should change, for example:
+{"changes": {"Vocal Harmony": {"STYLE": "LOW", "LEVEL": -10}, "Vocal Reverb": {"CONTROL": "ON"}}}
+
+\`\`\`json
+${JSON.stringify(data, null, 1)}
+\`\`\`
+`;
+  }
+  async function claudeCopy() {
+    if (!L.ready) return notConnected();
+    const text = claudeText(), out = $("#claude-out");
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch {}
+    out.value = text; out.hidden = ok;   // no clipboard (some iPad browsers): show it to copy by hand
+    if (!ok) { out.focus(); out.select(); }
+    $("#claude-copied").textContent = ok ? "Copied. Paste it in Claude and say what you want." : "Select all the text below and copy it.";
+  }
+  let claudePlan = [];
+  function claudeReview() {
+    const raw = $("#claude-in").value, list = $("#claude-list"); claudePlan = []; $("#claude-apply").hidden = true;
+    const block = (raw.match(/```(?:json)?\s*([\s\S]*?)```/g) || []).map(b => b.replace(/```(?:json)?/g, "").trim()).reverse().find(b => b.includes("{")) || raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
+    let data; try { data = JSON.parse(block); } catch { list.innerHTML = `<p class="warnline">No changes found in that text. Paste Claude's whole answer (with the json block).</p>`; return; }
+    const changes = data && typeof data === "object" ? (data.changes || data.effects || data) : null;
+    if (!changes || typeof changes !== "object") { list.innerHTML = `<p class="warnline">No changes found in that text. Paste Claude's whole answer (with the json block).</p>`; return; }
+    const idx = claudeIndex(), find = (m, k) => { const K = String(k).trim().toUpperCase(); for (const [n, x] of m) if (n.toUpperCase() === K) return [n, x]; return null; };
+    const rows = [], bad = [];
+    for (const [fxName, params] of Object.entries(changes)) {
+      const fx = find(idx, fxName);
+      if (!fx || !params || typeof params !== "object") { bad.push(`${fxName}: not an effect this pedal has (or it isn't editable)`); continue; }
+      for (const [pk, want0] of Object.entries(params)) {
+        const p = find(fx[1], pk); if (!p) { bad.push(`${fx[0]} · ${pk}: unknown parameter`); continue; }
+        const c = p[1], cur = V.get(rid(c)); let want = want0 && typeof want0 === "object" && "value" in want0 ? want0.value : want0, v;
+        if (c.values) { const i = c.values.findIndex(s => s.trim().toUpperCase() === String(want).trim().toUpperCase()); if (i < 0) { bad.push(`${fx[0]} · ${p[0]}: "${want}" isn't an option`); continue; } v = c.min + i; }
+        else { v = Number(want); if (!Number.isInteger(v) || v < c.min || v > c.max) { bad.push(`${fx[0]} · ${p[0]}: ${want} is outside ${c.min}…${c.max}`); continue; } }
+        if (v === cur) continue;
+        claudePlan.push({ c, v }); rows.push(`<li><span>${esc(fx[0])} · <b>${esc(p[0])}</b></span><span class="mono">${esc(fmt(c, cur))} → <b>${esc(fmt(c, v))}</b></span></li>`);
+      }
+    }
+    const other = data.preset && P.name && String(data.preset).trim() !== P.name.trim() ? `<p class="warnline">That text was made for "${esc(data.preset)}"; the pedal is now on "${esc(P.name)}".</p>` : "";
+    list.innerHTML = other + (rows.length ? `<p class="cap-lbl">${rows.length} changes</p><ul class="clist">${rows.join("")}</ul>` : `<p>Nothing to change: the pedal already has these values.</p>`)
+      + (bad.length ? `<p class="cap-lbl">Ignored</p><ul class="clist bad">${bad.map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : "");
+    $("#claude-apply").hidden = !claudePlan.length;
+  }
+  function claudeApply() {
+    if (!L.ready) return notConnected();
+    for (const { c, v } of claudePlan) setParam(c, v);
+    const n = claudePlan.length; claudePlan = []; $("#claude-apply").hidden = true;
+    $("#claude-list").innerHTML = `<p>Applied ${n} changes. Listen, then press Save to keep them (Undo goes back).</p>`;
+    paint(); toast(`Applied ${n} changes: press Save to keep them`);
+  }
+  function openClaude() { if (!L.ready) return notConnected(); $("#picker").hidden = true; $("#claude").hidden = false; $("#claude-copied").textContent = ""; $("#claude-out").hidden = true; }
+
   // ── link events ─────────────────────────────────────────────────────────
   L.on("ready", () => {
     // Full Acoustic editing only for a pedal that really identified itself as a Play Acoustic.
@@ -994,6 +1084,11 @@
     if (b.dataset.preset != null) return gotoPreset(+b.dataset.preset);
     if (b.id === "open-picker" || b.id === "open-picker2") return openPicker();
     if (b.id === "pick-close") { $("#picker").hidden = true; return; }
+    if (b.id === "claude-open") return openClaude();
+    if (b.id === "claude-close") { $("#claude").hidden = true; return; }
+    if (b.id === "claude-copy") return claudeCopy();
+    if (b.id === "claude-review") return claudeReview();
+    if (b.id === "claude-apply") return claudeApply();
     if (b.id === "pop-close") return closePop();
     if (b.id === "lib-read") return readAllPresets();
     if (b.id === "lib-cancel") { LIB.cancel = true; return; }
@@ -1040,9 +1135,10 @@
   });
   document.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); undo(); }
-    if (e.key === "Escape") { $("#drawer").hidden = true; if (!LIB.busy) $("#picker").hidden = true; if (popKey) closePop(); }
+    if (e.key === "Escape") { $("#drawer").hidden = true; $("#claude").hidden = true; if (!LIB.busy) $("#picker").hidden = true; if (popKey) closePop(); }
   });
   $("#picker").addEventListener("click", e => { if (e.target === e.currentTarget && !LIB.busy) e.currentTarget.hidden = true; });
+  $("#claude").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
   $("#fxpop").addEventListener("click", e => { if (e.target === e.currentTarget) closePop(); });
 
   async function connect(auto = false) {

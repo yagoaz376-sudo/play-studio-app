@@ -38,6 +38,11 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
   - O app ainda relê o pedal em seguida, pra confirmar os valores.
   - Por enquanto, só funciona no Play Acoustic.
   - Atenção: ler todos os presets troca o preset do pedal, então edições não salvas no preset atual se perdem. O app pergunta antes.
+- **Editar com o Claude** (na lista de presets, tocando no nome do preset):
+  1. **Copiar preset para o Claude** copia um texto com todos os parâmetros do preset e as opções válidas.
+  2. Cole no Claude (no app do iPad, no celular ou no PC) e peça em português, por exemplo: "deixa esse preset com cara de balada, harmonia mais suave e reverb de igreja".
+  3. Copie a resposta inteira do Claude, cole na caixa e toque em **Conferir mudanças**. O app mostra o que vai mudar ("Harmony · STYLE: HIGH → LOW") e ignora o que for inválido.
+  4. **Aplicar no pedal** manda as mudanças. Ouça: se gostar, **Salvar**; se não, **Desfazer** volta tudo de uma vez.
 - **EN | PT, ao lado do Save:** troca o idioma do app entre inglês e português. Os nomes dos efeitos, estilos e presets continuam como no pedal. A escolha fica salva neste navegador.
 - **Bolinha verde embaixo, à esquerda:** abre a conexão e o **monitor MIDI**, com tudo o que entra e sai.
 
