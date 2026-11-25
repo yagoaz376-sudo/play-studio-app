@@ -601,7 +601,10 @@
     // The Play Electric sends no Program Change when its preset changes (seen on a real unit, 2026-11-25), so a new
     // preset shows up as a new name here: treat it as a preset change (drop old values, re-read).
     if (MODE === "pe" && !walking && P.name && nm && nm !== P.name) { presetChanged(null); return; }
-    P.name = nm ?? ""; paintChrome();   // "" = no name / no answer
+    P.name = nm ?? "";   // "" = no name / no answer
+    // Electric, number not confirmed yet: show the saved list's number when the name is unique there
+    if (MODE === "pe" && !numOk && nm) { const m = Object.entries(lib.presets).filter(([, e]) => e.name === nm); if (m.length === 1) P.num = +m[0][0]; }
+    paintChrome();
     const got = await L.getBatch(readIds(), { alive, each: (id, v) => { if (!recent(id)) { V.set(id, v); schedulePaint(); } } });
     if (got && alive() && fresh && n != null) libPut(n, P.name, presetVals(), info ? info.fav : null);   // keep it for next time
   }
@@ -628,11 +631,19 @@
     return null;
   })();
   // make the Electric's register trustworthy: one step forward and back (lands on the same preset)
+  // ▶ then ◀ (lands on the same preset); at the end of the list (the Electric doesn't wrap, and a genre such as
+  // Favorites can be short) ▶ can't move, so ◀ then ▶ is tried instead.
   async function refreshNum() {
     if (MODE !== "pe" || numOk) return true;
-    let cur = await L.get(PRESET_REG()); let w = armStep(cur, 2000); await L.press(L.EVT.next); if ((await w) == null) return false;
-    cur = await L.get(PRESET_REG()); w = armStep(cur, 2000); await L.press(L.EVT.prev); if ((await w) == null) return false;
-    numOk = true; return true;
+    const pair = async (a, b) => {
+      let cur = await L.get(PRESET_REG()), w = armStep(cur, 2000); await L.press(a); if ((await w) == null) return false;
+      cur = await L.get(PRESET_REG()); w = armStep(cur, 2000); await L.press(b); return (await w) != null;
+    };
+    for (let attempt = 0; attempt < 2 && L.ready; attempt++) {   // right after connecting the pedal can still be busy: try twice
+      if (await pair(L.EVT.next, L.EVT.prev) || await pair(L.EVT.prev, L.EVT.next)) { numOk = true; return true; }
+      await delay(1200);
+    }
+    return false;
   }
   const waitProgram = ms => new Promise(res => { const off = L.on("program", p => { off(); clearTimeout(t); res(p); }); const t = setTimeout(() => { off(); res(null); }, ms); });
   async function stepPreset(d) {
@@ -826,8 +837,8 @@
   async function readAllPresets() {
     if (!L.ready) return notConnected(); if (!MODE || walking || stepping) return;
     if (P.edited && !confirm(tt("Reading all presets changes presets on the pedal, so unsaved edits on this preset will be lost. Continue?"))) return;
-    walking = true; LIB.busy = true; LIB.cancel = false; paintPicker();
-    const quit = msg => { walking = false; LIB.busy = false; paintPicker(); toast(msg, "warn", 3500); };
+    walking = true; LIB.busy = true; LIB.reading = true; LIB.cancel = false; paintPicker();
+    const quit = msg => { walking = false; LIB.busy = false; LIB.reading = false; paintPicker(); toast(msg, "warn", 3500); };
     if (!(await refreshNum())) return quit("The pedal didn't change preset. Is it on its preset screen?");
     const start = await L.get(PRESET_REG()); if (start == null) return quit("Couldn't read the preset number");
     const t0 = performance.now(), known = Object.keys(lib.presets).length || null, seen = new Set(), ids = presetIds();
@@ -860,10 +871,11 @@
         if (seen.has(r.n)) break;
         if (!(await take(r.n, r.prog))) { failed = true; break; }
       }
-      if (ended && !count) failed = true;   // didn't move at all: not on the preset screen
-      if (ended && count && !LIB.cancel && L.ready) {   // stopped at the last preset: no wrap; read the start and below it with ◀
+      // Stopped at the last preset (no wrap), possibly at once when the start IS the last one (e.g. the last Favorite):
+      // read the start and everything below it with ◀. refreshNum already proved the pedal moves.
+      if (ended && !LIB.cancel && L.ready) {
         lib.wraps = false;
-        cur = await moveTo(start);
+        cur = count ? await moveTo(start) : start;
         if (cur === start && await take(start, null)) {
           for (let i = 0; i < 600 && !LIB.cancel && L.ready; i++) {
             const r = await step(L.EVT.prev);
@@ -872,10 +884,15 @@
           }
         }
       }
-      if (!failed && !LIB.cancel) { lib.readAt = Date.now(); lib.storeAt = Math.min(lib.storeAt, lib.readAt - 1); }
+      if (!failed && !LIB.cancel) {
+        lib.readAt = Date.now(); lib.storeAt = Math.min(lib.storeAt, lib.readAt - 1);
+        // a complete read is the list: drop presets the pedal no longer shows (e.g. another genre)
+        for (const k of Object.keys(lib.presets)) if (!seen.has(+k)) delete lib.presets[k];
+        paintPicker();
+      }
       saveLib();
     } finally {
-      walking = false;
+      walking = false; LIB.reading = false;
       if (cur !== start && L.ready) { LIB.busy = false; await gotoPreset(start); }   // gotoPreset re-reads at the end
       else { LIB.busy = false; lastProg = null; presetChanged(null, cur); }
       paintPicker();
@@ -896,7 +913,12 @@
       if (P.genre != null && document.activeElement !== gs) gs.value = String(P.genre);
       gs.disabled = LIB.busy || P.genre == null;
     }
-    $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;   // shown once presets with values are saved $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
+    $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;   // shown once presets with values are saved
+    $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
+    if (LIB.reading) {   // while reading: one calm "loading" panel; the whole list appears when it's done
+      if (!$("#plist .plist-loading")) $("#plist").innerHTML = `<div class="plist-loading" role="status"><i class="pl-spin" aria-hidden="true"></i><b>Reading the pedal's presets…</b><small>The pedal steps through them; the list appears when it's done.</small></div>`;
+      return;
+    }
     if (!LIB.busy) $("#lib-status").textContent = ents.length ? "Tap a preset to go to it." : "Read all presets once (about 2 s each) to see every preset here and switch instantly.";
     $("#plist").innerHTML = ents.map(([n, e]) => `<button type="button" class="pitem" data-preset="${n}" ${n === P.num ? 'aria-current="true"' : ""} ${LIB.busy ? "disabled" : ""}>
       <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${e.fav ? '<i class="fav" title="Favorite">★</i>' : ""}${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");

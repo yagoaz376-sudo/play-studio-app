@@ -6,7 +6,7 @@
   const PT = {
     // navigation and top bar
     "Stage": "Palco", "Effects": "Efeitos", "Setup": "Ajustes", "Mapper": "Mapeador", "Offline": "Desconectado",
-    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…", "Saved": "Salvo", "Export presets": "Exportar presets", "Favorites only": "Só favoritos", "Cancel": "Cancelar",
+    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…", "Saved": "Salvo", "Reading the pedal's presets…": "Lendo os presets do pedal…", "The pedal steps through them; the list appears when it's done.": "O pedal passa por eles; a lista aparece quando terminar.", "Export presets": "Exportar presets", "Favorites only": "Só favoritos", "Cancel": "Cancelar",
     "A file you can send (WhatsApp, e-mail, Files). Nothing changes on the pedal.": "Um arquivo pra mandar (WhatsApp, e-mail, Arquivos). Nada muda no pedal.",
     "No presets tagged ★ yet": "Nenhum preset marcado com ★ ainda", "Genre": "Gênero", "All presets": "Todos os presets", "★ Favorites": "★ Favoritos",
     "Which presets the pedal shows (its GENRE button)": "Quais presets o pedal mostra (botão GENRE dele)",

@@ -900,3 +900,10 @@ body.talking #talk2[aria-pressed="true"] { box-shadow: var(--hl), 0 0 0 2px var(
 @keyframes sheetin { from { transform: translateY(14px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes sheetfade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sheet, .sheet-bg { animation: none; } }
+
+/* Preset list while reading: one calm panel instead of a list that fills in */
+.plist-loading { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 180px; text-align: center; padding: 24px; }
+.plist-loading b { font-size: 15px; }
+.plist-loading small { font-size: 12.5px; color: var(--muted); max-width: 320px; }
+.pl-spin { width: 30px; height: 30px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--accent) 22%, transparent); border-top-color: var(--accent); animation: svspin .8s linear infinite; margin-bottom: 4px; }
+@media (prefers-reduced-motion: reduce) { .pl-spin { animation-duration: 2s; } }
