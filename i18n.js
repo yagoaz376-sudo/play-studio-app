@@ -6,7 +6,9 @@
   const PT = {
     // navigation and top bar
     "Stage": "Palco", "Effects": "Efeitos", "Setup": "Ajustes", "Mapper": "Mapeador", "Offline": "Desconectado",
-    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…", "Saved": "Salvo", "Genre": "Gênero", "All presets": "Todos os presets", "★ Favorites": "★ Favoritos",
+    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…", "Saved": "Salvo", "Export presets": "Exportar presets", "Favorites only": "Só favoritos", "Cancel": "Cancelar",
+    "A file you can send (WhatsApp, e-mail, Files). Nothing changes on the pedal.": "Um arquivo pra mandar (WhatsApp, e-mail, Arquivos). Nada muda no pedal.",
+    "No presets tagged ★ yet": "Nenhum preset marcado com ★ ainda", "Genre": "Gênero", "All presets": "Todos os presets", "★ Favorites": "★ Favoritos",
     "Which presets the pedal shows (its GENRE button)": "Quais presets o pedal mostra (botão GENRE dele)",
     "No Favorites genre: tag a preset with ★ first": "Sem o gênero Favoritos: marque um preset com ★ primeiro",
     "The pedal didn't change genre. Is it on its preset screen?": "O pedal não mudou o gênero. Ele está na tela de presets?",

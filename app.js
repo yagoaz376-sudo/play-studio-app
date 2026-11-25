@@ -896,8 +896,7 @@
       if (P.genre != null && document.activeElement !== gs) gs.value = String(P.genre);
       gs.disabled = LIB.busy || P.genre == null;
     }
-    $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;
-    $("#lib-favs-wrap").hidden = $("#lib-export").hidden || !ents.some(([, e]) => e.fav === true);   // shown once presets with values are saved $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
+    $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;   // shown once presets with values are saved $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
     if (!LIB.busy) $("#lib-status").textContent = ents.length ? "Tap a preset to go to it." : "Read all presets once (about 2 s each) to see every preset here and switch instantly.";
     $("#plist").innerHTML = ents.map(([n, e]) => `<button type="button" class="pitem" data-preset="${n}" ${n === P.num ? 'aria-current="true"' : ""} ${LIB.busy ? "disabled" : ""}>
       <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${e.fav ? '<i class="fav" title="Favorite">★</i>' : ""}${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");
@@ -1017,8 +1016,15 @@ ${JSON.stringify(data, null, 1)}
   // Same effect / parameter names as "Edit with Claude", so a single preset from it can also be pasted there.
   // Lists are written as their option name, numbers as {value, shows} (shows = what the pedal displays, used to
   // convert between models). Only reads the saved list: nothing is sent to the pedal.
-  async function exportAll() {
-    const favOnly = !!$("#lib-favs")?.checked;
+  // the Export button opens a small sheet: all presets, or Favorites only
+  function openExport() {
+    const ents = Object.values(lib.presets).filter(e => e.vals && e.vals.length), nFav = ents.filter(e => e.fav === true).length;
+    $("#exp-all-n").textContent = `${ents.length} presets`;
+    $("#exp-fav-n").textContent = nFav ? `${nFav} presets` : "No presets tagged ★ yet";
+    $("[data-export='fav']").disabled = !nFav;
+    $("#export-sheet").hidden = false;
+  }
+  async function exportAll(favOnly = false) {
     const ents = Object.entries(lib.presets).map(([n, e]) => [+n, e]).filter(([, e]) => e.vals && e.vals.length && (!favOnly || e.fav === true)).sort((a, b) => a[0] - b[0]);
     if (!ents.length) return toast(favOnly ? "No favorite presets found (tag them with FAVORITE, then read all presets again)" : "Read all presets first", "warn", 4500);
     const fx = fxList();
@@ -1284,7 +1290,8 @@ ${JSON.stringify(data, null, 1)}
     if (b.id === "open-picker" || b.id === "open-picker2") return openPicker();
     if (b.id === "pick-close") { $("#picker").hidden = true; return; }
     if (b.id === "claude-open") return openClaude();
-    if (b.id === "lib-export") return exportAll();
+    if (b.id === "lib-export") return openExport();
+    if (b.dataset.export) { $("#export-sheet").hidden = true; if (b.dataset.export !== "cancel") exportAll(b.dataset.export === "fav"); return; }
     if (b.dataset.fav) return toggleFav();
     if (b.id === "claude-close") { $("#claude").hidden = true; return; }
     if (b.id === "claude-copy") return claudeCopy();
@@ -1336,10 +1343,11 @@ ${JSON.stringify(data, null, 1)}
   });
   document.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); undo(); }
-    if (e.key === "Escape") { $("#drawer").hidden = true; $("#claude").hidden = true; if (!LIB.busy) $("#picker").hidden = true; if (popKey) closePop(); }
+    if (e.key === "Escape") { $("#export-sheet").hidden = true; $("#drawer").hidden = true; $("#claude").hidden = true; if (!LIB.busy) $("#picker").hidden = true; if (popKey) closePop(); }
   });
   $("#picker").addEventListener("click", e => { if (e.target === e.currentTarget && !LIB.busy) e.currentTarget.hidden = true; });
   $("#genre-sel").addEventListener("change", e => { const t = +e.target.value; if (t !== P.genre) setGenre(t); });
+  $("#export-sheet").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
   $("#claude").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
   $("#fxpop").addEventListener("click", e => { if (e.target === e.currentTarget) closePop(); });
 
