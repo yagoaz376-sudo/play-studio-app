@@ -33,8 +33,8 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
 - **Aviso vermelho de MIDI:** depois de usar os controles do pedal, o app confere o MIDI CTRL e o FILTER. Se algum estiver num valor que trava a USB, aparece um aviso pra voltar o valor antes de desligar o pedal.
 - **Mapper:** descobre quais parâmetros o Play Electric usa.
 - **Nome do preset, no topo ou na Stage:** abre a **lista de presets**.
-  - **Read all presets** passa por todos os presets uma vez (uns 2 segundos cada) e guarda os valores neste computador.
-  - Depois disso, a lista mostra todos os presets: toque num pra ir direto pra ele. Trocar de preset também fica instantâneo na tela.
+  - **Read all presets** passa por todos os presets uma vez (uns 2 segundos cada) e guarda os valores neste aparelho. Na **primeira conexão** de um Play Acoustic o app faz isso sozinho; depois a lista fica salva e vai se atualizando conforme você usa.
+  - Depois disso, a lista mostra todos os presets: toque num pra ir direto pra ele. O app aperta as setas do pedal em sequência rápida (e dá a volta pelo fim da lista quando é mais perto), então chegar num preset distante leva um ou dois segundos.
   - O app ainda relê o pedal em seguida, pra confirmar os valores.
   - Por enquanto, só funciona no Play Acoustic.
   - Atenção: ler todos os presets troca o preset do pedal, então edições não salvas no preset atual se perdem. O app pergunta antes.

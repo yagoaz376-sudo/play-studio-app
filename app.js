@@ -489,7 +489,7 @@
   }
 
   // ── reading the pedal ───────────────────────────────────────────────────
-  let gen = 0, paintQ = 0;
+  let gen = 0, paintQ = 0, connN = 0;   // connN: one per connection (gen changes on every re-read)
   const schedulePaint = () => { if (!paintQ) paintQ = requestAnimationFrame(() => { paintQ = 0; render(); }); };
   function readIds() {
     if (MODE === "pe") return [...new Set(paToDev.values())];
@@ -712,7 +712,18 @@
         L.programChange(n - lib.pcOffset); await delay(350); cur = await L.get(ID.PRESET);
         const ok = cur === n; if (lib.pcWorks !== ok) { lib.pcWorks = ok; saveLib(); }
       }
-      let guard = 0;
+      // Fast: press the arrow the whole distance in one burst (no waiting for each preset), then read where the pedal
+      // landed and correct. Going round the end is used when the full list is known and it's shorter.
+      const nums = Object.keys(lib.presets).map(Number), lo = Math.min(...nums), hi = Math.max(...nums), span = hi - lo + 1;
+      const fullList = !!lib.readAt && nums.length === span && n >= lo && n <= hi;
+      for (let round = 0; round < 4 && cur != null && cur !== n && !LIB.cancel && L.ready; round++) {
+        let d = n - cur; if (fullList && Math.abs(d) > span / 2) d = d > 0 ? d - span : d + span;
+        $("#lib-status").textContent = `Going to preset ${n}… (now ${cur})`;
+        const code = d > 0 ? L.EVT.next : L.EVT.prev;
+        for (let i = 0; i < Math.abs(d) && !LIB.cancel && L.ready; i++) { await L.press(code); await delay(70); }
+        await delay(450); cur = await L.get(ID.PRESET);
+      }
+      let guard = 0;   // fallback: one step at a time, each confirmed by the pedal
       while (cur != null && cur !== n && guard++ < 400 && !LIB.cancel && L.ready) {
         $("#lib-status").textContent = `Going to preset ${n}… (now ${cur})`;
         const w = waitProgram(1500); await L.press(n > cur ? L.EVT.next : L.EVT.prev);
@@ -872,6 +883,12 @@ ${JSON.stringify(data, null, 1)}
     MAPS.base.clear(); MAPS.changes.clear(); MAPS.stop = false; MAPS.again = false;
     $("#midi-alarm").hidden = true;
     render(true); syncAll(); checkMidiGuard(); renderMapper(); renderDrawer();
+    // First connection of this Play Acoustic (no preset list yet): read all presets once, so the list is ready.
+    // Later connections use the saved list (kept current as presets are visited); "Read all presets" refreshes it.
+    const conn = ++connN;
+    if (confirmedPA && !Object.keys(lib.presets).length) {
+      setTimeout(() => { if (conn === connN && L.ready && MODE === "pa" && !walking && !stepping && !P.edited) { toast("First connection: reading all presets for the list…", "", 4000); readAllPresets(); } }, 3000);
+    }
     toast(L.pid === 0x71 ? "Connected: Play Electric (protected mode)" : confirmedPA ? "Connected: Play Acoustic" : "Connected, but the pedal didn't identify itself: protected mode", confirmedPA || L.pid === 0x71 ? "" : "warn", 4000);
   });
   L.on("status", () => { $("#gate-status").textContent = L.message; paintChrome(); renderDrawer(); if (!L.ready) { MAPS.stop = true; resetWrites(); $("#midi-alarm").hidden = true; paint(); } });
