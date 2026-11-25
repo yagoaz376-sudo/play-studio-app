@@ -54,6 +54,11 @@
       if (((v >> 16) & 0xFF) === 0xDB && e2 === 0x00 && e1 === 0x01) { if (genreMenu == null) genreMenu = genre; else { genre = genreMenu; genreMenu = null; } return; }
       if (genreMenu != null && ((v >> 16) & 0xFF) === 0xAE) { genreMenu = Math.max(0, Math.min(18, genreMenu + (e2 === 0x01 ? 1 : -1))); return; }
       if (((v >> 16) & 0xFF) === 0xDB && e1 === 0x06 && e2 === 0x00) genreMenu = null;
+      if (((v >> 16) & 0xFF) === 0xAE) {   // PLAY STUDIO: on the preset screen the knob steps presets like the arrows
+        if (PID === 0x71) { const nx = cur + (e2 === 0x01 ? 1 : -1); if (nx >= 0 && nx < NAMES.length) cur = nx; }
+        else { cur = (cur + (e2 === 0x01 ? 1 : NAMES.length - 1)) % NAMES.length; reply([0xC0, cur]); }
+        return;
+      }
       if (((v >> 16) & 0xFF) === 0xDB && e2 === 0x00 && e1 === 0x00) { if (FAV.has(cur)) FAV.delete(cur); else FAV.add(cur); }   // PLAY STUDIO: FAVORITE toggles
       if (e2 === 0x00 && (e1 === 0x04 || e1 === 0x05)) {
         // PLAY STUDIO: the Play Electric stops at its first/last preset and sends no Program Change (seen on a real unit)

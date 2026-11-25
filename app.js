@@ -812,9 +812,14 @@
       let d = ia >= 0 && ib >= 0 ? ib - ia : n - cur;   // the arrows only step through the current genre
       if (roundTrip && !(P.genre > 0) && Math.abs(d) > span / 2) d = d > 0 ? d - span : d + span;
       $("#lib-status").textContent = `Going to preset ${n}… (now ${cur})`;
-      const code = d > 0 ? L.EVT.next : L.EVT.prev;
-      for (let i = 0; i < Math.abs(d) && !LIB.cancel && L.ready; i++) { await L.press(code); await delay(70); }
-      await delay(MODE === "pe" ? 700 : 450); cur = await L.get(PRESET_REG());
+      // The knob steps presets on the preset screen like the arrows, but one event per click, so it can go ~10x
+      // faster (real Electric: 20 presets in ~0.5 s). Inside a menu the knob would change a value, so BACK first.
+      if (round === 0) { await L.press(L.EVT.back); await delay(250); }
+      for (let i = 0; i < Math.abs(d) && !LIB.cancel && L.ready; i++) { L.inject(0xAE, 0x00, d > 0 ? 0x01 : 0x00); await delay(12); }
+      // the number register catches up a moment later: wait until it stops moving
+      let last = null;
+      for (let k = 0; k < 20 && L.ready; k++) { await delay(150); const v = await L.get(PRESET_REG()); if (v != null && v === last) break; last = v; }
+      cur = last;
     }
     let guard = 0;
     while (cur != null && cur !== n && guard++ < 400 && !LIB.cancel && L.ready) {
