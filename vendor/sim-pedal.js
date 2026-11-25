@@ -41,7 +41,12 @@
     if (cmd === 0x22) set(id, dec28(d, 9));
     if (cmd === 0x47) window.simPedal.reads++;
     if (cmd === 0x47) reply([...H, 0x22, d[7], d[8], ...enc28(get(id)), 0xF7]);
-    if (cmd === 0x45) { const n = [...NAMES[cur]].slice(0, 15).map(c => c.charCodeAt(0)); while (n.length < 15) n.push(0); reply([...H, 0x20, 0, 0, 0, 0, ...n, 0, 0, 0, FAV.has(cur) ? 1 : 0, 0, 0xF7]); }   // PLAY STUDIO: favorites (FAVORITE toggles)
+    if (cmd === 0x45) {   // PLAY STUDIO: 45 bank num = that stored preset (0 0 = current); flags: bit 0 Favorite, bit g-1 = genre g
+      const num = (d[7] << 7) | d[8], i = num === 0 ? cur : num - 1;
+      if (i >= 0 && i < NAMES.length) { const n = [...NAMES[i]].slice(0, 15).map(c => c.charCodeAt(0)); while (n.length < 15) n.push(0);
+        const flags = (FAV.has(i) ? 1 : 0) | (1 << (3 + (i % 4)));
+        reply([...H, 0x20, d[7], d[8], 1, 3, ...n, (flags >> 21) & 0x7F, (flags >> 14) & 0x7F, (flags >> 7) & 0x7F, flags & 0x7F, 0, 0xF7]); }
+    }
     if (cmd === 0x55 && d[7] === 0x01) tunnel = true;
     if (cmd === 0x55 && d[7] === 0x02) { const v = dec28(d, 8);
       if (tunnel) reply([...H, 0x55, ...enc28(v), 0xF7]);

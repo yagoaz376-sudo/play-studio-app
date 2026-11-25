@@ -161,10 +161,12 @@
     });
   };
   // PLAY STUDIO: presetInfo also returns the header's flags word (bytes 26-29; bit 0 = Favorite, per docs/SYSEX.md)
-  L.presetInfo = () => queue(async () => {
+  // PLAY STUDIO: n = 0 is the current edit buffer; n = 1… asks for that stored preset (bank n>>7, number n&127),
+  // which the pedal answers without loading it (checked on a real Play Electric: 25 ms each, no reply past the last).
+  L.presetInfo = (n = 0, timeout = 1000) => queue(async () => {
     if (!L.ready) return null;
-    const p = collect(1000, 1, m => m[0] === 0xF0 && m[3] === 0x38 && m[6] === 0x20 && m.length >= 31);
-    L.out.send([...hdr(), 0x45, 0x00, 0x00, 0xF7]);
+    const p = collect(timeout, 1, m => m[0] === 0xF0 && m[3] === 0x38 && m[6] === 0x20 && m.length >= 31);
+    L.out.send([...hdr(), 0x45, (n >> 7) & 0x7F, n & 0x7F, 0xF7]);
     const r = await p; if (!r.length) return null;
     const raw = [...r[0].slice(11, 26)], end = raw.indexOf(0);
     const name = String.fromCharCode(...(end < 0 ? raw : raw.slice(0, end)).filter(c => c >= 0x20 && c < 0x7F)).trim();

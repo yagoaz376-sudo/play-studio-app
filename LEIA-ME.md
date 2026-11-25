@@ -33,10 +33,10 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
 - **Aviso vermelho de MIDI:** depois de usar os controles do pedal, o app confere o MIDI CTRL e o FILTER. Se algum estiver num valor que trava a USB, aparece um aviso pra voltar o valor antes de desligar o pedal.
 - **Mapper:** descobre quais parâmetros o Play Electric usa.
 - **Nome do preset, no topo ou na Stage:** abre a **lista de presets**.
-  - **Read all presets** passa por todos os presets uma vez (uns 2 segundos cada) e guarda os valores neste aparelho. O app faz isso **sozinho a cada conexão** (o pedal passa por todos os presets e volta pro que estava; **Stop** na lista interrompe).
-  - Depois disso, a lista mostra todos os presets: toque num pra ir direto pra ele. O app aperta as setas do pedal em sequência rápida (e dá a volta pelo fim da lista quando é mais perto), então chegar num preset distante leva um ou dois segundos.
+  - **Read all presets** pede ao pedal a lista de presets por número (nome, ★ e gêneros), **sem trocar o preset do pedal** e sem mudar o som: uns 5 segundos pra 178 presets. O app faz isso sozinho a cada conexão.
+  - A lista mostra os presets do **gênero** escolhido no pedal (Todos, ★ Favoritos…). Toque num preset pra ir até ele: o pedal passa pelos presets do caminho com as setas (não existe comando de ir direto).
   - O app ainda relê o pedal em seguida, pra confirmar os valores.
-  - Funciona no Play Acoustic e no Play Electric. A lista guarda os valores de cada preset (trocar de preset mostra tudo na hora, e o app confirma lendo o pedal em seguida). No Electric a leitura vai até o último preset e depois volta pelos primeiros (ele não dá a volta no fim da lista).
+  - Os valores de cada preset (pra mostrar na hora e pra exportar) ficam salvos quando você passa pelo preset. Ao exportar, o app lê antes os valores que faltam, passando só pelos presets exportados.
   - Pra chegar num preset, o pedal passa pelos presets do caminho (não existe comando de "ir direto"), então dá pra ouvir a voz mudando rapidinho durante o pulo.
   - Atenção: ler todos os presets troca o preset do pedal, então edições não salvas no preset atual se perdem. O app pergunta antes.
 - **Editar com o Claude** (na lista de presets, tocando no nome do preset):
