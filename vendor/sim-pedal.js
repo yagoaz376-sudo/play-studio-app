@@ -9,6 +9,7 @@
     "Tight Double", "Church Choir", "Tape Echo", "Robot Tune", "Shimmer Room", "Dry Talk", "Arena", "Bossa Nylon", "Campfire", "Spring Surf"];
   const P = NAMES.map(() => new Map()); let cur = 2;
   const FAV = new Set([0, 3, 6, 9, 12, 15]);   // PLAY STUDIO: simulated favorites
+  let genre = 0, genreMenu = null;              // PLAY STUDIO: GENRE opens, the knob moves, GENRE again picks
   const M = window.PA_MENUS || {}, cells = [];
   for (const m of Object.values(M)) for (const p of m.pages) { if (p.control) cells.push(p.control); for (const c of (p.rows || []).flat()) if (c) cells.push(c); }
   const seed = (i, s) => { let x = (i * 9301 + s * 49297) % 233280; return x / 233280; };
@@ -16,7 +17,7 @@
     vals.set(id, c.label === "CONTROL" ? Math.floor(seed(i, k) * (c.max + 1.6)) % (c.max + 1) : Math.round(c.min + seed(i + 3, k) * (c.max - c.min))); }));
   const global = new Map([[0x2A8, 0]]);
   const GLOBAL_IDS = new Set([0x2A8]);
-  const get = id => id === 0x2A4 || (PID === 0x71 && id === 0x282) ? cur + 1 :   // PLAY STUDIO: 0x282 = preset number on the Electric
+  const get = id => (id === (PID === 0x71 ? 0x283 : 0x2A5)) ? genre : id === 0x2A4 || (PID === 0x71 && id === 0x282) ? cur + 1 :   // PLAY STUDIO: 0x282 = preset number on the Electric
     GLOBAL_IDS.has(id) ? global.get(id) : P[cur].get(id) ?? 0;
   const set = (id, v) => GLOBAL_IDS.has(id) ? global.set(id, v) : P[cur].set(id, v);
   const enc28 = v => { if (v < 0) v += (1 << 28); return [(v >> 21) & 0x7f, (v >> 14) & 0x7f, (v >> 7) & 0x7f, v & 0x7f]; };
@@ -45,6 +46,9 @@
     if (cmd === 0x55 && d[7] === 0x02) { const v = dec28(d, 8);
       if (tunnel) reply([...H, 0x55, ...enc28(v), 0xF7]);
       const e1 = (v >> 8) & 0xFF, e2 = v & 0xFF;
+      if (((v >> 16) & 0xFF) === 0xDB && e2 === 0x00 && e1 === 0x01) { if (genreMenu == null) genreMenu = genre; else { genre = genreMenu; genreMenu = null; } return; }
+      if (genreMenu != null && ((v >> 16) & 0xFF) === 0xAE) { genreMenu = Math.max(0, Math.min(18, genreMenu + (e2 === 0x01 ? 1 : -1))); return; }
+      if (((v >> 16) & 0xFF) === 0xDB && e1 === 0x06 && e2 === 0x00) genreMenu = null;
       if (((v >> 16) & 0xFF) === 0xDB && e2 === 0x00 && e1 === 0x00) { if (FAV.has(cur)) FAV.delete(cur); else FAV.add(cur); }   // PLAY STUDIO: FAVORITE toggles
       if (e2 === 0x00 && (e1 === 0x04 || e1 === 0x05)) {
         // PLAY STUDIO: the Play Electric stops at its first/last preset and sends no Program Change (seen on a real unit)

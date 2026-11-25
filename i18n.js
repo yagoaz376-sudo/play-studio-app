@@ -6,7 +6,10 @@
   const PT = {
     // navigation and top bar
     "Stage": "Palco", "Effects": "Efeitos", "Setup": "Ajustes", "Mapper": "Mapeador", "Offline": "Desconectado",
-    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…", "Saved": "Salvo",
+    "Not connected": "Desconectado", "edited": "editado", "Save": "Salvar", "Saving…": "Salvando…", "Saved": "Salvo", "Genre": "Gênero", "All presets": "Todos os presets", "★ Favorites": "★ Favoritos",
+    "Which presets the pedal shows (its GENRE button)": "Quais presets o pedal mostra (botão GENRE dele)",
+    "No Favorites genre: tag a preset with ★ first": "Sem o gênero Favoritos: marque um preset com ★ primeiro",
+    "The pedal didn't change genre. Is it on its preset screen?": "O pedal não mudou o gênero. Ele está na tela de presets?",
     "Sections": "Seções", "Connection and MIDI monitor": "Conexão e monitor MIDI", "Previous preset": "Preset anterior",
     "All presets": "Todos os presets", "Next preset": "Próximo preset",
     "Save this preset on the pedal (presses STORE, then STORE again to confirm)": "Salvar este preset no pedal (aperta STORE e STORE de novo pra confirmar)",
@@ -144,6 +147,8 @@
     [/^no presets read yet$/, "nenhum preset lido ainda"],
     [/^Read (\d+) presets in (\d+) s$/, "Li $1 presets em $2 s"],
     [/^(\d+) changes$/, "$1 mudanças"],
+    [/^Changing genre to (.+)…$/, (m, g) => "Mudando o gênero pra " + ({ "All presets": "Todos os presets", "★ Favorites": "★ Favoritos" }[g] || g) + "…"],
+    [/^Genre: (.+)\. Reading its presets…$/, (m, g) => "Gênero: " + ({ "All presets": "Todos os presets", "★ Favorites": "★ Favoritos" }[g] || g) + ". Lendo os presets dele…"],
     [/^Exported (\d+) presets$/, "Exportei $1 presets"],
     [/^Exported (\d+) presets \(file saved, also copied\)$/, "Exportei $1 presets (arquivo salvo e também copiado)"],
     [/^Exported (\d+) presets \(file saved\)$/, "Exportei $1 presets (arquivo salvo)"],

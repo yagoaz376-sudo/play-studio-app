@@ -118,7 +118,7 @@
   // ── model: values read from the pedal ───────────────────────────────────
   const V = new Map();                 // device id → value
   const valOf = paId => { const c = CELLS.get(paId); const id = c ? rid(c) : (MODE === "pe" ? null : paId); return id == null ? undefined : V.get(id); };
-  const P = { num: null, name: null, edited: false, fav: null };   // fav: the current preset is a Favorite (from the pedal)
+  const P = { num: null, name: null, edited: false, fav: null, genre: null };   // fav: the current preset is a Favorite (from the pedal)
   const clamp = (c, v) => Math.max(c.min, Math.min(c.max, Math.round(v)));
 
   // ── value formats (same rules as open-acoustic views.js) ────────────────
@@ -187,6 +187,39 @@
   }
   function resetWrites() { clearTimeout(flushT); flushT = 0; pending.clear(); touched.clear(); backIds.clear(); clearTimeout(backT); epoch++; endDrags(); }
   const STRUCT_IDS = new Set([ID.BODYREZ_EDIT, ID.FOOTSWITCH]);
+  // ── Genre: which presets the pedal steps through (its GENRE button). Picking one on the pedal is GENRE, the knob
+  // (one click per genre), GENRE again (checked on a real Play Electric, 2026-11-25); the register then holds the
+  // genre's number. The preset list follows the genre, so it is read again afterwards. ─────────────────────────
+  const GENRE_REG = () => MODE === "pe" ? 0x283 : 0x2A5;
+  const GENRES = () => MODE === "pe"
+    ? ["ALL", "FAVORITE", "SHOWCASE", "SONGS & ARTISTS", "POP", "ROCK", "ALTERNATIVE", "COUNTRY", "HIP HOP/RAP", "EDM", "ECHO", "DOUBLING", "REVERB", "HARMONY", "HARDTUNE", "MEGAPHONE", "EXTREME", "CHARACTER", "BLUES"]   // from its firmware
+    : ((PP[0x2A5] && PP[0x2A5][4]) || ["ALL", "FAVORITE"]);
+  const genreLabel = g => g === "ALL" ? "All presets" : g === "FAVORITE" ? "★ Favorites" : g;
+  async function readGenre() { const g = await L.get(GENRE_REG()); if (g != null) { P.genre = g; paintPicker(); } return g; }
+  async function setGenre(t) {
+    if (!L.ready) return notConnected();
+    if (walking || stepping) { paintPicker(); return toast("Wait: the app is reading the presets", "warn"); }
+    walking = true; LIB.busy = true; paintPicker();
+    let cur = null;
+    try {
+      cur = await L.get(GENRE_REG());
+      for (let round = 0; round < 3 && cur != null && cur !== t && L.ready; round++) {
+        $("#lib-status").textContent = `Changing genre to ${genreLabel(GENRES()[t] || t)}…`;
+        await L.press(L.EVT.back); await delay(350);
+        await L.press(0x01); await delay(600);                     // GENRE: opens the list
+        const d = t - cur;
+        for (let i = 0; i < Math.abs(d); i++) { L.inject(0xAE, 0x00, d > 0 ? 0x01 : 0x00); await delay(300); }
+        await L.press(0x01); await delay(1000);                    // GENRE again: picks it
+        cur = await L.get(GENRE_REG());
+      }
+    } finally { walking = false; LIB.busy = false; }
+    if (cur != null) P.genre = cur;
+    if (cur !== t) { paintPicker(); return toast(GENRES()[t] === "FAVORITE" ? "No Favorites genre: tag a preset with ★ first" : "The pedal didn't change genre. Is it on its preset screen?", "warn", 4500); }
+    toast(`Genre: ${genreLabel(GENRES()[t] || t)}. Reading its presets…`, "", 3500);
+    lib.presets = {}; lib.readAt = 0; saveLib(); presetChanged(null); paintPicker();
+    readAllPresets();
+  }
+
   // ── ★ Favorite: press the pedal's own FAVORITE button (BACK first, so it acts on the preset screen and never on a
   // menu cell), then read the preset header again to show what the pedal now says ─────────────────────────────
   let favBusy = false;
@@ -856,13 +889,20 @@
     const stale = ents.filter(([n]) => !libEntry(n)).length;
     $("#lib-info").textContent = !pa ? "" : ents.length ? `${ents.length} presets${stale ? ` · ${stale} may be outdated` : ""}${lib.readAt ? " · read " + new Date(lib.readAt).toLocaleDateString() : ""}` : "no presets read yet";
     $("#lib-read").hidden = !pa || LIB.busy;
+    const gs = $("#genre-sel");
+    if (gs) {
+      const names = GENRES(), sig = MODE + names.length;
+      if (gs.dataset.sig !== sig) { gs.innerHTML = names.map((g, i) => `<option value="${i}">${esc(genreLabel(g))}</option>`).join(""); gs.dataset.sig = sig; }
+      if (P.genre != null && document.activeElement !== gs) gs.value = String(P.genre);
+      gs.disabled = LIB.busy || P.genre == null;
+    }
     $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;
     $("#lib-favs-wrap").hidden = $("#lib-export").hidden || !ents.some(([, e]) => e.fav === true);   // shown once presets with values are saved $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
     if (!LIB.busy) $("#lib-status").textContent = ents.length ? "Tap a preset to go to it." : "Read all presets once (about 2 s each) to see every preset here and switch instantly.";
     $("#plist").innerHTML = ents.map(([n, e]) => `<button type="button" class="pitem" data-preset="${n}" ${n === P.num ? 'aria-current="true"' : ""} ${LIB.busy ? "disabled" : ""}>
       <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${e.fav ? '<i class="fav" title="Favorite">★</i>' : ""}${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");
   }
-  function openPicker() { if (!L.ready) return notConnected(); $("#picker").hidden = false; paintPicker(); }
+  function openPicker() { if (!L.ready) return notConnected(); $("#picker").hidden = false; paintPicker(); if (!walking) readGenre(); }
 
   // ── Edit with Claude: copy the preset as text, paste Claude's answer back, review, apply ──
   // The text lists every parameter of this preset that the app may write, with its current value and the allowed
@@ -1025,7 +1065,7 @@ ${JSON.stringify(data, null, 1)}
     render(true); syncAll(); checkMidiGuard(); renderMapper(); renderDrawer();
     // Every connection of a Play Acoustic reads all presets, so the list is always current (the user asked for it).
     // It walks the pedal through every preset and comes back; "Stop" in the preset list ends it early.
-    const conn = ++connN;
+    const conn = ++connN; P.genre = null; setTimeout(() => { if (conn === connN && L.ready) readGenre(); }, 1200);
     numOk = MODE === "pa";
     if (confirmedPA || L.pid === 0x71) {
       setTimeout(() => { if (conn === connN && L.ready && !walking && !stepping && !P.edited) { toast("Connected: reading all presets for the list…", "", 4000); readAllPresets(); } }, 3000);
@@ -1299,6 +1339,7 @@ ${JSON.stringify(data, null, 1)}
     if (e.key === "Escape") { $("#drawer").hidden = true; $("#claude").hidden = true; if (!LIB.busy) $("#picker").hidden = true; if (popKey) closePop(); }
   });
   $("#picker").addEventListener("click", e => { if (e.target === e.currentTarget && !LIB.busy) e.currentTarget.hidden = true; });
+  $("#genre-sel").addEventListener("change", e => { const t = +e.target.value; if (t !== P.genre) setGenre(t); });
   $("#claude").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
   $("#fxpop").addEventListener("click", e => { if (e.target === e.currentTarget) closePop(); });
 
