@@ -824,7 +824,8 @@
     const pa = !!MODE, ents = Object.entries(lib.presets).map(([n, e]) => [+n, e]).sort((a, b) => a[0] - b[0]);
     const stale = ents.filter(([n]) => !libEntry(n)).length;
     $("#lib-info").textContent = !pa ? "" : ents.length ? `${ents.length} presets${stale ? ` · ${stale} may be outdated` : ""}${lib.readAt ? " · read " + new Date(lib.readAt).toLocaleDateString() : ""}` : "no presets read yet";
-    $("#lib-read").hidden = !pa || LIB.busy; $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
+    $("#lib-read").hidden = !pa || LIB.busy;
+    $("#lib-export").hidden = LIB.busy || !ents.some(([, e]) => e.vals && e.vals.length);   // values are kept on the Play Acoustic $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
     if (!LIB.busy) $("#lib-status").textContent = ents.length ? "Tap a preset to go to it." : "Read all presets once (about 2 s each) to see every preset here and switch instantly.";
     $("#plist").innerHTML = ents.map(([n, e]) => `<button type="button" class="pitem" data-preset="${n}" ${n === P.num ? 'aria-current="true"' : ""} ${LIB.busy ? "disabled" : ""}>
       <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");
@@ -939,6 +940,43 @@ ${JSON.stringify(data, null, 1)}
     const n = claudePlan.length; claudePlan = []; $("#claude-apply").hidden = true;
     $("#claude-list").innerHTML = `<p>Applied ${n} changes. Listen, then press Save to keep them (Undo goes back).</p>`;
     paint(); toast(`Applied ${n} changes: press Save to keep them`);
+  }
+  // ── Export all presets: every preset in the library (read with "Read all presets") as one JSON file ──
+  // Same effect / parameter names as "Edit with Claude", so a single preset from it can also be pasted there.
+  // Lists are written as their option name, numbers as {value, shows} (shows = what the pedal displays, used to
+  // convert between models). Only reads the saved list: nothing is sent to the pedal.
+  async function exportAll() {
+    const ents = Object.entries(lib.presets).map(([n, e]) => [+n, e]).filter(([, e]) => e.vals && e.vals.length).sort((a, b) => a[0] - b[0]);
+    if (!ents.length) return toast("Read all presets first", "warn");
+    const fx = fxList();
+    const presets = ents.map(([n, e]) => {
+      const vm = new Map(e.vals), effects = {}, seen = new Set();
+      for (const f of fx) {
+        const o = {};
+        for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) {
+          if (!c || seen.has(hex(c.param))) continue;
+          const id = rid(c); if (id == null || !vm.has(id)) continue;
+          seen.add(hex(c.param));
+          const base = c === f.style ? "STYLE" : c === f.control ? "CONTROL" : c.label.toUpperCase();
+          let k = base, i = 2; while (k in o) k = base + " " + i++;
+          const v = vm.get(id); o[k] = c.values ? (c.values[v - c.min] ?? v) : { value: v, shows: fmt(c, v) };
+        }
+        if (Object.keys(o).length) effects[(f.side === "voz" ? "Vocal " : "Guitar ") + f.name] = o;
+      }
+      return { number: n, name: e.name || "", effects };
+    });
+    const day = new Date().toISOString().slice(0, 10);
+    const data = { format: "play-studio-presets", version: 1, device: devName(), exported: new Date().toISOString(), count: presets.length, presets };
+    const text = JSON.stringify(data), fname = `play-presets-${devName().replace(/\s+/g, "-").toLowerCase()}-${day}.json`;
+    const file = new File([text], fname, { type: "application/json" });
+    let copied = false; try { await navigator.clipboard.writeText(text); copied = true; } catch {}
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {   // phones / iPad: share sheet (WhatsApp, Files, e-mail…)
+      try { await navigator.share({ files: [file], title: fname }); toast(`Exported ${presets.length} presets`); return; }
+      catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = fname; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+    toast(copied ? `Exported ${presets.length} presets (file saved, also copied)` : `Exported ${presets.length} presets (file saved)`, "", 4500);
   }
   function openClaude() { if (!L.ready) return notConnected(); $("#picker").hidden = true; $("#claude").hidden = false; $("#claude-copied").textContent = ""; $("#claude-out").hidden = true; }
 
@@ -1172,6 +1210,7 @@ ${JSON.stringify(data, null, 1)}
     if (b.id === "open-picker" || b.id === "open-picker2") return openPicker();
     if (b.id === "pick-close") { $("#picker").hidden = true; return; }
     if (b.id === "claude-open") return openClaude();
+    if (b.id === "lib-export") return exportAll();
     if (b.id === "claude-close") { $("#claude").hidden = true; return; }
     if (b.id === "claude-copy") return claudeCopy();
     if (b.id === "claude-review") return claudeReview();

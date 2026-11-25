@@ -51,7 +51,7 @@
     "No Web MIDI in this browser (iPad: use a Web MIDI browser app)": "Este navegador não tem Web MIDI (iPad: use um app de navegador com Web MIDI)",
     "Connected, but the pedal didn't identify itself: protected mode": "Conectado, mas o pedal não se identificou: modo protegido",
     // edit with Claude
-    "Edit with Claude": "Editar com o Claude", "Copy this preset, paste it in Claude and say what you want.": "Copie este preset, cole no Claude e diga o que você quer.",
+    "Edit with Claude": "Editar com o Claude", "Export all presets": "Exportar todos os presets", "Read all presets first": "Leia todos os presets primeiro","Copy this preset, paste it in Claude and say what you want.": "Copie este preset, cole no Claude e diga o que você quer.",
     "Copy Claude's whole answer and paste it below.": "Copie a resposta inteira do Claude e cole aqui embaixo.",
     "Check the list of changes, apply, listen. Save keeps them.": "Confira a lista de mudanças, aplique e ouça. O Salvar guarda no preset.",
     "Copy preset for Claude": "Copiar preset para o Claude", "Paste Claude's answer here": "Cole aqui a resposta do Claude", "Claude's answer": "Resposta do Claude",
@@ -142,6 +142,9 @@
     [/^no presets read yet$/, "nenhum preset lido ainda"],
     [/^Read (\d+) presets in (\d+) s$/, "Li $1 presets em $2 s"],
     [/^(\d+) changes$/, "$1 mudanças"],
+    [/^Exported (\d+) presets$/, "Exportei $1 presets"],
+    [/^Exported (\d+) presets \(file saved, also copied\)$/, "Exportei $1 presets (arquivo salvo e também copiado)"],
+    [/^Exported (\d+) presets \(file saved\)$/, "Exportei $1 presets (arquivo salvo)"],
     [/^Applied (\d+) changes\. Listen, then press Save to keep them \(Undo goes back\)\.$/, "Apliquei $1 mudanças. Ouça e aperte Salvar pra guardar (Desfazer volta)."],
     [/^Preset from a (Play \w+) \("(.*)"\): only the vocal effects are brought over\.$/, 'Preset de um $1 ("$2"): só os efeitos de voz são trazidos.'],
     [/^Applied (\d+) changes: press Save to keep them$/, "Apliquei $1 mudanças: aperte Salvar pra guardar"],
