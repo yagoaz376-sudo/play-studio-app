@@ -417,8 +417,10 @@
     $("#p-num").textContent = num; $("#s-num").textContent = num; $("#p-num").hidden = !num; $("#s-num").hidden = !num;
     $("#p-name").textContent = name; $("#s-name").textContent = name;
     $("#p-edited").hidden = !P.edited;
-    $("#s-edit").hidden = !(ready && P.edited);
-    for (const b of $$("[data-save]")) { b.hidden = b.closest("#s-edit") ? false : !(ready && P.edited); b.disabled = saving; b.textContent = saving ? "Saving…" : "Save"; }
+    // Save is always there while connected (edits made on the pedal itself aren't seen by the app); it stands out
+    // once something was edited here.
+    $("#s-edit").hidden = !ready; $("#s-edit .edited").hidden = !P.edited;
+    for (const b of $$("[data-save]")) { b.hidden = b.closest("#s-edit") ? false : !ready; b.classList.toggle("quiet", !P.edited); b.disabled = saving; b.textContent = saving ? "Saving…" : "Save"; }
     const hitC = CELLS.get(ID.HIT), hitId = rid(hitC), hv = hitId == null ? undefined : V.get(hitId);
     for (const b of [$("#hit"), $("#hit2")]) if (b) { b.setAttribute("aria-pressed", hv === 1); popOnChange(b, hv == null ? "unk" : String(hv)); b.title = hitId == null ? "Sends a HIT footswitch press (state unknown on this pedal)" : "HIT on / off"; }
     document.body.classList.toggle("talking", ready && talkOn);   // TALK on: everything greys out except TALK
