@@ -8,6 +8,7 @@
   const NAMES = ["Studio Vocal", "Warm Ballad", "Coffee House Duet", "Big Chorus", "Country Slap", "Octave Up", "Radio Verse", "Megaphone",
     "Tight Double", "Church Choir", "Tape Echo", "Robot Tune", "Shimmer Room", "Dry Talk", "Arena", "Bossa Nylon", "Campfire", "Spring Surf"];
   const P = NAMES.map(() => new Map()); let cur = 2;
+  const FAV = new Set([0, 3, 6, 9, 12, 15]);   // PLAY STUDIO: simulated favorites
   const M = window.PA_MENUS || {}, cells = [];
   for (const m of Object.values(M)) for (const p of m.pages) { if (p.control) cells.push(p.control); for (const c of (p.rows || []).flat()) if (c) cells.push(c); }
   const seed = (i, s) => { let x = (i * 9301 + s * 49297) % 233280; return x / 233280; };
@@ -39,11 +40,12 @@
     if (cmd === 0x22) set(id, dec28(d, 9));
     if (cmd === 0x47) window.simPedal.reads++;
     if (cmd === 0x47) reply([...H, 0x22, d[7], d[8], ...enc28(get(id)), 0xF7]);
-    if (cmd === 0x45) { const n = [...NAMES[cur]].map(c => c.charCodeAt(0)); while (n.length < 15) n.push(0); reply([...H, 0x20, 0, 0, 0, 0, ...n, 0, 0, 0, cur % 3 === 0 ? 1 : 0, 0, 0xF7]); }   // PLAY STUDIO: every 3rd preset is a Favorite
+    if (cmd === 0x45) { const n = [...NAMES[cur]].slice(0, 15).map(c => c.charCodeAt(0)); while (n.length < 15) n.push(0); reply([...H, 0x20, 0, 0, 0, 0, ...n, 0, 0, 0, FAV.has(cur) ? 1 : 0, 0, 0xF7]); }   // PLAY STUDIO: favorites (FAVORITE toggles)
     if (cmd === 0x55 && d[7] === 0x01) tunnel = true;
     if (cmd === 0x55 && d[7] === 0x02) { const v = dec28(d, 8);
       if (tunnel) reply([...H, 0x55, ...enc28(v), 0xF7]);
       const e1 = (v >> 8) & 0xFF, e2 = v & 0xFF;
+      if (((v >> 16) & 0xFF) === 0xDB && e2 === 0x00 && e1 === 0x00) { if (FAV.has(cur)) FAV.delete(cur); else FAV.add(cur); }   // PLAY STUDIO: FAVORITE toggles
       if (e2 === 0x00 && (e1 === 0x04 || e1 === 0x05)) {
         // PLAY STUDIO: the Play Electric stops at its first/last preset and sends no Program Change (seen on a real unit)
         if (PID === 0x71) { const nx = cur + (e1 === 0x04 ? 1 : -1); if (nx >= 0 && nx < NAMES.length) cur = nx; }

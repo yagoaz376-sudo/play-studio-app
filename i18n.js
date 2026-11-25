@@ -51,7 +51,7 @@
     "No Web MIDI in this browser (iPad: use a Web MIDI browser app)": "Este navegador não tem Web MIDI (iPad: use um app de navegador com Web MIDI)",
     "Connected, but the pedal didn't identify itself: protected mode": "Conectado, mas o pedal não se identificou: modo protegido",
     // edit with Claude
-    "Edit with Claude": "Editar com o Claude", "Export all presets": "Exportar todos os presets", "Only favorites ★": "Só favoritos ★", "Favorite": "Favorito",
+    "Edit with Claude": "Editar com o Claude", "Export all presets": "Exportar todos os presets", "Only favorites ★": "Só favoritos ★", "Favorite (presses the pedal's FAVORITE button)": "Favorito (aperta o botão FAVORITE do pedal)", "★ Added to favorites": "★ Adicionado aos favoritos", "Wait: the app is reading the presets": "Espere: o app está lendo os presets", "Removed from favorites": "Tirado dos favoritos", "The pedal didn't confirm the change: check FAV on its screen": "O pedal não confirmou a mudança: confira o FAV na tela dele", "Favorite": "Favorito",
     "No favorite presets found (tag them with FAVORITE, then read all presets again)": "Nenhum preset favorito encontrado (marque com FAVORITE e leia todos os presets de novo)", "Read all presets first": "Leia todos os presets primeiro","Copy this preset, paste it in Claude and say what you want.": "Copie este preset, cole no Claude e diga o que você quer.",
     "Copy Claude's whole answer and paste it below.": "Copie a resposta inteira do Claude e cole aqui embaixo.",
     "Check the list of changes, apply, listen. Save keeps them.": "Confira a lista de mudanças, aplique e ouça. O Salvar guarda no preset.",

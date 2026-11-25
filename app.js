@@ -118,7 +118,7 @@
   // ── model: values read from the pedal ───────────────────────────────────
   const V = new Map();                 // device id → value
   const valOf = paId => { const c = CELLS.get(paId); const id = c ? rid(c) : (MODE === "pe" ? null : paId); return id == null ? undefined : V.get(id); };
-  const P = { num: null, name: null, edited: false };
+  const P = { num: null, name: null, edited: false, fav: null };   // fav: the current preset is a Favorite (from the pedal)
   const clamp = (c, v) => Math.max(c.min, Math.min(c.max, Math.round(v)));
 
   // ── value formats (same rules as open-acoustic views.js) ────────────────
@@ -187,6 +187,25 @@
   }
   function resetWrites() { clearTimeout(flushT); flushT = 0; pending.clear(); touched.clear(); backIds.clear(); clearTimeout(backT); epoch++; endDrags(); }
   const STRUCT_IDS = new Set([ID.BODYREZ_EDIT, ID.FOOTSWITCH]);
+  // ── ★ Favorite: press the pedal's own FAVORITE button (BACK first, so it acts on the preset screen and never on a
+  // menu cell), then read the preset header again to show what the pedal now says ─────────────────────────────
+  let favBusy = false;
+  async function toggleFav() {
+    if (!L.ready) return notConnected(); if (favBusy || stepping) return;
+    if (walking) return toast("Wait: the app is reading the presets", "warn");
+    favBusy = true; paintChrome();
+    try {
+      const was = P.fav;
+      await L.press(L.EVT.back); await delay(250);
+      await L.press(0x00); await delay(450);
+      const info = await L.presetInfo(); if (!info) return;
+      P.fav = info.fav;
+      if (P.num != null && lib.presets[P.num]) { lib.presets[P.num].fav = info.fav; saveLib(); paintPicker(); }
+      if (was != null && info.fav === was) toast("The pedal didn't confirm the change: check FAV on its screen", "warn", 4000);
+      else toast(info.fav ? "★ Added to favorites" : "Removed from favorites");
+    } finally { favBusy = false; paintChrome(); }
+  }
+
   // ── tap tempo (Stage) ───────────────────────────────────────────────────
   // One TEMPO per preset (45–300 BPM) drives every tempo-synced effect (vocal and guitar delay). The average of the
   // last taps sets it; a pause of more than 2 s starts a new count.
@@ -441,6 +460,7 @@
     // Save is always there while connected (edits made on the pedal itself aren't seen by the app); it stands out
     // once something was edited here.
     $("#s-edit").hidden = !ready; $("#s-edit .edited").hidden = !P.edited;
+    for (const b of $$("[data-fav]")) { b.hidden = !ready || P.name == null; b.setAttribute("aria-pressed", String(P.fav === true)); b.classList.toggle("busy", favBusy); }
     for (const b of $$("[data-save]")) { b.hidden = b.closest("#s-edit") ? false : !ready; b.classList.toggle("quiet", !P.edited); b.disabled = saving; b.textContent = saving ? "Saving…" : "Save"; }
     const hitC = CELLS.get(ID.HIT), hitId = rid(hitC), hv = hitId == null ? undefined : V.get(hitId);
     for (const b of [$("#hit"), $("#hit2")]) if (b) { b.setAttribute("aria-pressed", hv === 1); popOnChange(b, hv == null ? "unk" : String(hv)); b.title = hitId == null ? "Sends a HIT footswitch press (state unknown on this pedal)" : "HIT on / off"; }
@@ -542,7 +562,7 @@
       if (MODE === "pa" && lastProg != null && lib.pcOffset !== n - lastProg) { lib.pcOffset = n - lastProg; saveLib(); }
     }
     lastProg = null;
-    const info = await L.presetInfo(); if (!alive()) return; const nm = info ? info.name : null;
+    const info = await L.presetInfo(); if (!alive()) return; const nm = info ? info.name : null; if (info) P.fav = info.fav;
     // The Play Electric sends no Program Change when its preset changes (seen on a real unit, 2026-11-25), so a new
     // preset shows up as a new name here: treat it as a preset change (drop old values, re-read).
     if (MODE === "pe" && !walking && P.name && nm && nm !== P.name) { presetChanged(null); return; }
@@ -561,6 +581,7 @@
     P.num = null;
     const num = knownNum ?? (MODE === "pa" && prog != null && lib.pcOffset != null ? prog + lib.pcOffset : null), e = num != null ? libEntry(num) : null;
     if (num != null) P.num = num;
+    P.fav = e ? e.fav : null;
     if (e) { P.name = e.name; for (const [id, v] of e.vals) V.set(id, v); }
     render(); syncSoon(30);
   }
@@ -1220,6 +1241,7 @@ ${JSON.stringify(data, null, 1)}
     if (b.id === "pick-close") { $("#picker").hidden = true; return; }
     if (b.id === "claude-open") return openClaude();
     if (b.id === "lib-export") return exportAll();
+    if (b.dataset.fav) return toggleFav();
     if (b.id === "claude-close") { $("#claude").hidden = true; return; }
     if (b.id === "claude-copy") return claudeCopy();
     if (b.id === "claude-review") return claudeReview();

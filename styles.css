@@ -374,6 +374,15 @@ body { background: var(--wash), var(--bg); background-attachment: fixed; }
 .picker-card header .icon-btn { margin-left: auto; width: 36px; height: 36px; }
 .lib-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .lib-row p { margin: 0; color: var(--muted); font-size: 13px; flex: 1; min-width: 200px; }
+/* ★ favorite toggle (top bar and Stage) */
+.favstar { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 0; cursor: pointer;
+  background: color-mix(in srgb, currentColor 7%, transparent); color: var(--faint); transition: color .2s, background .2s, transform .2s; }
+.favstar svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.favstar[aria-pressed="true"] { color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); }
+.favstar[aria-pressed="true"] svg { fill: currentColor; }
+.favstar:active { transform: scale(.9); }
+.favstar.busy { opacity: .5; }
+.favstar[hidden] { display: none; }
 /* favorites in the preset list + export option */
 .pitem .fav { font-style: normal; color: var(--warn); margin-left: auto; padding-left: 6px; }
 .favchk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; user-select: none; }
