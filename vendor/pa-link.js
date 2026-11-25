@@ -160,14 +160,18 @@
       return alive() ? out : null;
     });
   };
-  L.presetName = () => queue(async () => {
+  // PLAY STUDIO: presetInfo also returns the header's flags word (bytes 26-29; bit 0 = Favorite, per docs/SYSEX.md)
+  L.presetInfo = () => queue(async () => {
     if (!L.ready) return null;
     const p = collect(1000, 1, m => m[0] === 0xF0 && m[3] === 0x38 && m[6] === 0x20 && m.length >= 31);
     L.out.send([...hdr(), 0x45, 0x00, 0x00, 0xF7]);
     const r = await p; if (!r.length) return null;
     const raw = [...r[0].slice(11, 26)], end = raw.indexOf(0);
-    return String.fromCharCode(...(end < 0 ? raw : raw.slice(0, end)).filter(c => c >= 0x20 && c < 0x7F)).trim();
+    const name = String.fromCharCode(...(end < 0 ? raw : raw.slice(0, end)).filter(c => c >= 0x20 && c < 0x7F)).trim();
+    const flags = dec28(r[0], 26);
+    return { name, flags, fav: (flags & 1) === 1 };
   });
+  L.presetName = async () => { const i = await L.presetInfo(); return i ? i.name : null; };
   // Panel events, as if a control on the unit was used. Our own echoes are flagged self:true on the "panel" event.
   L.inject = (e0, e1, e2) => {
     if (!L.ready) return false;

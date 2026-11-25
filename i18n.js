@@ -51,7 +51,8 @@
     "No Web MIDI in this browser (iPad: use a Web MIDI browser app)": "Este navegador não tem Web MIDI (iPad: use um app de navegador com Web MIDI)",
     "Connected, but the pedal didn't identify itself: protected mode": "Conectado, mas o pedal não se identificou: modo protegido",
     // edit with Claude
-    "Edit with Claude": "Editar com o Claude", "Export all presets": "Exportar todos os presets", "Read all presets first": "Leia todos os presets primeiro","Copy this preset, paste it in Claude and say what you want.": "Copie este preset, cole no Claude e diga o que você quer.",
+    "Edit with Claude": "Editar com o Claude", "Export all presets": "Exportar todos os presets", "Only favorites ★": "Só favoritos ★", "Favorite": "Favorito",
+    "No favorite presets found (tag them with FAVORITE, then read all presets again)": "Nenhum preset favorito encontrado (marque com FAVORITE e leia todos os presets de novo)", "Read all presets first": "Leia todos os presets primeiro","Copy this preset, paste it in Claude and say what you want.": "Copie este preset, cole no Claude e diga o que você quer.",
     "Copy Claude's whole answer and paste it below.": "Copie a resposta inteira do Claude e cole aqui embaixo.",
     "Check the list of changes, apply, listen. Save keeps them.": "Confira a lista de mudanças, aplique e ouça. O Salvar guarda no preset.",
     "Copy preset for Claude": "Copiar preset para o Claude", "Paste Claude's answer here": "Cole aqui a resposta do Claude", "Claude's answer": "Resposta do Claude",
@@ -126,7 +127,7 @@
     [/^(\d+) not mapped$/, "$1 sem mapa"],
     [/^(.+): tap = on\/off · hold = edit$/, "$1: toque = liga/desliga · segure = editar"],
     [/^Going to preset (.+)… \(now (.+)\)$/, "Indo para o preset $1… (agora $2)"],
-    [/^Reading presets…(.*)$/, "Lendo presets…$1"],
+    [/^Reading presets…(.*)$/, (m, rest) => "Lendo presets…" + rest.replace(/ left$/, " restantes")],
     [/^Reading (\S+) of (\S+)… (\d+) answered · ~(\d+) s left$/, "Lendo $1 de $2… $3 responderam · ~$4 s restantes"],
     [/^Read (\d+) parameters\. Now change one thing on the pedal\.$/, "Li $1 parâmetros. Agora mude uma coisa no pedal."],
     [/^Imported (\d+) parameters$/, "Importei $1 parâmetros"],

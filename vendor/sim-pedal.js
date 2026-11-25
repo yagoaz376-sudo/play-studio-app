@@ -39,7 +39,7 @@
     if (cmd === 0x22) set(id, dec28(d, 9));
     if (cmd === 0x47) window.simPedal.reads++;
     if (cmd === 0x47) reply([...H, 0x22, d[7], d[8], ...enc28(get(id)), 0xF7]);
-    if (cmd === 0x45) { const n = [...NAMES[cur]].map(c => c.charCodeAt(0)); while (n.length < 15) n.push(0); reply([...H, 0x20, 0, 0, 0, 0, ...n, 0, 0, 0, 0, 0, 0xF7]); }
+    if (cmd === 0x45) { const n = [...NAMES[cur]].map(c => c.charCodeAt(0)); while (n.length < 15) n.push(0); reply([...H, 0x20, 0, 0, 0, 0, ...n, 0, 0, 0, cur % 3 === 0 ? 1 : 0, 0, 0xF7]); }   // PLAY STUDIO: every 3rd preset is a Favorite
     if (cmd === 0x55 && d[7] === 0x01) tunnel = true;
     if (cmd === 0x55 && d[7] === 0x02) { const v = dec28(d, 8);
       if (tunnel) reply([...H, 0x55, ...enc28(v), 0xF7]);

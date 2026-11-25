@@ -510,7 +510,7 @@
     for (const [k, e] of Object.entries(raw.presets)) {
       const n = Number(k);
       if (!Number.isInteger(n) || n < 0 || n > 65535 || !e || !Array.isArray(e.vals)) continue;
-      lib.presets[n] = { name: typeof e.name === "string" ? e.name.slice(0, 15) : "", t: Number(e.t) || 0,
+      lib.presets[n] = { name: typeof e.name === "string" ? e.name.slice(0, 15) : "", t: Number(e.t) || 0, fav: typeof e.fav === "boolean" ? e.fav : null,
         vals: e.vals.filter(p => Array.isArray(p) && Number.isInteger(p[0]) && Number.isInteger(p[1]) && okIds.has(p[0])) };
     }
     lib.storeAt = Number(raw.storeAt) || 0; lib.readAt = Number(raw.readAt) || 0;
@@ -523,7 +523,7 @@
   const presetIds = () => MODE === "pe" ? [...new Set([...paToDev].filter(([pa]) => !GLOBAL.has(pa)).map(([, dev]) => dev))]
     : [...CELLS.keys()].filter(id => !GLOBAL.has(id) && id <= MAX_ID);
   const presetVals = () => presetIds().filter(id => V.has(id)).map(id => [id, V.get(id)]);
-  function libPut(n, name, vals) { lib.presets[n] = { name: name || "", t: Date.now(), vals }; saveLib(); paintPicker(); }
+  function libPut(n, name, vals, fav = null) { const old = lib.presets[n]; lib.presets[n] = { name: name || "", t: Date.now(), vals, fav: fav ?? old?.fav ?? null }; saveLib(); paintPicker(); }
 
   // fresh = the pedal just loaded a preset and nothing was edited since: what we read is the stored preset
   let fresh = false, lastProg = null, walking = false;
@@ -542,13 +542,13 @@
       if (MODE === "pa" && lastProg != null && lib.pcOffset !== n - lastProg) { lib.pcOffset = n - lastProg; saveLib(); }
     }
     lastProg = null;
-    const nm = await L.presetName(); if (!alive()) return;
+    const info = await L.presetInfo(); if (!alive()) return; const nm = info ? info.name : null;
     // The Play Electric sends no Program Change when its preset changes (seen on a real unit, 2026-11-25), so a new
     // preset shows up as a new name here: treat it as a preset change (drop old values, re-read).
     if (MODE === "pe" && !walking && P.name && nm && nm !== P.name) { presetChanged(null); return; }
     P.name = nm ?? ""; paintChrome();   // "" = no name / no answer
     const got = await L.getBatch(readIds(), { alive, each: (id, v) => { if (!recent(id)) { V.set(id, v); schedulePaint(); } } });
-    if (got && alive() && fresh && n != null) libPut(n, P.name, presetVals());   // keep it for next time
+    if (got && alive() && fresh && n != null) libPut(n, P.name, presetVals(), info ? info.fav : null);   // keep it for next time
   }
   let syncT = 0; const syncSoon = ms => { clearTimeout(syncT); syncT = setTimeout(syncAll, ms); };
   // a preset change on the pedal: show it from the library if we have it, else "··"; then read it from the pedal
@@ -787,10 +787,10 @@
     const take = async (n, prog) => {   // read the preset the pedal is on now
       seen.add(n); cur = n;
       if (MODE === "pa" && prog != null && lib.pcOffset !== n - prog) lib.pcOffset = n - prog;   // Program Change number → preset number
-      const name = await L.presetName(), vals = [];
+      const info = await L.presetInfo(), name = info ? info.name : null, vals = [];
       const got = ids.length ? await L.getBatch(ids, { alive: () => !LIB.cancel && L.ready, each: (id, v) => vals.push([id, v]) }) : {};
       if (!got) return false;
-      libPut(n, name ?? "", vals); count++; tell(); return true;
+      libPut(n, name ?? "", vals, info ? info.fav : null); count++; tell(); return true;
     };
     try {
       tell();
@@ -831,10 +831,11 @@
     const stale = ents.filter(([n]) => !libEntry(n)).length;
     $("#lib-info").textContent = !pa ? "" : ents.length ? `${ents.length} presets${stale ? ` · ${stale} may be outdated` : ""}${lib.readAt ? " · read " + new Date(lib.readAt).toLocaleDateString() : ""}` : "no presets read yet";
     $("#lib-read").hidden = !pa || LIB.busy;
-    $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;   // shown once presets with values are saved $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
+    $("#lib-export").hidden = !ents.some(([, e]) => e.vals && e.vals.length); $("#lib-export").disabled = LIB.busy;
+    $("#lib-favs-wrap").hidden = $("#lib-export").hidden || !ents.some(([, e]) => e.fav === true);   // shown once presets with values are saved $("#lib-cancel").hidden = !LIB.busy; if (!LIB.busy) $("#lib-bar").hidden = true; $("#pick-close").hidden = LIB.busy;
     if (!LIB.busy) $("#lib-status").textContent = ents.length ? "Tap a preset to go to it." : "Read all presets once (about 2 s each) to see every preset here and switch instantly.";
     $("#plist").innerHTML = ents.map(([n, e]) => `<button type="button" class="pitem" data-preset="${n}" ${n === P.num ? 'aria-current="true"' : ""} ${LIB.busy ? "disabled" : ""}>
-      <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");
+      <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${e.fav ? '<i class="fav" title="Favorite">★</i>' : ""}${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");
   }
   function openPicker() { if (!L.ready) return notConnected(); $("#picker").hidden = false; paintPicker(); }
 
@@ -952,8 +953,9 @@ ${JSON.stringify(data, null, 1)}
   // Lists are written as their option name, numbers as {value, shows} (shows = what the pedal displays, used to
   // convert between models). Only reads the saved list: nothing is sent to the pedal.
   async function exportAll() {
-    const ents = Object.entries(lib.presets).map(([n, e]) => [+n, e]).filter(([, e]) => e.vals && e.vals.length).sort((a, b) => a[0] - b[0]);
-    if (!ents.length) return toast("Read all presets first", "warn");
+    const favOnly = !!$("#lib-favs")?.checked;
+    const ents = Object.entries(lib.presets).map(([n, e]) => [+n, e]).filter(([, e]) => e.vals && e.vals.length && (!favOnly || e.fav === true)).sort((a, b) => a[0] - b[0]);
+    if (!ents.length) return toast(favOnly ? "No favorite presets found (tag them with FAVORITE, then read all presets again)" : "Read all presets first", "warn", 4500);
     const fx = fxList();
     const presets = ents.map(([n, e]) => {
       const vm = new Map(e.vals), effects = {}, seen = new Set();
@@ -969,11 +971,11 @@ ${JSON.stringify(data, null, 1)}
         }
         if (Object.keys(o).length) effects[(f.side === "voz" ? "Vocal " : "Guitar ") + f.name] = o;
       }
-      return { number: n, name: e.name || "", effects };
+      return { number: n, name: e.name || "", favorite: e.fav === true, effects };
     });
     const day = new Date().toISOString().slice(0, 10);
-    const data = { format: "play-studio-presets", version: 1, device: devName(), exported: new Date().toISOString(), count: presets.length, presets };
-    const text = JSON.stringify(data), fname = `play-presets-${devName().replace(/\s+/g, "-").toLowerCase()}-${day}.json`;
+    const data = { format: "play-studio-presets", version: 1, device: devName(), exported: new Date().toISOString(), favoritesOnly: favOnly, count: presets.length, presets };
+    const text = JSON.stringify(data), fname = `play-presets-${devName().replace(/\s+/g, "-").toLowerCase()}${favOnly ? "-favorites" : ""}-${day}.json`;
     const file = new File([text], fname, { type: "application/json" });
     let copied = false; try { await navigator.clipboard.writeText(text); copied = true; } catch {}
     if (navigator.canShare && navigator.canShare({ files: [file] })) {   // phones / iPad: share sheet (WhatsApp, Files, e-mail…)
