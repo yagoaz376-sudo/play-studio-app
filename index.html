@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Play Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-view="palco">
+<div class="app">
+  <aside class="rail">
+    <div class="logo" title="Play Studio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 14v-4M8 18V6M12 15V9M16 20V4M20 14v-4"/></svg></div>
+    <nav aria-label="Sections">
+      <button data-view="palco" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Stage</button>
+      <button data-view="editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="5" height="12" rx="1.5"/><rect x="10" y="6" width="5" height="12" rx="1.5"/><rect x="17" y="6" width="4" height="12" rx="1.5"/></svg>Effects</button>
+      <button data-view="mix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4v16M12 4v16M18 4v16"/><rect x="4" y="13" width="4" height="3" rx="1"/><rect x="10" y="7" width="4" height="3" rx="1"/><rect x="16" y="11" width="4" height="3" rx="1"/></svg>Mix</button>
+      <button data-view="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Setup</button>
+      <button data-view="pedal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M7 16h2M11 16h2M15 16h2"/></svg>Pedal</button>
+      <button data-view="mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M11 8v6M8 11h6"/></svg>Mapper</button>
+    </nav>
+    <div class="conn"><button id="conn-btn" title="Connection and MIDI monitor" aria-label="Connection and MIDI monitor"><span class="dot" id="conn-dot"></span></button><span id="conn-name">Offline</span></div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div class="preset">
+        <button class="arrow" data-step="-1" aria-label="Previous preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button type="button" class="preset-info" id="open-picker" title="All presets"><span class="preset-num mono" id="p-num">—</span><span class="preset-name" id="p-name">Not connected</span><span class="edited" id="p-edited" hidden>edited</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button class="arrow" data-step="1" aria-label="Next preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="tools">
+        <button class="btn save-btn" data-save="1" hidden title="Save this preset on the pedal (presses STORE, then STORE again to confirm)">Save</button>
+        <button class="icon-btn" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+        <button class="icon-btn" id="theme" title="Light / dark theme" aria-label="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+        <button class="hit" id="hit" aria-pressed="false"><i></i>HIT</button>
+      </div>
+    </header>
+
+    <div class="midi-alarm" id="midi-alarm" role="alert" hidden></div>
+    <div class="pe-note glass" id="pe-note" hidden><b>Play Electric · protected mode.</b> <span>Only parameters confirmed in the Mapper can be changed; everything else is read-only.</span><button class="btn" data-goto="mapa">Open Mapper</button></div>
+
+    <section class="view" id="v-editor">
+      <div class="chains">
+        <div class="chain"><span class="cap-lbl">Vocal</span><div class="links" id="chain-voz" role="tablist" aria-label="Vocal effects"></div></div>
+        <div class="chain"><span class="cap-lbl">Guitar</span><div class="links" id="chain-gtr" role="tablist" aria-label="Guitar effects"></div></div>
+      </div>
+      <div class="detail" id="detail"></div>
+    </section>
+
+    <section class="view" id="v-pedal" hidden>
+      <p class="pnl-note glass"><b>The pedal's own buttons.</b> Each one presses the real button over USB (hold = hold). Watch the pedal's screen. In SETUP, stay away from the MIDI settings.</p>
+      <div class="pnl">
+        <div class="pnl-col">
+          <button type="button" class="pbtn" data-ev="09">VOCAL FX</button>
+          <button type="button" class="pbtn" data-ev="08">GUITAR FX</button>
+          <button type="button" class="pbtn" data-ev="07">MIX</button>
+        </div>
+        <div class="pnl-center">
+          <div class="pnl-knob-row">
+            <button type="button" class="pbtn round" data-ev="05" aria-label="Front left arrow">◀</button>
+            <div class="pknob" id="pknob" role="slider" tabindex="0" aria-label="Control knob: drag, scroll or use the arrow keys" aria-valuetext="turn"><i></i></div>
+            <button type="button" class="pbtn round" data-ev="04" aria-label="Front right arrow">▶</button>
+          </div>
+          <div class="pnl-knob-row small">
+            <button type="button" class="pbtn round" data-knob="-1" aria-label="Knob one step left">−</button>
+            <span class="cap-lbl">knob</span>
+            <button type="button" class="pbtn round" data-knob="1" aria-label="Knob one step right">+</button>
+          </div>
+          <div class="pnl-row">
+            <button type="button" class="pbtn" data-ev="06">BACK</button>
+            <button type="button" class="pbtn store" data-ev="03">STORE</button>
+          </div>
+        </div>
+        <div class="pnl-col">
+          <button type="button" class="pbtn" data-ev="00">FAVORITE</button>
+          <button type="button" class="pbtn" data-ev="01">GENRE</button>
+          <button type="button" class="pbtn" data-ev="02">SETUP</button>
+        </div>
+      </div>
+      <div class="pnl-fsw">
+        <span class="cap-lbl">Footswitches</span>
+        <button type="button" class="pbtn fsw" data-ev="0D">▼</button>
+        <button type="button" class="pbtn fsw" data-ev="0C">▲</button>
+        <button type="button" class="pbtn fsw hitfsw" data-ev="0B">HIT <small>hold = TALK</small></button>
+        <button type="button" class="pbtn fsw hitfsw" id="loop-btn" title="Holds ▼ and ▲ together (enter / leave Loop mode)">LOOP <small>▼ + ▲ hold</small></button>
+      </div>
+    </section>
+
+    <section class="view" id="v-mix" hidden>
+      <div class="panel"><h2>Mix <span class="cap-lbl" style="margin-left:8px">global · applies to every preset</span></h2><div class="mix-knobs" id="mix"></div></div>
+    </section>
+
+    <section class="view" id="v-ajustes" hidden>
+      <div class="split">
+        <div class="groups" id="groups" role="tablist" aria-label="Setup groups"></div>
+        <div class="panel" id="group"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-palco" hidden>
+      <div class="stage-preset">
+        <button class="big-arrow" data-step="-1" aria-label="Previous preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div class="stage-mid"><button type="button" class="stage-name" id="open-picker2" title="All presets"><div class="num mono" id="s-num">—</div><div class="name" id="s-name">Not connected</div></button>
+          <div class="stage-edit" id="s-edit" hidden><span class="edited">edited</span><button class="btn save-btn" data-save="1" title="Save this preset on the pedal (presses STORE, then STORE again to confirm)">Save</button></div></div>
+        <button class="big-arrow" data-step="1" aria-label="Next preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </section>
+
+    <section class="view" id="v-mapa" hidden>
+      <div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <div><b>Finds which parameter ID is which.</b> <span>Reading never changes anything on the pedal. While mapping, don't touch the pedal's MIDI settings.</span></div></div>
+      <div class="steps">
+        <div class="stepc" id="st1"><span class="n">1</span><div><b>Read everything</b><p id="st1-p">Reads all 948 parameter IDs once (read-only).</p><div class="progress" id="scan-bar" hidden><i></i></div><div class="row-btns"><button class="btn primary" id="scan-btn">Read all</button><button class="btn" id="scan-stop" hidden>Stop</button></div></div></div>
+        <div class="stepc" id="st2"><span class="n">2</span><div><b>Change ONE thing on the pedal</b><p>Turn a knob or switch an effect on the pedal itself. The app re-reads and lists what changed.</p><div class="row-btns"><button class="btn" id="check-btn" disabled>Check now</button><button class="btn" id="sim-turn" hidden>Simulate a knob turn</button></div></div></div>
+        <div class="stepc" id="st3"><span class="n">3</span><div><b>Say what it was</b><p>Pick the matching control and confirm. Confirmed parameters become editable.</p></div></div>
+      </div>
+      <div class="map-wrap">
+        <div class="map-col"><h3>Changes found <span class="cap-lbl" id="chg-count"></span></h3><div class="table" id="changes"></div></div>
+        <div class="map-col"><h3>Confirmed <span class="cap-lbl" id="map-count"></span></h3>
+          <div class="row-btns"><button class="btn" id="map-export">Export map</button><button class="btn" id="map-import">Import map</button><input type="file" id="map-file" accept=".json,application/json" hidden></div>
+          <div class="table maplist" id="maplist"></div></div>
+      </div>
+    </section>
+
+    <div class="gate" id="gate">
+      <div class="gate-card glass">
+        <h1>Connect your pedal</h1>
+        <p class="status" id="gate-status">Not connected</p>
+        <ul>
+          <li>Connect the Play Acoustic / Play Electric by USB.</li>
+          <li><b>Quit VoiceSupport</b> if it is open (it corrupts SysEx).</li>
+          <li>Use <b>Chrome or Edge</b> and allow MIDI with SysEx when asked.</li>
+          <li>Leave the pedal on its preset screen.</li>
+        </ul>
+        <button class="btn primary" id="gate-connect">Connect</button>
+        <div class="links-row"><a href="?sim">Try with a simulated Play Acoustic</a><a href="?sim=pe">… or Play Electric</a></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<aside class="drawer glass" id="drawer" hidden aria-label="Connection and MIDI monitor">
+  <header><span class="dot" id="drw-dot"></span><h2>Connection</h2><button class="icon-btn" id="drw-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+  <div class="kv" id="drw-kv"></div>
+  <div class="ports">
+    <label>Output<div class="sel sm"><select id="port-out"></select></div></label>
+    <label>Input<div class="sel sm"><select id="port-in"></select></div></label>
+  </div>
+  <div class="row-btns"><button class="btn primary" id="drw-connect">Connect / retry</button><button class="btn" id="drw-resync">Re-read pedal</button></div>
+  <h2 style="margin-top:4px">MIDI monitor</h2>
+  <div class="row-btns"><button class="btn" id="log-pause">Pause</button><button class="btn" id="log-clear">Clear</button><button class="btn" id="log-copy">Copy</button></div>
+  <div class="log" id="log" aria-live="off"></div>
+</aside>
+<div class="picker" id="picker" hidden role="dialog" aria-modal="true" aria-labelledby="picker-title">
+  <div class="picker-card glass">
+    <header><h2 id="picker-title">Presets</h2><span class="cap-lbl" id="lib-info"></span><button class="icon-btn" id="pick-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+    <div class="lib-row"><button class="btn primary" id="lib-read">Read all presets</button><button class="btn" id="lib-cancel" hidden>Stop</button><p id="lib-status"></p></div>
+    <div class="progress" id="lib-bar" hidden><i></i></div>
+    <div class="plist" id="plist"></div>
+  </div>
+</div>
+<div class="fxpop" id="fxpop" hidden role="dialog" aria-modal="true" aria-label="Edit effect">
+  <div class="fxpop-card">
+    <button class="icon-btn pop-close" id="pop-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="detail" id="pop-detail"></div>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="vendor/pa-menus.js"></script>
+<script src="vendor/pa-images.js"></script>
+<script src="maps/pe-images.js"></script>
+<script src="maps/pe-menus.js"></script>
+<script src="vendor/pa-params.js"></script>
+<script src="maps/builtin-maps.js"></script>
+<script>if (new URLSearchParams(location.search).has("sim")) document.write('<script src="vendor/sim-pedal.js"><\/script>');</script>
+<script src="vendor/pa-link.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

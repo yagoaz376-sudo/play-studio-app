@@ -1,0 +1,922 @@
+{ "source": "PlayElectric 1.3.00 Build34 (stock)", "note": "hi>0 = follower of a master/follower pair", "params": { "0x000": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x001": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x002": { "name": "PreFX LowCut", "min": 0, "max": 3, "def": 0
+  }, "0x003": { "name": "PreFX Dynamics", "min": 0, "max": 3, "def": 0
+  }, "0x004": { "name": "THRESH", "min": -60, "max": 0, "def": -6
+  }, "0x005": { "name": "RATIO", "min": 0, "max": 14, "def": 5, "values": ["1.0", "1.1", "1.2", "1.4", "1.6", "1.8", "2.0", "2.5", "3.2", "4.0", "5.6", "8.0", "16", "32", "64" ]
+  }, "0x006": { "name": "PreFX NoiseGate", "min": -71, "max": 0, "def": -70
+  }, "0x007": { "name": "ENABLED", "min": 0, "max": 1, "def": 1
+  }, "0x008": { "name": "SHAPE", "min": 0, "max": 100, "def": 50
+  }, "0x009": { "name": "WARMTH", "min": 0, "max": 1, "def": 0
+  }, "0x00a": { "name": "ADAPTIVE", "min": 0, "max": 1, "def": 1
+  }, "0x00b": { "name": "AutoShape LBFreq", "min": 0, "max": 240, "def": 115
+  }, "0x00c": { "name": "AutoShape HBFreq", "min": 0, "max": 240, "def": 194
+  }, "0x00d": { "name": "AutoShape LBGainLow", "min": -120, "max": 120, "def": -120
+  }, "0x00e": { "name": "AutoShape LBGainHigh", "min": -120, "max": 120, "def": 0
+  }, "0x00f": { "name": "AutoShape HBGainLow", "min": -120, "max": 120, "def": -120
+  }, "0x010": { "name": "AutoShape HBGainHigh", "min": -120, "max": 120, "def": 120
+  }, "0x011": { "name": "AutoShape GlideSpeed", "min": 1, "max": 60, "def": 1
+  }, "0x012": { "name": "AutoShape RmsSpeed", "min": 0, "max": 4, "def": 2
+  }, "0x013": { "name": "AutoShape TargetLow", "min": 0, "max": 25, "def": 12
+  }, "0x014": { "name": "AutoShape TargetHigh", "min": 0, "max": 25, "def": 12
+  }, "0x015": { "name": "AutoShape Meta1", "min": 0, "max": 3, "def": 2
+  }, "0x016": { "name": "AutoShape Meta2", "min": 0, "max": 3, "def": 2
+  }, "0x017": { "name": "ENABLED", "min": 0, "max": 1, "def": 1
+  }, "0x018": { "name": "COMPRESS", "min": 0, "max": 100, "def": 50
+  }, "0x019": { "name": "ADAPTIVE", "min": 0, "max": 1, "def": 1
+  }, "0x01a": { "name": "THRESHOLD", "min": -30, "max": 0, "def": 0
+  }, "0x01b": { "name": "RATIO", "min": 10, "max": 40, "def": 40
+  }, "0x01c": { "name": "ATTACK", "min": 0, "max": 19, "def": 0
+  }, "0x01d": { "name": "RELEASE", "min": 0, "max": 19, "def": 9
+  }, "0x01e": { "name": "SMOOTH", "min": 0, "max": 2, "def": 2
+  }, "0x01f": { "name": "TLRATIO", "min": 0, "max": 100, "def": 40
+  }, "0x020": { "name": "ENABLED", "min": 0, "max": 1, "def": 1
+  }, "0x021": { "name": "DE-ESS", "min": 0, "max": 100, "def": 50
+  }, "0x022": { "name": "ATTACK", "min": 0, "max": 19, "def": 0
+  }, "0x023": { "name": "RELEASE", "min": 0, "max": 19, "def": 9
+  }, "0x024": { "name": "SMOOTH", "min": 0, "max": 2, "def": 0
+  }, "0x025": { "name": "TLRATIO", "min": 0, "max": 100, "def": 20
+  }, "0x026": { "name": "ENABLE", "min": 0, "max": 1, "def": 1
+  }, "0x027": { "name": "ENABLE", "min": 0, "max": 1, "def": 1, "hi": 1
+  }, "0x028": { "name": "ENABLE", "min": 0, "max": 1, "def": 1, "hi": 2
+  }, "0x029": { "name": "ENABLE", "min": 0, "max": 1, "def": 1, "hi": 3
+  }, "0x02a": { "name": "ENABLE", "min": 0, "max": 1, "def": 1, "hi": 4
+  }, "0x02b": { "name": "BASS", "min": -18, "max": 18, "def": 0
+  }, "0x02c": { "name": "BASS", "min": -18, "max": 18, "def": 0, "hi": 1
+  }, "0x02d": { "name": "BASS", "min": -18, "max": 18, "def": 0, "hi": 2
+  }, "0x02e": { "name": "BASS", "min": -18, "max": 18, "def": 0, "hi": 3
+  }, "0x02f": { "name": "BASS", "min": -18, "max": 18, "def": 0, "hi": 4
+  }, "0x030": { "name": "BASS", "min": -18, "max": 18, "def": 0, "hi": 5
+  }, "0x031": { "name": "LOW FREQ", "min": 0, "max": 240, "def": 140
+  }, "0x032": { "name": "LOW FREQ", "min": 0, "max": 240, "def": 140, "hi": 1
+  }, "0x033": { "name": "LOW FREQ", "min": 0, "max": 240, "def": 140, "hi": 2
+  }, "0x034": { "name": "LOW FREQ", "min": 0, "max": 240, "def": 140, "hi": 3
+  }, "0x035": { "name": "LOW FREQ", "min": 0, "max": 240, "def": 140, "hi": 4
+  }, "0x036": { "name": "LOW WIDTH", "min": 0, "max": 32, "def": 16
+  }, "0x037": { "name": "LOW WIDTH", "min": 0, "max": 32, "def": 16, "hi": 1
+  }, "0x038": { "name": "LOW WIDTH", "min": 0, "max": 32, "def": 16, "hi": 2
+  }, "0x039": { "name": "LOW WIDTH", "min": 0, "max": 32, "def": 16, "hi": 3
+  }, "0x03a": { "name": "LOW WIDTH", "min": 0, "max": 32, "def": 16, "hi": 4
+  }, "0x03b": { "name": "MID", "min": -18, "max": 18, "def": 0
+  }, "0x03c": { "name": "MID", "min": -18, "max": 18, "def": 0, "hi": 1
+  }, "0x03d": { "name": "MID", "min": -18, "max": 18, "def": 0, "hi": 2
+  }, "0x03e": { "name": "MID", "min": -18, "max": 18, "def": 0, "hi": 3
+  }, "0x03f": { "name": "MID", "min": -18, "max": 18, "def": 0, "hi": 4
+  }, "0x040": { "name": "MID", "min": -18, "max": 18, "def": 0, "hi": 5
+  }, "0x041": { "name": "MID FREQ", "min": 0, "max": 240, "def": 140
+  }, "0x042": { "name": "MID FREQ", "min": 0, "max": 240, "def": 140, "hi": 1
+  }, "0x043": { "name": "MID FREQ", "min": 0, "max": 240, "def": 140, "hi": 2
+  }, "0x044": { "name": "MID FREQ", "min": 0, "max": 240, "def": 140, "hi": 3
+  }, "0x045": { "name": "MID FREQ", "min": 0, "max": 240, "def": 140, "hi": 4
+  }, "0x046": { "name": "MID FREQ", "min": 0, "max": 240, "def": 140, "hi": 5
+  }, "0x047": { "name": "MID WIDTH", "min": 0, "max": 32, "def": 16
+  }, "0x048": { "name": "MID WIDTH", "min": 0, "max": 32, "def": 16, "hi": 1
+  }, "0x049": { "name": "MID WIDTH", "min": 0, "max": 32, "def": 16, "hi": 2
+  }, "0x04a": { "name": "MID WIDTH", "min": 0, "max": 32, "def": 16, "hi": 3
+  }, "0x04b": { "name": "MID WIDTH", "min": 0, "max": 32, "def": 16, "hi": 4
+  }, "0x04c": { "name": "TREBLE", "min": -18, "max": 18, "def": 0
+  }, "0x04d": { "name": "TREBLE", "min": -18, "max": 18, "def": 0, "hi": 1
+  }, "0x04e": { "name": "TREBLE", "min": -18, "max": 18, "def": 0, "hi": 2
+  }, "0x04f": { "name": "TREBLE", "min": -18, "max": 18, "def": 0, "hi": 3
+  }, "0x050": { "name": "TREBLE", "min": -18, "max": 18, "def": 0, "hi": 4
+  }, "0x051": { "name": "TREBLE", "min": -18, "max": 18, "def": 0, "hi": 5
+  }, "0x052": { "name": "HI FREQ", "min": 0, "max": 240, "def": 140
+  }, "0x053": { "name": "HI FREQ", "min": 0, "max": 240, "def": 140, "hi": 1
+  }, "0x054": { "name": "HI FREQ", "min": 0, "max": 240, "def": 140, "hi": 2
+  }, "0x055": { "name": "HI FREQ", "min": 0, "max": 240, "def": 140, "hi": 3
+  }, "0x056": { "name": "HI FREQ", "min": 0, "max": 240, "def": 140, "hi": 4
+  }, "0x057": { "name": "HI WIDTH", "min": 0, "max": 32, "def": 16
+  }, "0x058": { "name": "HI WIDTH", "min": 0, "max": 32, "def": 16, "hi": 1
+  }, "0x059": { "name": "HI WIDTH", "min": 0, "max": 32, "def": 16, "hi": 2
+  }, "0x05a": { "name": "HI WIDTH", "min": 0, "max": 32, "def": 16, "hi": 3
+  }, "0x05b": { "name": "HI WIDTH", "min": 0, "max": 32, "def": 16, "hi": 4
+  }, "0x05c": { "name": "BASS", "min": -9, "max": 9, "def": 0
+  }, "0x05d": { "name": "MID", "min": -9, "max": 9, "def": 0
+  }, "0x05e": { "name": "MID FREQ", "min": 87, "max": 174, "def": 130
+  }, "0x05f": { "name": "TREBLE", "min": -9, "max": 9, "def": 0
+  }, "0x060": { "name": "LOW BAND", "min": 0, "max": 8, "def": 3
+  }, "0x061": { "name": "HI BAND", "min": 0, "max": 8, "def": 7
+  }, "0x062": { "name": "GATE", "min": 0, "max": 2, "def": 1
+  }, "0x063": { "name": "THRESHOLD", "min": -61, "max": 0, "def": -40
+  }, "0x064": { "name": "GATE", "min": 0, "max": 2, "def": 2
+  }, "0x065": { "name": "GATE THRESHOLD", "min": -61, "max": 0, "def": -40
+  }, "0x066": { "name": "GATE", "min": 0, "max": 1, "def": 1
+  }, "0x067": { "name": "STYLE", "min": 0, "max": 3, "def": 0
+  }, "0x068": { "name": "ENABLE", "min": 0, "max": 1, "def": 1
+  }, "0x069": { "name": "ENABLE", "min": 0, "max": 1, "def": 1, "hi": 1
+  }, "0x06a": { "name": "ATTEN", "min": -61, "max": 0, "def": -20
+  }, "0x06b": { "name": "ATTEN", "min": -61, "max": 0, "def": -20, "hi": 1
+  }, "0x06c": { "name": "ATTACK", "min": 0, "max": 4, "def": 0
+  }, "0x06d": { "name": "ATTACK", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x06e": { "name": "RELEASE", "min": 0, "max": 4, "def": 4
+  }, "0x06f": { "name": "RELEASE", "min": 0, "max": 4, "def": 4, "hi": 1
+  }, "0x070": { "name": "AutoMix Guitar_Thru_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x071": { "name": "STYLE", "min": 0, "max": 27, "def": 0, "values": ["HIGH", "HIGHER", "LOW", "LOWER", "OCTAVE UP", "OCTAVE DOWN", "HIGH & LOW", "HIGH & HIGHER", "HIGH & LOWER", "HIGHER & LOWER", "HIGHER & LOW", "LOWER & LOW", "OCT DOWN & UP", "OCT DOWN & HIGHER", "OCT DOWN & HIGH", "OCT DOWN & LOW", "OCT DOWN & LOWER", "OCT UP & HIGHER", "OCT UP & HIGH", "OCT UP & LOW", "OCT UP & LOWER", "+7 SEMITONES", "-5 SEMITONES", "+7 &-5 SEMITONES", "+12 &+7 SEMITONES", "+12 &-5 SEMITONES", "-12 &+7 SEMITONES", "-12 &-5 SEMITONES" ]
+  }, "0x072": { "name": "STYLE", "min": 0, "max": 3, "def": 0
+  }, "0x073": { "name": "STYLE", "min": 0, "max": 3, "def": 0
+  }, "0x074": { "name": "STYLE", "min": 0, "max": 3, "def": 0
+  }, "0x075": { "name": "HUMANIZE STYLE", "min": 0, "max": 6, "def": 0
+  }, "0x076": { "name": "VIBRATO STYLE", "min": 0, "max": 7, "def": 0
+  }, "0x077": { "name": "HUMANIZE AMOUNT", "min": 0, "max": 100, "def": 0
+  }, "0x078": { "name": "VIBRATO AMOUNT", "min": 0, "max": 100, "def": 0
+  }, "0x079": { "name": "", "min": 0, "max": 100, "def": 0
+  }, "0x07a": { "name": "VIBBOOST", "min": 0, "max": 1, "def": 0
+  }, "0x07b": { "name": "KEY", "min": 0, "max": 12, "def": 0
+  }, "0x07c": { "name": "NATURALPLAY", "min": 0, "max": 8, "def": 0
+  }, "0x07d": { "name": "KEY", "min": 0, "max": 11, "def": 0
+  }, "0x07e": { "name": "SCALE", "min": 0, "max": 5, "def": 1
+  }, "0x07f": { "name": "ROOT", "min": 0, "max": 11, "def": 0
+  }, "0x080": { "name": "CHORD", "min": 0, "max": 20, "def": 0
+  }, "0x081": { "name": "TUNING", "min": 0, "max": 2, "def": 0
+  }, "0x082": { "name": "", "min": 0, "max": 6, "def": 2
+  }, "0x083": { "name": "", "min": 0, "max": 6, "def": 2, "hi": 1
+  }, "0x084": { "name": "", "min": 0, "max": 28, "def": 14
+  }, "0x085": { "name": "", "min": 0, "max": 28, "def": 14, "hi": 1
+  }, "0x086": { "name": "", "min": -24, "max": 24, "def": 0
+  }, "0x087": { "name": "", "min": -24, "max": 24, "def": 0, "hi": 1
+  }, "0x088": { "name": "NOTES", "min": 0, "max": 1, "def": 0
+  }, "0x089": { "name": "NOTES", "min": 0, "max": 1, "def": 0, "hi": 1
+  }, "0x08a": { "name": "SMOOTH", "min": 0, "max": 100, "def": 50
+  }, "0x08b": { "name": "SMOOTH", "min": 0, "max": 100, "def": 50, "hi": 1
+  }, "0x08c": { "name": "LATCH", "min": 0, "max": 1, "def": 0
+  }, "0x08d": { "name": "GUITAR CHORDS", "min": 0, "max": 1, "def": 0
+  }, "0x08e": { "name": "ATTACK", "min": 0, "max": 1000, "def": 0
+  }, "0x08f": { "name": "DECAY", "min": 0, "max": 500, "def": 0
+  }, "0x090": { "name": "RELEASE", "min": 0, "max": 2000, "def": 0
+  }, "0x091": { "name": "RAND", "min": 0, "max": 100, "def": 0
+  }, "0x092": { "name": "Hold Release", "min": 0, "max": 1, "def": 0
+  }, "0x093": { "name": "HOLD RELEASE", "min": 0, "max": 100, "def": 10
+  }, "0x094": { "name": "DETUNE", "min": 0, "max": 100, "def": 0
+  }, "0x095": { "name": "DETUNE", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x096": { "name": "NOTES EXTENSION", "min": 0, "max": 1, "def": 0
+  }, "0x097": { "name": "GENDER", "min": -50, "max": 50, "def": 0
+  }, "0x098": { "name": "GENDER", "min": -50, "max": 50, "def": 0, "hi": 1
+  }, "0x099": { "name": "PORTA", "min": 0, "max": 200, "def": 0
+  }, "0x09a": { "name": "PORTA", "min": 0, "max": 200, "def": 0, "hi": 1
+  }, "0x09b": { "name": "MAP IN NOTE", "min": 0, "max": 11, "def": 0
+  }, "0x09c": { "name": "MAP IN SOURCE", "min": 0, "max": 1, "def": 0
+  }, "0x09d": { "name": "MAP OUT", "min": -24, "max": 25, "def": 0
+  }, "0x09e": { "name": "MAP OUT", "min": -24, "max": 25, "def": 0, "hi": 1
+  }, "0x09f": { "name": "PAN", "min": 0, "max": 2, "def": 0
+  }, "0x0a0": { "name": "SMOOTH", "min": 0, "max": 100, "def": 50
+  }, "0x0a1": { "name": "GENDER", "min": -50, "max": 50, "def": 0
+  }, "0x0a2": { "name": "PORTA", "min": 0, "max": 200, "def": 0
+  }, "0x0a3": { "name": "STYLE", "min": 0, "max": 9, "def": 1
+  }, "0x0a4": { "name": "HUMANIZE STYLE", "min": 0, "max": 24, "def": 0
+  }, "0x0a5": { "name": "HUMANIZE AMOUNT", "min": 0, "max": 100, "def": 0
+  }, "0x0a6": { "name": "SMOOTH", "min": 0, "max": 100, "def": 50
+  }, "0x0a7": { "name": "SMOOTH", "min": 0, "max": 100, "def": 50, "hi": 1
+  }, "0x0a8": { "name": "PORTA", "min": 0, "max": 200, "def": 0
+  }, "0x0a9": { "name": "PORTA", "min": 0, "max": 200, "def": 0, "hi": 1
+  }, "0x0aa": { "name": "OCTAVE SHIFT", "min": -1200, "max": 1200, "def": 0
+  }, "0x0ab": { "name": "OCTAVE SHIFT", "min": -1200, "max": 1200, "def": 0, "hi": 1
+  }, "0x0ac": { "name": "DOUBLING", "min": 0, "max": 1, "def": 0
+  }, "0x0ad": { "name": "DOUBLE", "min": 0, "max": 3, "def": 0
+  }, "0x0ae": { "name": "Voices Global_Pitch", "min": 0, "max": 100, "def": 0
+  }, "0x0af": { "name": "Voices Global_Time", "min": 0, "max": 100, "def": 0
+  }, "0x0b0": { "name": "Voices Global_Level", "min": 0, "max": 100, "def": 0
+  }, "0x0b1": { "name": "OUT LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x0b2": { "name": "HEADPHONE LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x0b3": { "name": "USB LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x0b4": { "name": "LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x0b5": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 1
+  }, "0x0b6": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 2
+  }, "0x0b7": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 3
+  }, "0x0b8": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 4
+  }, "0x0b9": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 5
+  }, "0x0ba": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 6
+  }, "0x0bb": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 7
+  }, "0x0bc": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 8
+  }, "0x0bd": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 9
+  }, "0x0be": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 10
+  }, "0x0bf": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 11
+  }, "0x0c0": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 12
+  }, "0x0c1": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 13
+  }, "0x0c2": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 14
+  }, "0x0c3": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 15
+  }, "0x0c4": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 16
+  }, "0x0c5": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 17
+  }, "0x0c6": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 18
+  }, "0x0c7": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 19
+  }, "0x0c8": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 20
+  }, "0x0c9": { "name": "", "min": -36, "max": 6, "def": 0
+  }, "0x0ca": { "name": "", "min": -36, "max": 6, "def": 0, "hi": 1
+  }, "0x0cb": { "name": "", "min": -36, "max": 6, "def": 0, "hi": 2
+  }, "0x0cc": { "name": "", "min": -36, "max": 12, "def": 0
+  }, "0x0cd": { "name": "", "min": -36, "max": 12, "def": 0, "hi": 1
+  }, "0x0ce": { "name": "LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x0cf": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 1
+  }, "0x0d0": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 2
+  }, "0x0d1": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 3
+  }, "0x0d2": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 4
+  }, "0x0d3": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 5
+  }, "0x0d4": { "name": "LEVEL", "min": -36, "max": 0, "def": 0, "hi": 6
+  }, "0x0d5": { "name": "PAN", "min": -100, "max": 100, "def": 0
+  }, "0x0d6": { "name": "PAN", "min": -100, "max": 100, "def": 0, "hi": 1
+  }, "0x0d7": { "name": "PAN", "min": -100, "max": 100, "def": 0, "hi": 2
+  }, "0x0d8": { "name": "PAN", "min": -100, "max": 100, "def": 0, "hi": 3
+  }, "0x0d9": { "name": "PAN", "min": -100, "max": 100, "def": 0, "hi": 4
+  }, "0x0da": { "name": "PAN", "min": -100, "max": 100, "def": 0, "hi": 5
+  }, "0x0db": { "name": "PAN", "min": -100, "max": 100, "def": 0, "hi": 6
+  }, "0x0dc": { "name": "LEVEL", "min": -51, "max": 0, "def": 0
+  }, "0x0dd": { "name": "LEVEL", "min": -51, "max": 0, "def": 0, "hi": 1
+  }, "0x0de": { "name": "LEVEL", "min": -51, "max": 0, "def": 0, "hi": 2
+  }, "0x0df": { "name": "LEVEL", "min": -51, "max": 0, "def": 0, "hi": 3
+  }, "0x0e0": { "name": "LEVEL", "min": -51, "max": 0, "def": 0, "hi": 4
+  }, "0x0e1": { "name": "LEVEL", "min": -51, "max": 0, "def": 0, "hi": 5
+  }, "0x0e2": { "name": "LEVEL", "min": -51, "max": 0, "def": 0, "hi": 6
+  }, "0x0e3": { "name": "LEVEL", "min": -51, "max": 0, "def": 0, "hi": 7
+  }, "0x0e4": { "name": "WIDTH", "min": 0, "max": 100, "def": 100
+  }, "0x0e5": { "name": "WIDTH", "min": 0, "max": 100, "def": 100, "hi": 1
+  }, "0x0e6": { "name": "WIDTH", "min": 0, "max": 100, "def": 100, "hi": 2
+  }, "0x0e7": { "name": "WIDTH", "min": 0, "max": 100, "def": 100, "hi": 3
+  }, "0x0e8": { "name": "WIDTH", "min": 0, "max": 100, "def": 100, "hi": 4
+  }, "0x0e9": { "name": "WIDTH", "min": 0, "max": 100, "def": 100, "hi": 5
+  }, "0x0ea": { "name": "WIDTH", "min": 0, "max": 100, "def": 100, "hi": 6
+  }, "0x0eb": { "name": "WIDTH", "min": 0, "max": 100, "def": 100, "hi": 7
+  }, "0x0ec": { "name": "OUTPUT", "min": 0, "max": 3, "def": 0
+  }, "0x0ed": { "name": "AUX LOOP GAIN", "min": -61, "max": 0, "def": -5
+  }, "0x0ee": { "name": "DRY VOICE GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x0ef": { "name": "DRY VOICE GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x0f0": { "name": "DRY VOICE GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x0f1": { "name": "DRY VOICE ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x0f2": { "name": "DRY VOICE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x0f3": { "name": "DRY VOICE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x0f4": { "name": "WET VOICE GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x0f5": { "name": "WET VOICE GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x0f6": { "name": "WET VOICE GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x0f7": { "name": "WET VOICE ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x0f8": { "name": "WET VOICE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x0f9": { "name": "WET VOICE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x0fa": { "name": "WET GUITAR GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x0fb": { "name": "WET GUITAR GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x0fc": { "name": "WET GUITAR GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x0fd": { "name": "WET GUITAR ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x0fe": { "name": "WET GUITAR ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x0ff": { "name": "WET GUITAR ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x100": { "name": "DIGITAL GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x101": { "name": "DIGITAL GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x102": { "name": "DIGITAL GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x103": { "name": "DIGITAL ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x104": { "name": "DIGITAL ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x105": { "name": "DIGITAL ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x106": { "name": "LOOP GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x107": { "name": "LOOP GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x108": { "name": "LOOP GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x109": { "name": "LOOP ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x10a": { "name": "LOOP ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x10b": { "name": "LOOP ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x10c": { "name": "AUX GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x10d": { "name": "AUX GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x10e": { "name": "AUX GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x10f": { "name": "AUX ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x110": { "name": "AUX ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x111": { "name": "AUX ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x112": { "name": "ROOM SENSE GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x113": { "name": "ROOM SENSE GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x114": { "name": "ROOM SENSE GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x115": { "name": "ROOM SENSE ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x116": { "name": "ROOM SENSE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x117": { "name": "ROOM SENSE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x118": { "name": "PITCH PIPE GAIN", "min": -61, "max": 0, "def": 0
+  }, "0x119": { "name": "PITCH PIPE GAIN", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x11a": { "name": "PITCH PIPE GAIN", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x11b": { "name": "PITCH PIPE ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x11c": { "name": "PITCH PIPE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 1
+  }, "0x11d": { "name": "PITCH PIPE ROUTING", "min": 0, "max": 4, "def": 0, "hi": 2
+  }, "0x11e": { "name": "uMOD STYLE", "min": 0, "max": 23, "def": 0, "values": ["MICROMOD CLONE", "MICROMOD WIDER", "THICKEN", "LIGHT CHORUS", "MEDIUM CHORUS", "WIDE CHORUS", "MONO CHORUS", "FAST ROTOR", "STEREO PANNER", "FLANGER", "FLANGE FEEDBACK", "FLANGE NEGATIVE", "MONO FLANGE", "SOFT FLANGE", "TUBE", "UP TUBE", "DOWN TUBE", "DOWN & UP TUBE", "RISE AND FALL", "AUTO FILTER", "UNDERWATER", "CYLON MONO", "CYLON STEREO", "ALIEN VOICEOVER" ]
+  }, "0x11f": { "name": "uMOD STYLE", "min": 0, "max": 16, "def": 0, "values": ["CORONA CHORUS", "CORONA FAST", "CORONA SLOW", "VORTEX FLANGER", "VORTEX FAST", "SILKY DETUNE", "MEDIUM DETUNE", "MONO CHORUS", "FAST ROTOR", "STEREO PANNER", "FLANGER", "FLANGE FEEDBACK", "FLANGE NEGATIVE", "MONO FLANGE", "SOFT FLANGE", "TREMOLO", "AUTO FILTER" ]
+  }, "0x120": { "name": "STYLE", "min": 0, "max": 16, "def": 0, "values": ["CORONA CHORUS", "CORONA FAST", "CORONA SLOW", "VORTEX FLANGER", "VORTEX FAST", "SILKY DETUNE", "MEDIUM DETUNE", "MONO CHORUS", "FAST ROTOR", "STEREO PANNER", "FLANGER", "FLANGE FEEDBACK", "FLANGE NEGATIVE", "MONO FLANGE", "SOFT FLANGE", "TREMOLO", "AUTO FILTER" ]
+  }, "0x121": { "name": "DETUNE LEFT", "min": -25, "max": 25, "def": 0
+  }, "0x122": { "name": "DETUNE LEFT", "min": -25, "max": 25, "def": 0, "hi": 1
+  }, "0x123": { "name": "DETUNE RIGHT", "min": -25, "max": 25, "def": 0
+  }, "0x124": { "name": "DETUNE RIGHT", "min": -25, "max": 25, "def": 0, "hi": 1
+  }, "0x125": { "name": "DEPTH L", "min": 0, "max": 100, "def": 0
+  }, "0x126": { "name": "DEPTH L", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x127": { "name": "DEPTH R", "min": 0, "max": 100, "def": 0
+  }, "0x128": { "name": "DEPTH R", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x129": { "name": "SPEED", "min": 5, "max": 1000, "def": 150
+  }, "0x12a": { "name": "SPEED", "min": 5, "max": 1000, "def": 150, "hi": 1
+  }, "0x12b": { "name": "SPEED", "min": 5, "max": 1000, "def": 150
+  }, "0x12c": { "name": "PHASE", "min": 0, "max": 180, "def": 0
+  }, "0x12d": { "name": "PHASE", "min": 0, "max": 180, "def": 0, "hi": 1
+  }, "0x12e": { "name": "WAVE", "min": 0, "max": 2, "def": 0
+  }, "0x12f": { "name": "WAVE", "min": 0, "max": 2, "def": 0, "hi": 1
+  }, "0x130": { "name": "DELAY L", "min": 0, "max": 230, "def": 0
+  }, "0x131": { "name": "DELAY L", "min": 0, "max": 230, "def": 0, "hi": 1
+  }, "0x132": { "name": "DELAY R", "min": 0, "max": 230, "def": 0
+  }, "0x133": { "name": "DELAY R", "min": 0, "max": 230, "def": 0, "hi": 1
+  }, "0x134": { "name": "FEEDBACK L", "min": -100, "max": 100, "def": 0
+  }, "0x135": { "name": "FEEDBACK L", "min": -100, "max": 100, "def": 0, "hi": 1
+  }, "0x136": { "name": "FEEDBACK R", "min": -100, "max": 100, "def": 0
+  }, "0x137": { "name": "FEEDBACK R", "min": -100, "max": 100, "def": 0, "hi": 1
+  }, "0x138": { "name": "XFB L", "min": -100, "max": 100, "def": 0
+  }, "0x139": { "name": "XFB L", "min": -100, "max": 100, "def": 0, "hi": 1
+  }, "0x13a": { "name": "XFB R", "min": -100, "max": 100, "def": 0
+  }, "0x13b": { "name": "XFB R", "min": -100, "max": 100, "def": 0, "hi": 1
+  }, "0x13c": { "name": "LOWCUT L", "min": 0, "max": 240, "def": 0
+  }, "0x13d": { "name": "LOWCUT L", "min": 0, "max": 240, "def": 0, "hi": 1
+  }, "0x13e": { "name": "LOWCUT R", "min": 0, "max": 240, "def": 0
+  }, "0x13f": { "name": "LOWCUT R", "min": 0, "max": 240, "def": 0, "hi": 1
+  }, "0x140": { "name": "HICUT L", "min": 0, "max": 240, "def": 240
+  }, "0x141": { "name": "HICUT L", "min": 0, "max": 240, "def": 240, "hi": 1
+  }, "0x142": { "name": "HICUT R", "min": 0, "max": 240, "def": 240
+  }, "0x143": { "name": "HICUT R", "min": 0, "max": 240, "def": 240, "hi": 1
+  }, "0x144": { "name": "OUT PHASE", "min": 0, "max": 3, "def": 0
+  }, "0x145": { "name": "OUT PHASE", "min": 0, "max": 3, "def": 0, "hi": 1
+  }, "0x146": { "name": "TREMOLO MODE", "min": 0, "max": 2, "def": 0
+  }, "0x147": { "name": "TREMOLO MODE", "min": 0, "max": 2, "def": 0, "hi": 1
+  }, "0x148": { "name": "DELAY STYLE", "min": 0, "max": 18, "def": 0, "values": ["HALF", "QUARTER", "EIGHTH", "TRIPLET", "DOTTED 1/8", "DOTTED 1/4", "1/4 TRIPLET", "SIXTEENTH", "PING PONG 1", "PING PONG 2", "PING PONG 3", "MULTITAP 1", "MULTITAP 2", "MULTITAP 3", "MULTITAP 4", "MULTITAP 5", "MULTITAP 6", "CLASSIC SLAP", "SET TIME" ]
+  }, "0x149": { "name": "DELAY STYLE", "min": 0, "max": 15, "def": 0, "values": ["FLASHBACK 2290", "FLASHBACK ANALOG", "FLASHBACK TAPE", "FLASHBACK LOFI", "FLASHBACK SLAP", "EDGE-Y MOD", "ANALOG MODUL8R", "HALF", "QUARTER", "DOTTED 1/8", "PING PONG", "PING PONG FX", "MULTITAP", "300 MS", "LONG & THIN", "REVERB TANK" ]
+  }, "0x14a": { "name": "DELAY STYLE", "min": 0, "max": 15, "def": 0, "values": ["FLASHBACK 2290", "FLASHBACK ANALOG", "FLASHBACK TAPE", "FLASHBACK LOFI", "FLASHBACK SLAP", "EDGE-Y MOD", "ANALOG MODUL8R", "HALF", "QUARTER", "DOTTED 1/8", "PING PONG", "PING PONG FX", "MULTITAP", "300 MS", "LONG & THIN", "REVERB TANK" ]
+  }, "0x14b": { "name": "SOURCE", "min": 0, "max": 2, "def": 0
+  }, "0x14c": { "name": "SOURCE", "min": 0, "max": 2, "def": 0, "hi": 1
+  }, "0x14d": { "name": "TEMPO", "min": 45, "max": 300, "def": 120
+  }, "0x14e": { "name": "DELAY TIME", "min": 0, "max": 1333, "def": 0
+  }, "0x14f": { "name": "DELAY TIME", "min": 0, "max": 1333, "def": 0, "hi": 1
+  }, "0x150": { "name": "TIME", "min": 0, "max": 1333, "def": 0
+  }, "0x151": { "name": "TIME", "min": 0, "max": 1333, "def": 0
+  }, "0x152": { "name": "TIME", "min": 0, "max": 1333, "def": 0, "hi": 1
+  }, "0x153": { "name": "TIME", "min": 0, "max": 1333, "def": 0
+  }, "0x154": { "name": "DIV L", "min": 0, "max": 19, "def": 10
+  }, "0x155": { "name": "DIV L", "min": 0, "max": 19, "def": 10, "hi": 1
+  }, "0x156": { "name": "DIV R", "min": 0, "max": 19, "def": 10
+  }, "0x157": { "name": "DIV R", "min": 0, "max": 19, "def": 10, "hi": 1
+  }, "0x158": { "name": "FEEDBACK", "min": 0, "max": 100, "def": 0
+  }, "0x159": { "name": "FEEDBACK", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x15a": { "name": "DELAY FEEDBACK", "min": 0, "max": 100, "def": 0
+  }, "0x15b": { "name": "FEEDBACK L", "min": 0, "max": 100, "def": 0
+  }, "0x15c": { "name": "FEEDBACK L", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x15d": { "name": "FEEDBACK R", "min": 0, "max": 100, "def": 0
+  }, "0x15e": { "name": "FEEDBACK R", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x15f": { "name": "XFB L TO R", "min": 0, "max": 100, "def": 0
+  }, "0x160": { "name": "XFB L TO R", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x161": { "name": "XFB R TO L", "min": 0, "max": 100, "def": 0
+  }, "0x162": { "name": "XFB R TO L", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x163": { "name": "MODDEPTH", "min": 0, "max": 100, "def": 0
+  }, "0x164": { "name": "MODDEPTH", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x165": { "name": "MODSPEED", "min": 10, "max": 1000, "def": 100
+  }, "0x166": { "name": "MODSPEED", "min": 10, "max": 1000, "def": 100, "hi": 1
+  }, "0x167": { "name": "DLY FILTER STYLE", "min": 0, "max": 12, "def": 0
+  }, "0x168": { "name": "DLY FILTER STYLE", "min": 0, "max": 12, "def": 0, "hi": 1
+  }, "0x169": { "name": "FILTER STYLE", "min": 0, "max": 12, "def": 0
+  }, "0x16a": { "name": "LOCUT L", "min": 0, "max": 240, "def": 0
+  }, "0x16b": { "name": "LOCUT L", "min": 0, "max": 240, "def": 0, "hi": 1
+  }, "0x16c": { "name": "LOCUT R", "min": 0, "max": 240, "def": 0
+  }, "0x16d": { "name": "LOCUT R", "min": 0, "max": 240, "def": 0, "hi": 1
+  }, "0x16e": { "name": "HICUT L", "min": 0, "max": 240, "def": 240
+  }, "0x16f": { "name": "HICUT L", "min": 0, "max": 240, "def": 240, "hi": 1
+  }, "0x170": { "name": "HICUT R", "min": 0, "max": 240, "def": 240
+  }, "0x171": { "name": "HICUT R", "min": 0, "max": 240, "def": 240, "hi": 1
+  }, "0x172": { "name": "LOW CUT IN", "min": 0, "max": 240, "def": 0
+  }, "0x173": { "name": "LOW CUT IN", "min": 0, "max": 240, "def": 0, "hi": 1
+  }, "0x174": { "name": "HIGH CUT IN", "min": 0, "max": 240, "def": 240
+  }, "0x175": { "name": "HIGH CUT IN", "min": 0, "max": 240, "def": 240, "hi": 1
+  }, "0x176": { "name": "MIDI CLOCK", "min": 0, "max": 1, "def": 0
+  }, "0x177": { "name": "MIDI CLOCK", "min": 0, "max": 1, "def": 0, "hi": 1
+  }, "0x178": { "name": "REVERB STYLE", "min": 0, "max": 27, "def": 0, "values": ["SMOOTH PLATE", "REFLECTION PLATE", "THIN PLATE", "BRIGHT PLATE", "REAL PLATE", "REAL PLATE LONG", "JAZZ PLATE", "QUICK PLATE", "SOFT HALL", "AMSTERDAM HALL", "BROADWAY HALL", "SNAPPY ROOM", "LIBRARY", "DARK ROOM", "MUSIC CLUB", "STUDIO ROOM", "BOUNCY ROOM", "COZY CORNER", "BRIGHT CHAMBER", "WOODEN CHAMBER", "ST. JOSEPH CHURCH", "DOME CHAPEL", "HOCKEY ARENA", "MUSEUM", "INDOOR ARENA", "WAREHOUSE", "THIN SPRING", "FULL SPRING" ]
+  }, "0x179": { "name": "REVERB STYLE", "min": 0, "max": 35, "def": 0, "values": ["HOF HALL", "HOF PLATE", "HOF ROOM", "HOF CHURCH", "HOF SPRING", "HOF AMB", "HOF LOFI", "HOF TILE", "SMOOTH PLATE", "REFLECT PLATE", "THIN PLATE", "BRIGHT PLATE", "REAL PLATE", "REAL PLATE LONG", "JAZZ PLATE", "QUICK PLATE", "SOFT HALL", "AMSTERDAM HALL", "BROADWAY HALL", "SNAPPY ROOM", "LIBRARY", "DARK ROOM", "MUSIC CLUB", "STUDIO ROOM", "BOUNCY ROOM", "COZY CORNER", "BRIGHT CHAMBER", "WOODEN CHAMBER", "ST. JOSEPH CHRCH", "DOME CHAPEL", "HOCKEY ARENA", "MUSEUM", "INDOOR ARENA", "WAREHOUSE", "THIN SPRING", "FULL SPRING" ]
+  }, "0x17a": { "name": "REVERB STYLE", "min": 0, "max": 35, "def": 0, "values": ["HOF HALL", "HOF PLATE", "HOF ROOM", "HOF CHURCH", "HOF SPRING", "HOF AMB", "HOF LOFI", "HOF TILE", "SMOOTH PLATE", "REFLECT PLATE", "THIN PLATE", "BRIGHT PLATE", "REAL PLATE", "REAL PLATE LONG", "JAZZ PLATE", "QUICK PLATE", "SOFT HALL", "AMSTERDAM HALL", "BROADWAY HALL", "SNAPPY ROOM", "LIBRARY", "DARK ROOM", "MUSIC CLUB", "STUDIO ROOM", "BOUNCY ROOM", "COZY CORNER", "BRIGHT CHAMBER", "WOODEN CHAMBER", "ST. JOSEPH CHRCH", "DOME CHAPEL", "HOCKEY ARENA", "MUSEUM", "INDOOR ARENA", "WAREHOUSE", "THIN SPRING", "FULL SPRING" ]
+  }, "0x17b": { "name": "TYPE", "min": 0, "max": 13, "def": 0
+  }, "0x17c": { "name": "TYPE", "min": 0, "max": 13, "def": 0, "hi": 1
+  }, "0x17d": { "name": "DECAY", "min": 1, "max": 290, "def": 100
+  }, "0x17e": { "name": "DECAY", "min": 1, "max": 290, "def": 100, "hi": 1
+  }, "0x17f": { "name": "DECAY", "min": 1, "max": 290, "def": 100
+  }, "0x180": { "name": "PRE DLY", "min": 0, "max": 100, "def": 50
+  }, "0x181": { "name": "PRE DLY", "min": 0, "max": 100, "def": 50, "hi": 1
+  }, "0x182": { "name": "DIFFUSE", "min": -50, "max": 50, "def": 0
+  }, "0x183": { "name": "DIFFUSE", "min": -50, "max": 50, "def": 0, "hi": 1
+  }, "0x184": { "name": "LOCOLOR", "min": -50, "max": 50, "def": 0
+  }, "0x185": { "name": "LOCOLOR", "min": -50, "max": 50, "def": 0, "hi": 1
+  }, "0x186": { "name": "HICOLOR", "min": -50, "max": 50, "def": 0
+  }, "0x187": { "name": "HICOLOR", "min": -50, "max": 50, "def": 0, "hi": 1
+  }, "0x188": { "name": "HIFACTOR", "min": -25, "max": 25, "def": 0
+  }, "0x189": { "name": "HIFACTOR", "min": -25, "max": 25, "def": 0, "hi": 1
+  }, "0x18a": { "name": "SPEED", "min": -25, "max": 25, "def": 0
+  }, "0x18b": { "name": "SPEED", "min": -25, "max": 25, "def": 0, "hi": 1
+  }, "0x18c": { "name": "DEPTH", "min": -25, "max": 25, "def": 0
+  }, "0x18d": { "name": "DEPTH", "min": -25, "max": 25, "def": 0, "hi": 1
+  }, "0x18e": { "name": "EARLY REFLECTIONS", "min": -25, "max": 0, "def": 0
+  }, "0x18f": { "name": "EARLY REFLECTIONS", "min": -25, "max": 0, "def": 0, "hi": 1
+  }, "0x190": { "name": "TAIL LEVEL", "min": -25, "max": 0, "def": 0
+  }, "0x191": { "name": "TAIL LEVEL", "min": -25, "max": 0, "def": 0, "hi": 1
+  }, "0x192": { "name": "LEAD MIX", "min": -25, "max": 0, "def": 0
+  }, "0x193": { "name": "LEAD MIX", "min": -25, "max": 0, "def": 0, "hi": 1
+  }, "0x194": { "name": "Inflection Style", "min": 0, "max": 37, "def": 0
+  }, "0x195": { "name": "Inflection Style", "min": 0, "max": 37, "def": 0, "hi": 1
+  }, "0x196": { "name": "Inflection Style", "min": 0, "max": 37, "def": 0, "hi": 2
+  }, "0x197": { "name": "Inflection Style", "min": 0, "max": 37, "def": 0, "hi": 3
+  }, "0x198": { "name": "Inflection Amount", "min": 0, "max": 100, "def": 0
+  }, "0x199": { "name": "Inflection Amount", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x19a": { "name": "Inflection Amount", "min": 0, "max": 100, "def": 0, "hi": 2
+  }, "0x19b": { "name": "Inflection Amount", "min": 0, "max": 100, "def": 0, "hi": 3
+  }, "0x19c": { "name": "Inflection RandomizationMod", "min": 0, "max": 10, "def": 5
+  }, "0x19d": { "name": "Inflection RandomizationMod", "min": 0, "max": 10, "def": 5, "hi": 1
+  }, "0x19e": { "name": "Inflection RandomizationMod", "min": 0, "max": 10, "def": 5, "hi": 2
+  }, "0x19f": { "name": "Inflection RandomizationMod", "min": 0, "max": 10, "def": 5, "hi": 3
+  }, "0x1a0": { "name": "Inflection Type", "min": 0, "max": 1, "def": 0
+  }, "0x1a1": { "name": "Inflection Type", "min": 0, "max": 1, "def": 0, "hi": 1
+  }, "0x1a2": { "name": "Inflection Type", "min": 0, "max": 1, "def": 0, "hi": 2
+  }, "0x1a3": { "name": "Inflection Type", "min": 0, "max": 1, "def": 0, "hi": 3
+  }, "0x1a4": { "name": "Inflection MinInterval", "min": 0, "max": 50, "def": 0
+  }, "0x1a5": { "name": "Inflection MinInterval", "min": 0, "max": 50, "def": 0, "hi": 1
+  }, "0x1a6": { "name": "Inflection MinInterval", "min": 0, "max": 50, "def": 0, "hi": 2
+  }, "0x1a7": { "name": "Inflection MinInterval", "min": 0, "max": 50, "def": 0, "hi": 3
+  }, "0x1a8": { "name": "Inflection OvershootMean", "min": 0, "max": 100, "def": 50
+  }, "0x1a9": { "name": "Inflection OvershootMean", "min": 0, "max": 100, "def": 50, "hi": 1
+  }, "0x1aa": { "name": "Inflection OvershootMean", "min": 0, "max": 100, "def": 50, "hi": 2
+  }, "0x1ab": { "name": "Inflection OvershootMean", "min": 0, "max": 100, "def": 50, "hi": 3
+  }, "0x1ac": { "name": "Inflection OvershootDev", "min": 0, "max": 10, "def": 5
+  }, "0x1ad": { "name": "Inflection OvershootDev", "min": 0, "max": 10, "def": 5, "hi": 1
+  }, "0x1ae": { "name": "Inflection OvershootDev", "min": 0, "max": 10, "def": 5, "hi": 2
+  }, "0x1af": { "name": "Inflection OvershootDev", "min": 0, "max": 10, "def": 5, "hi": 3
+  }, "0x1b0": { "name": "Inflection TimeBreakMean", "min": 0, "max": 100, "def": 50
+  }, "0x1b1": { "name": "Inflection TimeBreakMean", "min": 0, "max": 100, "def": 50, "hi": 1
+  }, "0x1b2": { "name": "Inflection TimeBreakMean", "min": 0, "max": 100, "def": 50, "hi": 2
+  }, "0x1b3": { "name": "Inflection TimeBreakMean", "min": 0, "max": 100, "def": 50, "hi": 3
+  }, "0x1b4": { "name": "Inflection TimeBreakDev", "min": 0, "max": 10, "def": 5
+  }, "0x1b5": { "name": "Inflection TimeBreakDev", "min": 0, "max": 10, "def": 5, "hi": 1
+  }, "0x1b6": { "name": "Inflection TimeBreakDev", "min": 0, "max": 10, "def": 5, "hi": 2
+  }, "0x1b7": { "name": "Inflection TimeBreakDev", "min": 0, "max": 10, "def": 5, "hi": 3
+  }, "0x1b8": { "name": "Inflection TimeDurationMean", "min": 0, "max": 160, "def": 80
+  }, "0x1b9": { "name": "Inflection TimeDurationMean", "min": 0, "max": 160, "def": 80, "hi": 1
+  }, "0x1ba": { "name": "Inflection TimeDurationMean", "min": 0, "max": 160, "def": 80, "hi": 2
+  }, "0x1bb": { "name": "Inflection TimeDurationMean", "min": 0, "max": 160, "def": 80, "hi": 3
+  }, "0x1bc": { "name": "Inflection TimeDurationDev", "min": 0, "max": 30, "def": 15
+  }, "0x1bd": { "name": "Inflection TimeDurationDev", "min": 0, "max": 30, "def": 15, "hi": 1
+  }, "0x1be": { "name": "Inflection TimeDurationDev", "min": 0, "max": 30, "def": 15, "hi": 2
+  }, "0x1bf": { "name": "Inflection TimeDurationDev", "min": 0, "max": 30, "def": 15, "hi": 3
+  }, "0x1c0": { "name": "Inflection MagMean", "min": -50, "max": 50, "def": 0
+  }, "0x1c1": { "name": "Inflection MagMean", "min": -50, "max": 50, "def": 0, "hi": 1
+  }, "0x1c2": { "name": "Inflection MagMean", "min": -50, "max": 50, "def": 0, "hi": 2
+  }, "0x1c3": { "name": "Inflection MagMean", "min": -50, "max": 50, "def": 0, "hi": 3
+  }, "0x1c4": { "name": "Inflection MagDev", "min": 0, "max": 80, "def": 0
+  }, "0x1c5": { "name": "Inflection MagDev", "min": 0, "max": 80, "def": 0, "hi": 1
+  }, "0x1c6": { "name": "Inflection MagDev", "min": 0, "max": 80, "def": 0, "hi": 2
+  }, "0x1c7": { "name": "Inflection MagDev", "min": 0, "max": 80, "def": 0, "hi": 3
+  }, "0x1c8": { "name": "Inflection UVmod", "min": 0, "max": 100, "def": 0
+  }, "0x1c9": { "name": "Inflection UVmod", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x1ca": { "name": "Inflection UVmod", "min": 0, "max": 100, "def": 0, "hi": 2
+  }, "0x1cb": { "name": "Inflection UVmod", "min": 0, "max": 100, "def": 0, "hi": 3
+  }, "0x1cc": { "name": "Inflection UVattenuation", "min": -61, "max": 0, "def": 0
+  }, "0x1cd": { "name": "Inflection UVattenuation", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x1ce": { "name": "Inflection UVattenuation", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x1cf": { "name": "Inflection UVattenuation", "min": -61, "max": 0, "def": 0, "hi": 3
+  }, "0x1d0": { "name": "Inflection PitchMaxDev", "min": 0, "max": 60, "def": 10
+  }, "0x1d1": { "name": "Inflection PitchMaxDev", "min": 0, "max": 60, "def": 10, "hi": 1
+  }, "0x1d2": { "name": "Inflection PitchMaxDev", "min": 0, "max": 60, "def": 10, "hi": 2
+  }, "0x1d3": { "name": "Inflection PitchMaxDev", "min": 0, "max": 60, "def": 10, "hi": 3
+  }, "0x1d4": { "name": "Inflection PitchRate", "min": 0, "max": 100, "def": 50
+  }, "0x1d5": { "name": "Inflection PitchRate", "min": 0, "max": 100, "def": 50, "hi": 1
+  }, "0x1d6": { "name": "Inflection PitchRate", "min": 0, "max": 100, "def": 50, "hi": 2
+  }, "0x1d7": { "name": "Inflection PitchRate", "min": 0, "max": 100, "def": 50, "hi": 3
+  }, "0x1d8": { "name": "Inflection TimeMaxDev", "min": 0, "max": 20, "def": 0
+  }, "0x1d9": { "name": "Inflection TimeMaxDev", "min": 0, "max": 20, "def": 0, "hi": 1
+  }, "0x1da": { "name": "Inflection TimeMaxDev", "min": 0, "max": 20, "def": 0, "hi": 2
+  }, "0x1db": { "name": "Inflection TimeMaxDev", "min": 0, "max": 20, "def": 0, "hi": 3
+  }, "0x1dc": { "name": "Inflection TimeRate", "min": 0, "max": 100, "def": 0
+  }, "0x1dd": { "name": "Inflection TimeRate", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x1de": { "name": "Inflection TimeRate", "min": 0, "max": 100, "def": 0, "hi": 2
+  }, "0x1df": { "name": "Inflection TimeRate", "min": 0, "max": 100, "def": 0, "hi": 3
+  }, "0x1e0": { "name": "Inflection EnergyMaxDev", "min": 0, "max": 24, "def": 0
+  }, "0x1e1": { "name": "Inflection EnergyMaxDev", "min": 0, "max": 24, "def": 0, "hi": 1
+  }, "0x1e2": { "name": "Inflection EnergyMaxDev", "min": 0, "max": 24, "def": 0, "hi": 2
+  }, "0x1e3": { "name": "Inflection EnergyMaxDev", "min": 0, "max": 24, "def": 0, "hi": 3
+  }, "0x1e4": { "name": "Inflection EnergyRate", "min": 0, "max": 100, "def": 0
+  }, "0x1e5": { "name": "Inflection EnergyRate", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x1e6": { "name": "Inflection EnergyRate", "min": 0, "max": 100, "def": 0, "hi": 2
+  }, "0x1e7": { "name": "Inflection EnergyRate", "min": 0, "max": 100, "def": 0, "hi": 3
+  }, "0x1e8": { "name": "Inflection Bandwidth", "min": 0, "max": 100, "def": 0
+  }, "0x1e9": { "name": "Inflection Bandwidth", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x1ea": { "name": "Inflection Bandwidth", "min": 0, "max": 100, "def": 0, "hi": 2
+  }, "0x1eb": { "name": "Inflection Bandwidth", "min": 0, "max": 100, "def": 0, "hi": 3
+  }, "0x1ec": { "name": "Inflection FixedDelay", "min": 0, "max": 20, "def": 0
+  }, "0x1ed": { "name": "Inflection FixedDelay", "min": 0, "max": 20, "def": 0, "hi": 1
+  }, "0x1ee": { "name": "Inflection FixedPitch", "min": -20, "max": 20, "def": 0
+  }, "0x1ef": { "name": "Inflection FixedPitch", "min": -20, "max": 20, "def": 0, "hi": 1
+  }, "0x1f0": { "name": "Inflection FixedLevel", "min": -61, "max": 0, "def": 0
+  }, "0x1f1": { "name": "Inflection FixedLevel", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x1f2": { "name": "Vibrato Style", "min": 0, "max": 28, "def": 0
+  }, "0x1f3": { "name": "Vibrato Style", "min": 0, "max": 28, "def": 0, "hi": 1
+  }, "0x1f4": { "name": "Vibrato Amount", "min": 0, "max": 100, "def": 0
+  }, "0x1f5": { "name": "Vibrato Amount", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x1f6": { "name": "Vibrato RandomizationMod", "min": 0, "max": 100, "def": 0
+  }, "0x1f7": { "name": "Vibrato RandomizationMod", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x1f8": { "name": "Vibrato RateMean", "min": 30, "max": 100, "def": 60
+  }, "0x1f9": { "name": "Vibrato RateMean", "min": 30, "max": 100, "def": 60, "hi": 1
+  }, "0x1fa": { "name": "Vibrato RateDev", "min": 0, "max": 20, "def": 0
+  }, "0x1fb": { "name": "Vibrato RateDev", "min": 0, "max": 20, "def": 0, "hi": 1
+  }, "0x1fc": { "name": "Vibrato AmpMean", "min": 0, "max": 60, "def": 20
+  }, "0x1fd": { "name": "Vibrato AmpMean", "min": 0, "max": 60, "def": 20, "hi": 1
+  }, "0x1fe": { "name": "Vibrato AmpDev", "min": 0, "max": 10, "def": 1
+  }, "0x1ff": { "name": "Vibrato AmpDev", "min": 0, "max": 10, "def": 1, "hi": 1
+  }, "0x200": { "name": "Vibrato BiasMean", "min": -100, "max": 100, "def": 0
+  }, "0x201": { "name": "Vibrato BiasMean", "min": -100, "max": 100, "def": 0, "hi": 1
+  }, "0x202": { "name": "Vibrato BiasDev", "min": 0, "max": 100, "def": 4
+  }, "0x203": { "name": "Vibrato BiasDev", "min": 0, "max": 100, "def": 4, "hi": 1
+  }, "0x204": { "name": "Vibrato OnsetTimeMean", "min": 0, "max": 200, "def": 0
+  }, "0x205": { "name": "Vibrato OnsetTimeMean", "min": 0, "max": 200, "def": 0, "hi": 1
+  }, "0x206": { "name": "Vibrato OnsetTimeDev", "min": 0, "max": 32, "def": 0
+  }, "0x207": { "name": "Vibrato OnsetTimeDev", "min": 0, "max": 32, "def": 0, "hi": 1
+  }, "0x208": { "name": "Vibrato AttackTimeMean", "min": 0, "max": 64, "def": 10
+  }, "0x209": { "name": "Vibrato AttackTimeMean", "min": 0, "max": 64, "def": 10, "hi": 1
+  }, "0x20a": { "name": "Vibrato AttackTimeDev", "min": 0, "max": 11, "def": 1
+  }, "0x20b": { "name": "Vibrato AttackTimeDev", "min": 0, "max": 11, "def": 1, "hi": 1
+  }, "0x20c": { "name": "Vibrato SustainTimeMean", "min": 0, "max": 1000, "def": 300
+  }, "0x20d": { "name": "Vibrato SustainTimeMean", "min": 0, "max": 1000, "def": 300, "hi": 1
+  }, "0x20e": { "name": "Vibrato SustainTimeDev", "min": 0, "max": 60, "def": 10
+  }, "0x20f": { "name": "Vibrato SustainTimeDev", "min": 0, "max": 60, "def": 10, "hi": 1
+  }, "0x210": { "name": "Vibrato ReleaseTimeMean", "min": 0, "max": 300, "def": 5
+  }, "0x211": { "name": "Vibrato ReleaseTimeMean", "min": 0, "max": 300, "def": 5, "hi": 1
+  }, "0x212": { "name": "Vibrato ReleaseTimeDev", "min": 0, "max": 50, "def": 0
+  }, "0x213": { "name": "Vibrato ReleaseTimeDev", "min": 0, "max": 50, "def": 0, "hi": 1
+  }, "0x214": { "name": "Vibrato GainAmpMean", "min": 0, "max": 12, "def": 0
+  }, "0x215": { "name": "Vibrato GainAmpMean", "min": 0, "max": 12, "def": 0, "hi": 1
+  }, "0x216": { "name": "Vibrato GainAmpDev", "min": 0, "max": 6, "def": 0
+  }, "0x217": { "name": "Vibrato GainAmpDev", "min": 0, "max": 6, "def": 0, "hi": 1
+  }, "0x218": { "name": "Vibrato GainBiasMean", "min": -200, "max": 200, "def": 0
+  }, "0x219": { "name": "Vibrato GainBiasMean", "min": -200, "max": 200, "def": 0, "hi": 1
+  }, "0x21a": { "name": "Vibrato GainBiasDev", "min": 0, "max": 50, "def": 0
+  }, "0x21b": { "name": "Vibrato GainBiasDev", "min": 0, "max": 50, "def": 0, "hi": 1
+  }, "0x21c": { "name": "Vibrato RateDecr", "min": 0, "max": 10, "def": 0
+  }, "0x21d": { "name": "Vibrato RateDecr", "min": 0, "max": 10, "def": 0, "hi": 1
+  }, "0x21e": { "name": "Vibrato RateDecrMinRate", "min": 25, "max": 100, "def": 80
+  }, "0x21f": { "name": "Vibrato RateDecrMinRate", "min": 25, "max": 100, "def": 80, "hi": 1
+  }, "0x220": { "name": "Vibrato GainBeta", "min": 0, "max": 100, "def": 0
+  }, "0x221": { "name": "Vibrato GainBeta", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x222": { "name": "Vibrato GainPhase", "min": -100, "max": 100, "def": 0
+  }, "0x223": { "name": "Vibrato GainPhase", "min": -100, "max": 100, "def": 0, "hi": 1
+  }, "0x224": { "name": "Vibrato GainAlign", "min": 0, "max": 3, "def": 0
+  }, "0x225": { "name": "Vibrato GainAlign", "min": 0, "max": 3, "def": 0, "hi": 1
+  }, "0x226": { "name": "STYLE", "min": 0, "max": 7, "def": 1
+  }, "0x227": { "name": "ROUTING", "min": 0, "max": 1, "def": 1
+  }, "0x228": { "name": "DRIVE", "min": 0, "max": 100, "def": 0
+  }, "0x229": { "name": "LOW CUT", "min": 50, "max": 240, "def": 50
+  }, "0x22a": { "name": "HIGH CUT", "min": 75, "max": 238, "def": 238
+  }, "0x22b": { "name": "TRANSDUCER IN GAIN", "min": -20, "max": 20, "def": 0
+  }, "0x22c": { "name": "GAIN", "min": -20, "max": 20, "def": 0
+  }, "0x22d": { "name": "DISTORTION TYPE", "min": 0, "max": 14, "def": 0, "values": ["SATURATION 1", "SATURATION 2", "SATURATION 3", "OVERDRIVE 1", "OVERDRIVE 2", "OVERDRIVE 3", "OVERDRIVE 4", "OVERDRIVE 5", "DISTORTION 1", "DISTORTION 2", "DISTORTION 3", "DISTORTION 4", "FUZZ 1", "FUZZ 2", "FUZZ 3" ]
+  }, "0x22e": { "name": "", "min": -60, "max": 60, "def": 0
+  }, "0x22f": { "name": "", "min": -60, "max": 60, "def": 0
+  }, "0x230": { "name": "", "min": -60, "max": 60, "def": 0
+  }, "0x231": { "name": "", "min": 0, "max": 240, "def": 100
+  }, "0x232": { "name": "", "min": 0, "max": 16, "def": 8, "values": ["NARROW", "0.13", "0.18", "0.24", "0.32", "0.42", "0.56", "0.75", "1.0", "1.3", "1.8", "2.4", "3.2", "4.2", "5.6", "7.5", "WIDE" ]
+  }, "0x233": { "name": "", "min": -60, "max": 60, "def": 0
+  }, "0x234": { "name": "", "min": 0, "max": 240, "def": 100
+  }, "0x235": { "name": "", "min": 0, "max": 16, "def": 8, "values": ["NARROW", "0.13", "0.18", "0.24", "0.32", "0.42", "0.56", "0.75", "1.0", "1.3", "1.8", "2.4", "3.2", "4.2", "5.6", "7.5", "WIDE" ]
+  }, "0x236": { "name": "", "min": -100, "max": -1, "def": -30
+  }, "0x237": { "name": "", "min": -100, "max": 100, "def": 10
+  }, "0x238": { "name": "", "min": -20, "max": 20, "def": 10
+  }, "0x239": { "name": "", "min": -20, "max": 20, "def": 10
+  }, "0x23a": { "name": "", "min": 0, "max": 100, "def": 50
+  }, "0x23b": { "name": "", "min": 0, "max": 100, "def": 50
+  }, "0x23c": { "name": "PRESENCE GAIN", "min": -20, "max": 20, "def": 0
+  }, "0x23d": { "name": "PRES FREQ", "min": 100, "max": 195, "def": 140
+  }, "0x23e": { "name": "PRES WIDTH", "min": 0, "max": 16, "def": 4, "values": ["NARROW", "0.13", "0.18", "0.24", "0.32", "0.42", "0.56", "0.75", "1.0", "1.3", "1.8", "2.4", "3.2", "4.2", "5.6", "7.5", "WIDE" ]
+  }, "0x23f": { "name": "", "min": 1, "max": 4, "def": 1
+  }, "0x240": { "name": "FILTER", "min": 0, "max": 100, "def": 50
+  }, "0x241": { "name": "", "min": -60, "max": 60, "def": 0
+  }, "0x242": { "name": "", "min": -60, "max": 60, "def": 0
+  }, "0x243": { "name": "STYLE", "min": 0, "max": 6, "def": 1
+  }, "0x244": { "name": "HARDTUNE KEY", "min": 0, "max": 3, "def": 0
+  }, "0x245": { "name": "HARDTUNE AMOUNT", "min": 0, "max": 100, "def": 0
+  }, "0x246": { "name": "HARDTUNE WINDOW", "min": 0, "max": 60, "def": 0
+  }, "0x247": { "name": "HARDTUNE RATE", "min": 0, "max": 100, "def": 0
+  }, "0x248": { "name": "SHIFT", "min": -36, "max": 36, "def": 0
+  }, "0x249": { "name": "KEY", "min": 0, "max": 11, "def": 0
+  }, "0x24a": { "name": "ENABLED", "min": 0, "max": 1, "def": 0
+  }, "0x24b": { "name": "NOTE", "min": 0, "max": 11, "def": 0
+  }, "0x24c": { "name": "SCALE", "min": 0, "max": 5, "def": 0
+  }, "0x24d": { "name": "PITCH COR AMT", "min": 0, "max": 100, "def": 0
+  }, "0x24e": { "name": "GENDER", "min": -50, "max": 50, "def": 0
+  }, "0x24f": { "name": "INPUT", "min": 0, "max": 6, "def": 0
+  }, "0x250": { "name": "INPUT", "min": 0, "max": 6, "def": 0
+  }, "0x251": { "name": "IN GAIN", "min": 0, "max": 66, "def": 30
+  }, "0x252": { "name": "AUX", "min": -61, "max": 0, "def": -5
+  }, "0x253": { "name": "ROOMSENSE", "min": -36, "max": 0, "def": -36
+  }, "0x254": { "name": "PITCH PIPE LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x255": { "name": "MIDI CTRL", "min": 0, "max": 2, "def": 0
+  }, "0x256": { "name": "MIDI CHAN", "min": 0, "max": 16, "def": 1
+  }, "0x257": { "name": "CC CHAN", "min": 0, "max": 16, "def": 1
+  }, "0x258": { "name": "FILTER", "min": 0, "max": 3, "def": 0
+  }, "0x259": { "name": "SYSEXID", "min": 0, "max": 127, "def": 0
+  }, "0x25a": { "name": "PBRANGE", "min": 0, "max": 12, "def": 2
+  }, "0x25b": { "name": "TRANSPOSE", "min": -4, "max": 4, "def": 0
+  }, "0x25c": { "name": "SPLITDIR", "min": 0, "max": 1, "def": 0
+  }, "0x25d": { "name": "SPLITNOTE", "min": 0, "max": 127, "def": 0
+  }, "0x25e": { "name": "TUNE REFERENCE", "min": 840, "max": 920, "def": 880
+  }, "0x25f": { "name": "HEADROOM", "min": 0, "max": 12, "def": 5
+  }, "0x260": { "name": "GUITAR", "min": -31, "max": 24, "def": 10
+  }, "0x261": { "name": "GUITAR MUTE", "min": 0, "max": 1, "def": 0
+  }, "0x262": { "name": "BYPASS", "min": 0, "max": 1, "def": 0
+  }, "0x263": { "name": "GLOBAL GUITAR FX", "min": 0, "max": 1, "def": 0
+  }, "0x264": { "name": "GLOBAL KEY", "min": 0, "max": 1, "def": 0
+  }, "0x265": { "name": "NAT PLAY GBL", "min": 0, "max": 9, "def": 0
+  }, "0x266": { "name": "KEY/SCALE GBL", "min": 0, "max": 1, "def": 0
+  }, "0x267": { "name": "KEY", "min": 0, "max": 12, "def": 0
+  }, "0x268": { "name": "GLOBAL TEMPO", "min": 0, "max": 1, "def": 0
+  }, "0x269": { "name": "LEAD DELAY", "min": 0, "max": 2, "def": 0
+  }, "0x26a": { "name": "LEAD MUTE", "min": 0, "max": 1, "def": 0
+  }, "0x26b": { "name": "LEAD LEVEL", "min": -61, "max": 0, "def": 0
+  }, "0x26c": { "name": "LEAD LEVEL", "min": -61, "max": 0, "def": 0, "hi": 1
+  }, "0x26d": { "name": "LEAD LEVEL", "min": -61, "max": 0, "def": 0, "hi": 2
+  }, "0x26e": { "name": "LEAD LEVEL", "min": -61, "max": 0, "def": 0, "hi": 3
+  }, "0x26f": { "name": "LEAD LEVEL", "min": -61, "max": 0, "def": 0, "hi": 4
+  }, "0x270": { "name": "LEAD LEVEL", "min": -61, "max": 0, "def": 0, "hi": 5
+  }, "0x271": { "name": "BPMODE", "min": 0, "max": 4, "def": 0
+  }, "0x272": { "name": "Utility Aux_In_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x273": { "name": "Utility Guitar_In_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x274": { "name": "Utility Guitar_Out_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x275": { "name": "Utility Midi_In_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x276": { "name": "Utility Usb_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x277": { "name": "Utility Pedal_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x278": { "name": "Utility Auto_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x279": { "name": "Utility HP_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x27a": { "name": "Utility InputMute", "min": 0, "max": 1, "def": 0
+  }, "0x27b": { "name": "Utility OutputMute", "min": 0, "max": 1, "def": 0
+  }, "0x27c": { "name": "MP75 CONTROL", "min": 0, "max": 3, "def": 0
+  }, "0x27d": { "name": "LCD CONTRAST", "min": 0, "max": 5, "def": 2
+  }, "0x27e": { "name": "UP/DN FUNCTION", "min": 0, "max": 1, "def": 0
+  }, "0x27f": { "name": "LOOP FEEDBACK", "min": 0, "max": 100, "def": 98
+  }, "0x280": { "name": "UNDO", "min": 0, "max": 1, "def": 1
+  }, "0x281": { "name": "", "min": -61, "max": 0, "def": 0
+  }, "0x282": { "name": "", "min": 0, "max": 65535, "def": 1
+  }, "0x283": { "name": "", "min": 0, "max": 18, "def": 0
+  }, "0x284": { "name": "OUT LEVEL", "min": 0, "max": 1, "def": 1
+  }, "0x285": { "name": "ROOMSENSE", "min": 0, "max": 2, "def": 0
+  }, "0x286": { "name": "", "min": 0, "max": 1, "def": 1
+  }, "0x287": { "name": "TONE STYLE", "min": 0, "max": 8, "def": 1
+  }, "0x288": { "name": "AUX IN TYPE", "min": 0, "max": 2, "def": 1
+  }, "0x289": { "name": "INPUT", "min": 0, "max": 6, "def": 3
+  }, "0x28a": { "name": "", "min": 0, "max": 11, "def": 0
+  }, "0x28b": { "name": "", "min": 0, "max": 2, "def": 0
+  }, "0x28c": { "name": "", "min": 0, "max": 2, "def": 0
+  }, "0x28d": { "name": "MIX", "min": 0, "max": 100, "def": 50
+  }, "0x28e": { "name": "", "min": 0, "max": 100, "def": 50
+  }, "0x28f": { "name": "", "min": -240, "max": 0, "def": 0
+  }, "0x290": { "name": "LOOP LEVEL", "min": -61, "max": 0, "def": 0
+  }, "0x291": { "name": "AUX TO MAIN OUT", "min": 0, "max": 1, "def": 1
+  }, "0x292": { "name": "LEAD EFFECT SENDS", "min": 0, "max": 1, "def": 0
+  }, "0x293": { "name": "TONE", "min": 0, "max": 1, "def": 1
+  }, "0x294": { "name": "", "min": 0, "max": 1, "def": 0
+  }, "0x295": { "name": "", "min": 0, "max": 1, "def": 1
+  }, "0x296": { "name": "uMOD", "min": 0, "max": 1, "def": 0
+  }, "0x297": { "name": "DELAY", "min": 0, "max": 1, "def": 0
+  }, "0x298": { "name": "REVERB", "min": 0, "max": 1, "def": 0
+  }, "0x299": { "name": "HARMONY", "min": 0, "max": 1, "def": 0
+  }, "0x29a": { "name": "DOUBLE", "min": 0, "max": 1, "def": 0
+  }, "0x29b": { "name": "TRANSDUCER", "min": 0, "max": 1, "def": 0
+  }, "0x29c": { "name": "CHOIR", "min": 0, "max": 1, "def": 0
+  }, "0x29d": { "name": "HARDTUNE", "min": 0, "max": 1, "def": 0
+  }, "0x29e": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x29f": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x2a0": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x2a1": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x2a2": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x2a3": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x2a4": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x2a5": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2a6": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2a7": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2a8": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2a9": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2aa": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2ab": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2ac": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2ad": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2ae": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2af": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b0": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b1": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b2": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b3": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b4": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b5": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b6": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b7": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b8": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2b9": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2ba": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2bb": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2bc": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2bd": { "name": "", "min": -65536, "max": 65535, "def": 0
+  }, "0x2be": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2bf": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c0": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c1": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c2": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c3": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c4": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c5": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c6": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c7": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c8": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2c9": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2ca": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2cb": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2cc": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2cd": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2ce": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2cf": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d0": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d1": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d2": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d3": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d4": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d5": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d6": { "name": "", "min": 0, "max": 4095, "def": 0
+  }, "0x2d7": { "name": "SEND PRESET TO MIDI SYSEX", "min": 1, "max": 400, "def": 0
+  }, "0x2d8": { "name": "ERASE USER PRESET", "min": 1, "max": 400, "def": 0
+  }, "0x2d9": { "name": "CONFIRM", "min": 0, "max": 1, "def": 0
+  }, "0x2da": { "name": "CLEAN PRESET BANK (UP TO 2 MINUTES)", "min": 1, "max": 0, "def": 0
+  }, "0x2db": { "name": "", "min": 0, "max": 127, "def": 0
+  }, "0x2dc": { "name": "", "min": 0, "max": 127, "def": 0, "hi": 1
+  }, "0x2dd": { "name": "", "min": 0, "max": 127, "def": 0
+  }, "0x2de": { "name": "", "min": 0, "max": 127, "def": 0
+  }, "0x2df": { "name": "GENDER", "min": -50, "max": 50, "def": 0
+  }, "0x2e0": { "name": "GENDER", "min": -50, "max": 50, "def": 0, "hi": 1
+  }, "0x2e1": { "name": "BEATBOX", "min": 0, "max": 1, "def": 0
+  }, "0x2e2": { "name": "", "min": 0, "max": 65535, "def": 0
+  }, "0x2e3": { "name": "", "min": 0, "max": 4, "def": 4
+  }, "0x2e4": { "name": "", "min": 0, "max": 1000, "def": 990
+  }, "0x2e5": { "name": "LEAD SOURCE", "min": 0, "max": 3, "def": 0
+  }, "0x2e6": { "name": "SELECTAUX", "min": 0, "max": 1, "def": 0
+  }, "0x2e7": { "name": "VOCAL CANCEL", "min": 0, "max": 1, "def": 0
+  }, "0x2e8": { "name": "ROUTING", "min": 0, "max": 1, "def": 0
+  }, "0x2e9": { "name": "PAREQ GAIN", "min": -48, "max": 0, "def": 0
+  }, "0x2ea": { "name": "PAREQ FREQ", "min": 0, "max": 240, "def": 140
+  }, "0x2eb": { "name": "PAREQ WIDTH", "min": 0, "max": 32, "def": 16
+  }, "0x2ec": { "name": "MAKEUP GAIN", "min": -6, "max": 6, "def": 0
+  }, "0x2ed": { "name": "STYLE", "min": 0, "max": 2, "def": 0
+  }, "0x2ee": { "name": "PAREQ 0 GAIN", "min": -24, "max": 24, "def": 0
+  }, "0x2ef": { "name": "PAREQ 0 FREQ", "min": 0, "max": 240, "def": 140
+  }, "0x2f0": { "name": "PAREQ 0 WIDTH", "min": 0, "max": 32, "def": 16
+  }, "0x2f1": { "name": "PAREQ 1 GAIN", "min": -24, "max": 24, "def": 0
+  }, "0x2f2": { "name": "PAREQ 1 FREQ", "min": 0, "max": 240, "def": 140
+  }, "0x2f3": { "name": "PAREQ 1 WIDTH", "min": 0, "max": 32, "def": 16
+  }, "0x2f4": { "name": "HISHELVE GAIN", "min": -24, "max": 24, "def": 0
+  }, "0x2f5": { "name": "HISHELVE FREQ", "min": 0, "max": 240, "def": 140
+  }, "0x2f6": { "name": "HISHELVE SLOPE", "min": 0, "max": 3, "def": 0
+  }, "0x2f7": { "name": "TRIGGER", "min": 0, "max": 1, "def": 0
+  }, "0x2f8": { "name": "LOADSAMPLE", "min": 0, "max": 11, "def": 5
+  }, "0x2f9": { "name": "GUITAR GATE", "min": -81, "max": 0, "def": -72
+  }, "0x2fa": { "name": "STYLE", "min": 0, "max": 4, "def": 0, "values": ["SUBTLE TUBE", "SUBTLE SUSTAIN", "SUSTAIN ATTACK", "SUSTAIN POP", "PUMPING" ]
+  }, "0x2fb": { "name": "STYLE", "min": 0, "max": 4, "def": 0, "values": ["SUBTLE TUBE", "SUBTLE SUSTAIN", "SUSTAIN ATTACK", "SUSTAIN POP", "PUMPING" ]
+  }, "0x2fc": { "name": "AMOUNT", "min": 0, "max": 100, "def": 0
+  }, "0x2fd": { "name": "AMOUNT", "min": 0, "max": 100, "def": 0, "hi": 1
+  }, "0x2fe": { "name": "RATIO", "min": 0, "max": 14, "def": 5, "values": ["1.0", "1.1", "1.2", "1.4", "1.6", "1.8", "2.0", "2.5", "3.2", "4.0", "5.6", "8.0", "16", "32", "64" ]
+  }, "0x2ff": { "name": "THRESHOLD", "min": -50, "max": 0, "def": 0
+  }, "0x300": { "name": "MAKEUP", "min": 0, "max": 24, "def": 0
+  }, "0x301": { "name": "MAKEUP", "min": 0, "max": 24, "def": 0, "hi": 1
+  }, "0x302": { "name": "ATTACK", "min": 0, "max": 19, "def": 0
+  }, "0x303": { "name": "RELEASE", "min": 0, "max": 19, "def": 9
+  }, "0x304": { "name": "RATIO", "min": 0, "max": 14, "def": 3, "values": ["1.0", "1.1", "1.2", "1.4", "1.6", "1.8", "2.0", "2.5", "3.2", "4.0", "5.6", "8.0", "16", "32", "64" ]
+  }, "0x305": { "name": "THRESHOLD", "min": -30, "max": 0, "def": 0
+  }, "0x306": { "name": "MAKEUP", "min": 0, "max": 12, "def": 3
+  }, "0x307": { "name": "ATTACK", "min": 0, "max": 19, "def": 0
+  }, "0x308": { "name": "RELEASE", "min": 0, "max": 19, "def": 0
+  }, "0x309": { "name": "PRE GAIN", "min": -40, "max": 40, "def": 0
+  }, "0x30a": { "name": "POST GAIN", "min": -40, "max": 18, "def": 0
+  }, "0x30b": { "name": "DC GAIN", "min": -100, "max": 100, "def": 0
+  }, "0x30c": { "name": "SLOPE", "min": 1, "max": 20, "def": 1
+  }, "0x30d": { "name": "DISTORTION MODE", "min": 0, "max": 1, "def": 0
+  }, "0x30e": { "name": "SPEAKER GAIN", "min": -20, "max": 20, "def": 0
+  }, "0x30f": { "name": "SPEAKER Q", "min": 0, "max": 16, "def": 8, "values": ["NARROW", "0.13", "0.18", "0.24", "0.32", "0.42", "0.56", "0.75", "1.0", "1.3", "1.8", "2.4", "3.2", "4.2", "5.6", "7.5", "WIDE" ]
+  }, "0x310": { "name": "ROLL-OFF", "min": 0, "max": 240, "def": 240
+  }, "0x311": { "name": "SPEAKER SIM", "min": 0, "max": 1, "def": 1
+  }, "0x312": { "name": "LOW CUT FC", "min": 0, "max": 72, "def": 36
+  }, "0x313": { "name": "DRIVE", "min": -9, "max": 60, "def": 0
+  }, "0x314": { "name": "DRIVE", "min": -9, "max": 60, "def": 0, "hi": 1
+  }, "0x315": { "name": "LEVEL", "min": -40, "max": 18, "def": 0
+  }, "0x316": { "name": "LEVEL", "min": -40, "max": 18, "def": 0, "hi": 1
+  }, "0x317": { "name": "DRIVE", "min": -9, "max": 60, "def": 0
+  }, "0x318": { "name": "DRIVE", "min": -9, "max": 60, "def": 0, "hi": 1
+  }, "0x319": { "name": "LEVEL", "min": -40, "max": 18, "def": 0
+  }, "0x31a": { "name": "LEVEL", "min": -40, "max": 18, "def": 0, "hi": 1
+  }, "0x31b": { "name": "GUITAR MAIN OUTPUT LEVEL", "min": -61, "max": 12, "def": 0
+  }, "0x31c": { "name": "GUITAR MAIN ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x31d": { "name": "", "min": 0, "max": 1, "def": 0
+  }, "0x31e": { "name": "GUITAR HP LEVEL", "min": -61, "max": 24, "def": 0
+  }, "0x31f": { "name": "GUITAR HP ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x320": { "name": "", "min": -61, "max": 24, "def": 0
+  }, "0x321": { "name": "", "min": 0, "max": 4, "def": 0
+  }, "0x322": { "name": "GUITAR DEDICATED LEVEL", "min": -61, "max": 0, "def": 0
+  }, "0x323": { "name": "GUITAR DEDICATED ROUTING", "min": 0, "max": 4, "def": 0
+  }, "0x324": { "name": "MIC BOOST", "min": 0, "max": 2, "def": 1
+  }, "0x325": { "name": "CONTROL", "min": 0, "max": 1, "def": 0
+  }, "0x326": { "name": "CONTROL", "min": 0, "max": 1, "def": 0, "hi": 1
+  }, "0x327": { "name": "CONTROL", "min": 0, "max": 1, "def": 0
+  }, "0x328": { "name": "CONTROL", "min": 0, "max": 1, "def": 0, "hi": 1
+  }, "0x329": { "name": "CONTROL", "min": 0, "max": 1, "def": 0
+  }, "0x32a": { "name": "CONTROL", "min": 0, "max": 1, "def": 0, "hi": 1
+  }, "0x32b": { "name": "CONTROL", "min": 0, "max": 1, "def": 0
+  }, "0x32c": { "name": "CONTROL", "min": 0, "max": 1, "def": 0, "hi": 1
+  }, "0x32d": { "name": "CONTROL", "min": 0, "max": 1, "def": 1
+  }, "0x32e": { "name": "CONTROL", "min": 0, "max": 1, "def": 1, "hi": 1
+  }, "0x32f": { "name": "BOOST", "min": 0, "max": 1, "def": 0
+  }, "0x330": { "name": "SWITCH-3 MODE", "min": 0, "max": 1, "def": 0
+  }, "0x331": { "name": "SWITCH 1", "min": 0, "max": 30, "def": 0
+  }, "0x332": { "name": "SWITCH 2", "min": 0, "max": 30, "def": 1
+  }, "0x333": { "name": "SWITCH 3", "min": 0, "max": 30, "def": 2
+  }, "0x334": { "name": "ROOMSENSE LOCUT", "min": 0, "max": 112, "def": 0
+  }, "0x335": { "name": "MP76 RIGHT", "min": 0, "max": 17, "def": 0
+  }, "0x336": { "name": "MP76 BOTTOM", "min": 0, "max": 17, "def": 0
+  }, "0x337": { "name": "MP76 LEFT", "min": 0, "max": 17, "def": 0
+  }, "0x338": { "name": "MP76 TOP", "min": 0, "max": 17, "def": 0
+  }, "0x339": { "name": "MP76 CONTROL", "min": 0, "max": 1, "def": 0
+  }, "0x33a": { "name": "FOOTSWITCH", "min": 0, "max": 1, "def": 1
+  }, "0x33b": { "name": "SWITCH-6 MODE", "min": 0, "max": 2, "def": 0
+  }, "0x33c": { "name": "SWITCH 1", "min": 0, "max": 30, "def": 0
+  }, "0x33d": { "name": "SWITCH 2", "min": 0, "max": 30, "def": 2
+  }, "0x33e": { "name": "SWITCH 3", "min": 0, "max": 30, "def": 4
+  }, "0x33f": { "name": "DIVISION", "min": 0, "max": 19, "def": 10
+  }, "0x340": { "name": "DIVISION", "min": 0, "max": 19, "def": 10
+  }, "0x341": { "name": "HUMANIZE", "min": 0, "max": 100, "def": 0
+  }, "0x342": { "name": "PORTAMENTO", "min": 0, "max": 200, "def": 0
+  }, "0x343": { "name": "PRESET UNUSED 6", "min": 0, "max": 1, "def": 0
+  }, "0x344": { "name": "PRESET UNUSED 6", "min": 0, "max": 1, "def": 0
+  }, "0x345": { "name": "PRESET UNUSED 7", "min": 0, "max": 1, "def": 0
+  }, "0x346": { "name": "PRESET UNUSED 8", "min": 0, "max": 1, "def": 0
+  }, "0x347": { "name": "PRESET UNUSED 9", "min": 0, "max": 1, "def": 0
+  }, "0x348": { "name": "PRESET UNUSED 8", "min": 0, "max": 1, "def": 0
+  }, "0x349": { "name": "PRESET UNUSED 9", "min": 0, "max": 1, "def": 0
+  }, "0x34a": { "name": "SWITCH 1", "min": 0, "max": 30, "def": 0
+  }, "0x34b": { "name": "SWITCH 2", "min": 0, "max": 30, "def": 1
+  }, "0x34c": { "name": "SWITCH 3", "min": 0, "max": 30, "def": 2
+  }, "0x34d": { "name": "MP76 RIGHT", "min": 0, "max": 17, "def": 0
+  }, "0x34e": { "name": "MP76 BOTTOM", "min": 0, "max": 17, "def": 0
+  }, "0x34f": { "name": "MP76 LEFT", "min": 0, "max": 17, "def": 0
+  }, "0x350": { "name": "MP76 TOP", "min": 0, "max": 17, "def": 0
+  }, "0x351": { "name": "SWITCH 4", "min": 0, "max": 30, "def": 6
+  }, "0x352": { "name": "SWITCH 5", "min": 0, "max": 30, "def": 7
+  }, "0x353": { "name": "SWITCH 6", "min": 0, "max": 30, "def": 4
+  }, "0x354": { "name": "SWITCH 1", "min": 0, "max": 30, "def": 0
+  }, "0x355": { "name": "SWITCH 2", "min": 0, "max": 30, "def": 2
+  }, "0x356": { "name": "SWITCH 3", "min": 0, "max": 30, "def": 4
+  }, "0x357": { "name": "SWITCH 4", "min": 0, "max": 30, "def": 6
+  }, "0x358": { "name": "SWITCH 5", "min": 0, "max": 30, "def": 7
+  }, "0x359": { "name": "SWITCH 6", "min": 0, "max": 30, "def": 4
+  }, "0x35a": { "name": "SYSTEM UNUSED 18", "min": 0, "max": 1, "def": 0
+  }, "0x35b": { "name": "SYSTEM UNUSED 17", "min": 0, "max": 1, "def": 0
+  }, "0x35c": { "name": "BAD", "min": 0, "max": 127, "def": 0
+  }, "0x35d": { "name": "LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x35e": { "name": "SMOOTH", "min": 0, "max": 2, "def": 2
+  }, "0x35f": { "name": "WIDTH", "min": 0, "max": 100, "def": 100
+  }, "0x360": { "name": "TLRATIO", "min": 0, "max": 100, "def": 40
+  }, "0x362": { "name": "Voices Global_Pitch", "min": 0, "max": 100, "def": 0
+  }, "0x364": { "name": "ATTACK", "min": 0, "max": 19, "def": 0
+  }, "0x366": { "name": "THRESH", "min": -60, "max": 0, "def": -6
+  }, "0x367": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x368": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x369": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x36a": { "name": "HI WIDTH", "min": 0, "max": 32, "def": 16
+  }, "0x36b": { "name": "RELEASE", "min": 0, "max": 4, "def": 4
+  }, "0x36c": { "name": "HUMANIZE STYLE", "min": 0, "max": 6, "def": 0
+  }, "0x36d": { "name": "CHORD", "min": 0, "max": 20, "def": 0
+  }, "0x36e": { "name": "MAP OUT", "min": -24, "max": 25, "def": 0
+  }, "0x36f": { "name": "DOUBLE", "min": 0, "max": 3, "def": 0
+  }, "0x370": { "name": "LEVEL", "min": -36, "max": 0, "def": 0
+  }, "0x371": { "name": "WIDTH", "min": 0, "max": 100, "def": 100
+  }, "0x372": { "name": "LOWCUT R", "min": 0, "max": 240, "def": 0
+  }, "0x373": { "name": "HIGH CUT IN", "min": 0, "max": 240, "def": 240
+  }, "0x374": { "name": "MIDI CLOCK", "min": 0, "max": 1, "def": 0
+  }, "0x375": { "name": "Inflection TimeBreakDev", "min": 0, "max": 10, "def": 5
+  }, "0x376": { "name": "Inflection TimeDurationMean", "min": 0, "max": 160, "def": 80
+  }, "0x377": { "name": "Inflection TimeDurationDev", "min": 0, "max": 30, "def": 15
+  }, "0x378": { "name": "Inflection MagDev", "min": 0, "max": 80, "def": 0
+  }, "0x379": { "name": "Inflection UVmod", "min": 0, "max": 100, "def": 0
+  }, "0x37a": { "name": "Inflection PitchRate", "min": 0, "max": 100, "def": 50
+  }, "0x37b": { "name": "Inflection TimeMaxDev", "min": 0, "max": 20, "def": 0
+  }, "0x37c": { "name": "Inflection TimeRate", "min": 0, "max": 100, "def": 0
+  }, "0x37d": { "name": "Inflection EnergyRate", "min": 0, "max": 100, "def": 0
+  }, "0x37e": { "name": "Inflection Bandwidth", "min": 0, "max": 100, "def": 0
+  }, "0x37f": { "name": "PRES FREQ", "min": 100, "max": 195, "def": 140
+  }, "0x380": { "name": "PRES WIDTH", "min": 0, "max": 16, "def": 4, "values": ["NARROW", "0.13", "0.18", "0.24", "0.32", "0.42", "0.56", "0.75", "1.0", "1.3", "1.8", "2.4", "3.2", "4.2", "5.6", "7.5", "WIDE" ]
+  }, "0x381": { "name": "SHIFT", "min": -36, "max": 36, "def": 0
+  }, "0x382": { "name": "KEY", "min": 0, "max": 11, "def": 0
+  }, "0x383": { "name": "KEY", "min": 0, "max": 12, "def": 0
+  }, "0x384": { "name": "GLOBAL TEMPO", "min": 0, "max": 1, "def": 0
+  }, "0x385": { "name": "BPMODE", "min": 0, "max": 4, "def": 0
+  }, "0x386": { "name": "Utility Aux_In_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x387": { "name": "Utility Guitar_In_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x388": { "name": "Utility Midi_In_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x389": { "name": "Utility Usb_Sense", "min": 0, "max": 1, "def": 0
+  }, "0x38a": { "name": "MP75 CONTROL", "min": 0, "max": 3, "def": 0
+  }, "0x38b": { "name": "LCD CONTRAST", "min": 0, "max": 5, "def": 2
+  }, "0x38c": { "name": "", "min": 0, "max": 2, "def": 0
+  }, "0x38d": { "name": "", "min": 0, "max": 2, "def": 0
+  }, "0x38e": { "name": "CHOIR", "min": 0, "max": 1, "def": 0
+  }, "0x38f": { "name": "HARDTUNE", "min": 0, "max": 1, "def": 0
+  }, "0x390": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x391": { "name": "CONTROL", "min": 0, "max": 2, "def": 0
+  }, "0x392": { "name": "SWITCH 4", "min": 0, "max": 30, "def": 6
+  }, "0x393": { "name": "SWITCH 5", "min": 0, "max": 30, "def": 7
+  }, "0x394": { "name": "SWITCH 6", "min": 0, "max": 30, "def": 4
+  }, "0x3b8": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x3b9": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x3ba": { "name": "DOUBLE", "min": 0, "max": 3, "def": 0
+  }, "0x3be": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }, "0x3bf": { "name": "AMP", "min": 0, "max": 25, "def": 0, "values": ["CLEAN BRIT", "CALI CLEAN", "UK CLEAN", "DEEP CLEAN", "BRIGHT SWITCH", "WARM", "LITTLE THING", "CHICKEN PICKER", "BRIT OD", "AC CRUNCH", "CHUNKY BRIT", "LIL CHAMPION", "CHIME DRIVE", "2X12 COMBO", "4X12 CRUNCH", "SWAMPTONE", "NASALTONE", "BROWN", "SCOOPED", "METALLIC", "DARK MATTER", "OD PEDAL", "DARK OD PEDAL", "DISTORTION PEDAL", "ACOUSTIC", "ACOUSTIC SHAPE" ]
+  }
+ }
+}
