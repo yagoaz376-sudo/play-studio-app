@@ -187,6 +187,24 @@
   }
   function resetWrites() { clearTimeout(flushT); flushT = 0; pending.clear(); touched.clear(); backIds.clear(); clearTimeout(backT); epoch++; endDrags(); }
   const STRUCT_IDS = new Set([ID.BODYREZ_EDIT, ID.FOOTSWITCH]);
+  // ── tap tempo (Stage) ───────────────────────────────────────────────────
+  // One TEMPO per preset (45–300 BPM) drives every tempo-synced effect (vocal and guitar delay). The average of the
+  // last taps sets it; a pause of more than 2 s starts a new count.
+  const TEMPO = 0x158;
+  let taps = [];
+  function tapTempo() {
+    const c = CELLS.get(TEMPO), b = $("#tap2");
+    if (b) { b.classList.remove("beat"); void b.offsetWidth; b.classList.add("beat"); }
+    if (!c) return; if (!L.ready) return notConnected();
+    const now = performance.now();
+    if (taps.length && now - taps[taps.length - 1] > 2000) taps = [];
+    taps.push(now); if (taps.length > 6) taps.shift();
+    if (taps.length < 2) { tapHint = "TAP AGAIN"; return paintChrome(); }
+    const bpm = Math.round(60000 / ((taps[taps.length - 1] - taps[0]) / (taps.length - 1)));
+    tapHint = null; setParam(c, Math.max(c.min, Math.min(c.max, bpm))); paintChrome();
+  }
+  let tapHint = null;
+
   function setParam(c, v, { undoable = true } = {}) {
     if (!c) return;
     if (!L.ready) return notConnected();
@@ -343,7 +361,10 @@
     $("#tiles").innerHTML = [["Vocal", "voz"], ["Guitar", "gtr"]].map(([label, side]) =>
       `<div class="stage-row"><span class="cap-lbl">${label}</span><div class="stage-links">${fx.filter(f => f.side === side).map(pad).join("")}</div></div>`).join("")
       + `<div class="stage-row"><span class="cap-lbl">Footswitch</span><div class="stage-links"><button type="button" class="hitbar" id="hit2" aria-pressed="false"><i></i>HIT</button>`
+      + `<button type="button" class="hitbar talkbar tapbar" id="tap2" title="Tap the beat: sets the preset's TEMPO, which every tempo-synced effect follows"><span class="tk"><i></i>TAP</span><small></small></button>`
       + `<button type="button" class="hitbar talkbar" id="talk2" aria-pressed="false" title="Each tap holds HIT for 1.3 s, like holding the footswitch"><span class="tk"><i></i>TALK</span><small></small></button></div></div>`;
+    $("#tap2").addEventListener("pointerdown", e => { if (e.button > 0) return; e.preventDefault(); tapTempo(); });   // on touch-down: taps land on the beat
+    $("#tap2").addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); tapTempo(); } });
     // tap = on/off (the click handler); hold 450 ms = open this effect's editor. A hold never also toggles.
     for (const t of $$("#tiles .tile")) {
       let timer = 0, x0 = 0, y0 = 0;
@@ -424,6 +445,7 @@
     const hitC = CELLS.get(ID.HIT), hitId = rid(hitC), hv = hitId == null ? undefined : V.get(hitId);
     for (const b of [$("#hit"), $("#hit2")]) if (b) { b.setAttribute("aria-pressed", hv === 1); popOnChange(b, hv == null ? "unk" : String(hv)); b.title = hitId == null ? "Sends a HIT footswitch press (state unknown on this pedal)" : "HIT on / off"; }
     document.body.classList.toggle("talking", ready && talkOn);   // TALK on: everything greys out except TALK
+    const tb = $("#tap2"); if (tb) { const bpm = valOf(TEMPO); tb.querySelector("small").textContent = tapHint || (bpm == null ? "TAP TEMPO" : bpm + " BPM"); }
     for (const b of [$("#talk"), $("#talk2")]) if (b) { b.setAttribute("aria-pressed", talkOn); popOnChange(b, String(talkOn)); b.classList.toggle("sending", talkSending); const s = b.querySelector("small"); if (s) s.textContent = talkOn ? "FX MUTED · TAP TO SING" : "MUTE FX BETWEEN SONGS"; }
     $("#undo").setAttribute("aria-disabled", history.length ? "false" : "true");
     $("#pe-note").hidden = MODE !== "pe";

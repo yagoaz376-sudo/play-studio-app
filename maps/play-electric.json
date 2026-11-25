@@ -153,6 +153,10 @@
       "pa": "0x151",
       "name": "GUITAR DELAY STYLE (Guitar)"
     },
+    "333": {
+      "pa": "0x158",
+      "name": "TEMPO (preset, from firmware)"
+    },
     "344": {
       "pa": "0x167",
       "name": "DELAY FEEDBACK (Vocal)"
