@@ -67,7 +67,7 @@
     "A/B compare": "Comparar A/B",
     "This effect has no level to drag": "Este efeito não tem nível pra arrastar",
     "Couldn't tell which preset this is. Change preset once on the pedal, then try again.": "Não consegui saber qual é este preset. Troque de preset uma vez no pedal e tente de novo.", "sends HIT": "envia HIT", "SENDS HIT": "ENVIA HIT", "▼ + ▲ HOLD": "SEGURA ▼ + ▲",
-    "In Loop mode: HIT is EXIT. Left Loop on the pedal? Tap HIT on the pedal instead.": "Em modo Loop: HIT é o EXIT. Saiu do Loop no pedal? Então toque HIT no pedal.",
+    "In Loop mode: HIT is EXIT. The app's preset arrows keep the loop playing and come back to the looper.": "Em modo Loop: HIT é o EXIT. As setas de preset do app mantêm o loop tocando e voltam para o looper.",
     // mix / setup
     "global · applies to every preset": "global · vale para todos os presets", "Setup groups": "Grupos de ajustes",
     // connect gate + drawer

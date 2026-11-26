@@ -818,6 +818,20 @@
     if (atEnd(d)) return bumpArrow(d);
     stepping = true;
     try {
+      // Play Electric in Loop mode (real unit, 2026-11-26, loop playing all along): the first ◀/▶ only leaves the
+      // looper screen, the second changes preset, and holding ▼+▲ from the preset screen goes back to the looper.
+      // (A lone knob click does nothing in the looper, and holding ▼+▲ INSIDE the looper presses STOP.)
+      if (MODE === "pe" && loopOn) {
+        const code = d > 0 ? L.EVT.next : L.EVT.prev, r0 = await L.get(PRESET_REG());
+        loopOn = false; paintLoop();
+        const w0 = armStep(r0, 450); await L.press(code); const moved = await w0;
+        // it moved at once: the pedal wasn't in the looper any more (left it on the unit). Keep that, don't go back in.
+        if (moved != null) { presetChanged(null, moved); return; }
+        const w = armStep(r0, 1200); await L.press(code); const got = await w;
+        if (got != null) presetChanged(null, got);
+        await toggleLoop();   // now on the preset screen: ▼+▲ held goes back to the looper
+        return;
+      }
       // Play Electric right after connecting: its number register isn't trusted yet (numOk). If it says we're at the
       // end of the list, one quick press settles it: no move = really the end (no BACK retry, no warning, no wait).
       if (MODE === "pe" && !numOk) {
@@ -942,7 +956,7 @@
   // after using the pedal's controls: re-read (a knob turn inside a menu changes a value) and check the MIDI guard
   let loopOn = false;   // Loop mode, as far as the app knows (the pedal doesn't say)
   function paintLoop() {
-    const title = loopOn ? "In Loop mode: HIT is EXIT. Left Loop on the pedal? Tap HIT on the pedal instead." : "Holds ▼ and ▲ together (enters Loop mode)";
+    const title = loopOn ? "In Loop mode: HIT is EXIT. The app's preset arrows keep the loop playing and come back to the looper." : "Holds ▼ and ▲ together (enters Loop mode)";
     const b = $("#loop-btn");
     if (b) { b.setAttribute("aria-pressed", loopOn); b.classList.toggle("down", loopBusy); b.title = title;
       b.innerHTML = loopOn ? 'EXIT LOOP <small>sends HIT</small>' : 'LOOP <small>▼ + ▲ hold</small>'; }
@@ -1192,11 +1206,18 @@
   async function gotoPreset(n) {
     if (!L.ready) return notConnected(); if (!MODE || walking || stepping) return;
     walking = true; LIB.busy = true; LIB.cancel = false; paintPicker();
-    let landed = null;
+    let landed = null, reloop = false;
     try {
+      // Loop mode on the Play Electric: one ▶ leaves the looper screen (the loop keeps playing), then jump as usual and
+      // go back to the looper after. If that ▶ changed preset, the pedal had already left the looper.
+      if (MODE === "pe" && loopOn) {
+        const r0 = await L.get(PRESET_REG()), w0 = armStep(r0, 450);
+        loopOn = false; paintLoop(); await L.press(L.EVT.next); reloop = (await w0) == null;
+      }
       if (!(await refreshNum())) toast("The pedal didn't change preset. Is it on its preset screen?", "warn", 3500);
       else landed = await moveTo(n);
     } finally { walking = false; LIB.busy = false; lastProg = null; presetChanged(null, landed); paintPicker(); }
+    if (reloop) { loopOn = false; paintLoop(); await toggleLoop(); }
   }
   // Read every preset's name (and, on the Play Acoustic, all its values) by stepping with ▶ until the list comes
   // round to the start, or, on a pedal that stops at its last preset, until the end and then with ◀ from the start
