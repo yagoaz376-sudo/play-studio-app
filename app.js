@@ -624,9 +624,9 @@
     if (num != null) P.num = num;
     P.fav = e ? e.fav : null;
     const live = new Set();   // ids that a global setting overrides: don't show the preset's stored copy
-    if (MODE === "pe" && valOf(0x286) === 1) for (const f of fxList()) if (f.side === "gtr")
+    if (valOf(0x286) === 1) for (const f of fxList()) if (f.side === "gtr")   // GLOBAL GUITAR FX on
       for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) { const id = c && rid(c); if (id != null) live.add(id); }
-    if (MODE === "pe" && valOf(0x287) === 1) live.add(0x07B);
+    if (valOf(0x287) === 1) { const k = CELLS.get(0x075), id = k && rid(k); if (id != null) live.add(id); }   // GLOBAL KEY on
     if (e) { P.name = e.name; for (const [id, v] of e.vals) if (!live.has(id)) V.set(id, v); }
     render(); syncSoon(30);
   }
@@ -868,10 +868,24 @@
     0x313, 0x315, 0x317, 0x319, 0x325, 0x327, 0x329, 0x32B, 0x32D, 0x340, 0x341, 0x342,
     0x343, 0x344, 0x345, 0x346, 0x347, 0x348, 0x349];
   const PE_SLOTS = Object.fromEntries(PE_SLOT_IDS.map((id, k) => [k, id]));
+  // Play Acoustic: the same kind of table in PA 1.3.00 (X:436842, 118 ids, 5 packets). Found in the firmware by its
+  // likeness to the Electric's; not yet checked against a real Acoustic.
+  const PA_SLOT_IDS = [0x000, 0x02C, 0x02D, 0x032, 0x033, 0x038, 0x039, 0x04A, 0x04B, 0x050, 0x051, 0x056,
+    0x057, 0x05E, 0x06B, 0x071, 0x075, 0x078, 0x093, 0x094, 0x09D, 0x0B9, 0x0BA, 0x0D3,
+    0x0D4, 0x0D5, 0x0D6, 0x0D7, 0x0D8, 0x0D9, 0x0DE, 0x0DF, 0x0E0, 0x0E1, 0x0E2, 0x0E3,
+    0x0E4, 0x124, 0x125, 0x12C, 0x131, 0x150, 0x151, 0x153, 0x158, 0x159, 0x15A, 0x15D,
+    0x15E, 0x167, 0x168, 0x17D, 0x17E, 0x182, 0x186, 0x18A, 0x18E, 0x19A, 0x19B, 0x19F,
+    0x1A0, 0x1A3, 0x249, 0x24A, 0x24B, 0x24F, 0x263, 0x266, 0x26B, 0x271, 0x2AD, 0x2AF,
+    0x2B1, 0x2B3, 0x2B5, 0x2B7, 0x2B9, 0x2BB, 0x2BD, 0x2CB, 0x2CC, 0x2CD, 0x2CE, 0x2CF,
+    0x2D0, 0x2D1, 0x353, 0x355, 0x357, 0x361, 0x363, 0x364, 0x365, 0x366, 0x367, 0x368,
+    0x369, 0x36A, 0x36B, 0x36D, 0x36F, 0x371, 0x373, 0x375, 0x377, 0x379, 0x37B, 0x37D,
+    0x37F, 0x381, 0x383, 0x385, 0x387, 0x389, 0x38B, 0x38D, 0x38F, 0x391];
+  if (SIM) { window.PS_SIM_TABLE_PE = PE_SLOT_IDS; window.PS_SIM_TABLE_PA = PA_SLOT_IDS; }   // the simulator sends packets in this order
   function decodeSlots(data) {
-    if (MODE !== "pe" || !Array.isArray(data)) return [];
+    if (!MODE || !Array.isArray(data)) return [];
+    const table = MODE === "pe" ? PE_SLOT_IDS : PA_SLOT_IDS;
     const flat = data.flatMap(p => p || []), ok = new Set(presetIds()), out = [];
-    for (const [s, id] of Object.entries(PE_SLOTS)) if (ok.has(id) && flat[+s] != null) out.push([id, flat[+s]]);
+    table.forEach((id, k) => { if (ok.has(id) && flat[k] != null) out.push([id, flat[k]]); });
     return out;
   }
   // The list: ask the pedal for each stored preset's header by number (name, ★, genres). The pedal stays where it
@@ -882,7 +896,7 @@
     const t0 = performance.now(), found = {}; let misses = 0, count = 0;
     try {
       for (let n = 1; n <= 512 && misses < 3 && !LIB.cancel && L.ready; n++) {
-        const info = await L.presetInfo(n, misses ? 400 : 700, MODE === "pe");
+        const info = await L.presetInfo(n, misses ? 400 : 700, true);
         if (!info) { misses++; continue; }
         misses = 0; count++;
         const old = lib.presets[n];

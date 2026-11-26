@@ -45,7 +45,14 @@
       const num = (d[7] << 7) | d[8], i = num === 0 ? cur : num - 1;
       if (i >= 0 && i < NAMES.length) { const n = [...NAMES[i]].slice(0, 15).map(c => c.charCodeAt(0)); while (n.length < 15) n.push(0);
         const flags = (FAV.has(i) ? 1 : 0) | (1 << (3 + (i % 4)));
-        reply([...H, 0x20, d[7], d[8], 1, 3, ...n, (flags >> 21) & 0x7F, (flags >> 14) & 0x7F, (flags >> 7) & 0x7F, flags & 0x7F, 0, 0xF7]); }
+        reply([...H, 0x20, d[7], d[8], 1, 3, ...n, (flags >> 21) & 0x7F, (flags >> 14) & 0x7F, (flags >> 7) & 0x7F, flags & 0x7F, 0, 0xF7]);
+        // PLAY STUDIO: the preset's data packets (21): chunk, 25 values (encode28) each, checksum, in the firmware's table order
+        const tbl = PID === 0x71 ? window.PS_SIM_TABLE_PE : window.PS_SIM_TABLE_PA;
+        if (tbl) for (let k = 0; k * 25 < tbl.length; k++) {
+          const vals = []; for (let j = 0; j < 25; j++) { const id = tbl[k * 25 + j]; vals.push(...enc28(id == null ? 0 : (i === cur ? get(id) : (P[i].get(id) ?? 0)))); }
+          reply([...H, 0x21, k, ...vals, 0, 0xF7]);
+        }
+      }
     }
     if (cmd === 0x55 && d[7] === 0x01) tunnel = true;
     if (cmd === 0x55 && d[7] === 0x02) { const v = dec28(d, 8);
