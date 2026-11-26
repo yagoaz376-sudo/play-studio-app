@@ -652,8 +652,16 @@
     abBusy = true; paintChrome();
     try {
       if (!ab) {
-        if (!P.edited || P.num == null) return toast("Edit something first: A/B compares your edit with the saved preset");
-        const n = P.num, g = gen, info = await L.presetInfo(n, 1200, true);
+        if (!P.edited) return toast("Edit something first: A/B compares your edit with the saved preset");
+        const g = gen; let n = P.num, info = null;
+        if (n == null && MODE === "pe") {   // number not confirmed yet (no preset change since connecting): finding it by
+          // stepping would drop the edit, so take the register's number only if that stored preset has this name
+          const r = await L.get(PRESET_REG()), i = r ? await L.presetInfo(r, 1200, true) : null;
+          if (g !== gen) return;
+          if (i && P.name && i.name === P.name) { n = r; info = i; P.num = r; }
+        }
+        if (n == null) return toast("Couldn't tell which preset this is. Change preset once on the pedal, then try again.", "warn");
+        if (!info) info = await L.presetInfo(n, 1200, true);
         if (g !== gen || P.num !== n) return;
         if (!info || !info.data) return toast("Couldn't read the saved preset. Try again.", "warn");
         const stored = new Map(decodeSlots(info.data)), live = liveIds();

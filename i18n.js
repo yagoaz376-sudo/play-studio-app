@@ -44,7 +44,8 @@
     "A · the saved preset": "A · o preset salvo", "B · your edit": "B · sua edição",
     "Playing A, the saved preset. Tap for B, your edit.": "Tocando A, o preset salvo. Toque pra ouvir B, sua edição.",
     "Playing B, your edit. Tap for A, the saved preset.": "Tocando B, sua edição. Toque pra ouvir A, o preset salvo.",
-    "A/B compare": "Comparar A/B", "sends HIT": "envia HIT", "SENDS HIT": "ENVIA HIT", "▼ + ▲ HOLD": "SEGURA ▼ + ▲",
+    "A/B compare": "Comparar A/B",
+    "Couldn't tell which preset this is. Change preset once on the pedal, then try again.": "Não consegui saber qual é este preset. Troque de preset uma vez no pedal e tente de novo.", "sends HIT": "envia HIT", "SENDS HIT": "ENVIA HIT", "▼ + ▲ HOLD": "SEGURA ▼ + ▲",
     "In Loop mode: HIT is EXIT. Left Loop on the pedal? Tap HIT on the pedal instead.": "Em modo Loop: HIT é o EXIT. Saiu do Loop no pedal? Então toque HIT no pedal.",
     // mix / setup
     "global · applies to every preset": "global · vale para todos os presets", "Setup groups": "Grupos de ajustes",
