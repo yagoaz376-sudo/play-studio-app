@@ -431,9 +431,13 @@
     box.querySelector(".eq-fill").setAttribute("d", line + ` L${EQ_W} ${eqY(0)} L0 ${eqY(0)} Z`);
     box.querySelector(".eq-dots").innerHTML = bands.map(b => `<circle cx="${eqX(b.f0).toFixed(1)}" cy="${eqY(Math.max(-EQ_DB, Math.min(EQ_DB, b.g))).toFixed(1)}" r="3.2"/>`).join("");
   }
+  // On the Electric, USB OUT LEVEL (Acoustic 0x0BD = Electric 0x0C6) is on SETUP › OUTPUT, not on MIX (PE firmware menu
+  // tables: MIX 2/2 has USB LEVEL, HARMONY and DELAY/REVERB, and the USB OUT place is empty). Mapped, so rid() alone keeps it.
+  const PE_NOT_MIX = new Set([0x0BD]);
+  const inPeMix = c => MODE !== "pe" || (rid(c) != null && !PE_NOT_MIX.has(hex(c.param)));
   function buildMix() {
     const cs = [...new Map(M.MIX.pages.filter(visible).flatMap(cellsOf).map(c => [hex(c.param), c])).values()]
-      .filter(c => MODE !== "pe" || rid(c) != null);   // the Electric's Mix has no USB OUT LEVEL etc.: show only what it has
+      .filter(inPeMix);   // the Electric's Mix: only what its own MIX pages have
     $("#mix").innerHTML = cs.map(knobHTML).join(""); wireKnobs($("#mix"));
   }
   function setupGroups() {
@@ -1061,7 +1065,7 @@
       const p = SCR.lo; title = `${p > 0 ? "◀ " : ""}${SCR_PAGES[SCR.at][p]} ${p + 1}/${n}${p < n - 1 ? " ▶" : ""}`;
       if (SCR.at === "mix") {
         const pg = M.MIX.pages.filter(visible)[p]; cls = "lcd-grid";
-        body = pg ? pg.rows.map(r => r.map(c => lcdCell(c && rid(c) != null ? c : null)).join("")).join("") : "";
+        body = pg ? pg.rows.map(r => r.map(c => lcdCell(c && inPeMix(c) ? c : null)).join("")).join("") : "";
       } else {
         const id = PE_PAGES[SCR.at][p], f = fxList().find(x => x.key === SCR.at + "-" + id);
         if (f) {
