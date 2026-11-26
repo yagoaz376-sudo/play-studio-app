@@ -422,6 +422,12 @@ body { background: var(--wash), var(--bg); background-attachment: fixed; }
 .stage-links:has(#tap2) > .hitbar { min-width: 0; }
 .stage-links:has(#tap2) > #hit2 { flex: 1.3 1 0; }
 .stage-links:has(#tap2) > .talkbar { flex: 1 1 0; }
+/* LOOP (footswitch row): a loop-green dot; lit while the app has put the pedal in Loop mode */
+.loopbar .tk i { background: var(--on); opacity: .5; }
+.loopbar[aria-pressed="true"] { color: var(--text); background-color: color-mix(in srgb, var(--on) 26%, var(--glass)); border-color: color-mix(in srgb, var(--on) 55%, transparent); box-shadow: var(--hl), 0 10px 30px color-mix(in srgb, var(--on) 32%, transparent); }
+.loopbar[aria-pressed="true"] .tk i { opacity: 1; box-shadow: 0 0 12px var(--on); }
+.loopbar[aria-pressed="true"] small { color: var(--on); }
+.loopbar.sending { opacity: .75; }
 @media (max-width: 700px) { .stage-links:has(#tap2) > .hitbar { font-size: 17px; letter-spacing: .08em; gap: 8px; }
   .stage-links:has(#tap2) > #hit2 { font-size: 22px; } .stage-links:has(#tap2) .talkbar small { font-size: 8px; letter-spacing: .02em; } }
 .tapbar .tk i { background: var(--accent); opacity: .55; }

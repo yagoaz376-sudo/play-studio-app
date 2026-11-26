@@ -416,9 +416,10 @@
       `<div class="stage-row"><span class="cap-lbl">${label}</span><div class="stage-links">${fx.filter(f => f.side === side).map(pad).join("")}</div></div>`).join("")
       + `<div class="stage-row"><span class="cap-lbl">Footswitch</span><div class="stage-links"><button type="button" class="hitbar" id="hit2" aria-pressed="false"><i></i>HIT</button>`
       + `<button type="button" class="hitbar talkbar tapbar" id="tap2" title="Tap the beat: sets the preset's TEMPO, which every tempo-synced effect follows"><span class="tk"><i></i>TAP</span><small></small></button>`
-      + `<button type="button" class="hitbar talkbar" id="talk2" aria-pressed="false" title="Each tap holds HIT for 1.3 s, like holding the footswitch"><span class="tk"><i></i>TALK</span><small></small></button></div></div>`;
+      + `<button type="button" class="hitbar talkbar" id="talk2" aria-pressed="false" title="Each tap holds HIT for 1.3 s, like holding the footswitch"><span class="tk"><i></i>TALK</span><small></small></button>`
+      + `<button type="button" class="hitbar talkbar loopbar" id="loop2" aria-pressed="false"></button></div></div>`;
     $("#tap2").addEventListener("pointerdown", e => { if (e.button > 0) return; e.preventDefault(); tapTempo(); });   // on touch-down: taps land on the beat
-    $("#tap2").addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); tapTempo(); } });
+    $("#tap2").addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); tapTempo(); } }); paintLoop();
     // tap = on/off (the click handler); hold 450 ms = open this effect's editor. A hold never also toggles.
     for (const t of $$("#tiles .tile")) {
       let timer = 0, x0 = 0, y0 = 0;
@@ -750,10 +751,12 @@
     // then both releases). In Loop mode ▼ = play/rec/overdub (hold: undo), ▲ = stop (hold: erase), and HIT is EXIT:
     // holding ▼+▲ again does NOT leave (seen on a real Electric, 2026-11-25). The pedal doesn't report Loop mode over
     // USB (no register, no message), so the app keeps the state itself: the second tap sends HIT to leave.
-    const lb = $("#loop-btn");
-    if (lb) lb.addEventListener("click", async () => {
-      if (!L.ready) return notConnected(); if (walking || lb.classList.contains("down")) return;
-      lb.classList.add("down");
+    // (the click goes through the delegated handler: #loop-btn on the Pedal view, #loop2 in the footswitch row)
+  }
+  let loopBusy = false;
+  async function toggleLoop() {
+      if (!L.ready) return notConnected(); if (walking || loopBusy) return;
+      loopBusy = true; paintLoop();
       try {
         if (loopOn) { await L.press(L.EVT.hit); loopOn = false; }
         else {
@@ -762,17 +765,19 @@
           try { await delay(1500); } finally { clearInterval(t); L.inject(0xDB, L.EVT.fswDown, 0x01); L.inject(0xDB, L.EVT.fswUp, 0x01); }
           loopOn = true;
         }
-      } finally { lb.classList.remove("down"); paintLoop(); }
+      } finally { loopBusy = false; paintLoop(); }
       afterPanel(null);
-    });
   }
   // after using the pedal's controls: re-read (a knob turn inside a menu changes a value) and check the MIDI guard
   let loopOn = false;   // Loop mode, as far as the app knows (the pedal doesn't say)
   function paintLoop() {
-    const b = $("#loop-btn"); if (!b) return;
-    b.setAttribute("aria-pressed", loopOn);
-    b.innerHTML = loopOn ? 'EXIT LOOP <small>sends HIT</small>' : 'LOOP <small>▼ + ▲ hold</small>';
-    b.title = loopOn ? "In Loop mode: HIT is EXIT. Left Loop on the pedal? Tap HIT on the pedal instead." : "Holds ▼ and ▲ together (enters Loop mode)";
+    const title = loopOn ? "In Loop mode: HIT is EXIT. Left Loop on the pedal? Tap HIT on the pedal instead." : "Holds ▼ and ▲ together (enters Loop mode)";
+    const b = $("#loop-btn");
+    if (b) { b.setAttribute("aria-pressed", loopOn); b.classList.toggle("down", loopBusy); b.title = title;
+      b.innerHTML = loopOn ? 'EXIT LOOP <small>sends HIT</small>' : 'LOOP <small>▼ + ▲ hold</small>'; }
+    const b2 = $("#loop2");
+    if (b2) { b2.setAttribute("aria-pressed", loopOn); b2.classList.toggle("sending", loopBusy); b2.title = title;
+      b2.innerHTML = loopOn ? '<span class="tk"><i></i>EXIT LOOP</span><small>SENDS HIT</small>' : '<span class="tk"><i></i>LOOP</span><small>▼ + ▲ HOLD</small>'; }
   }
   let afterT = 0;
   function afterPanel(code) {
@@ -1453,6 +1458,7 @@ ${JSON.stringify(data, null, 1)}
     if (b.id === "lib-cancel") { LIB.cancel = true; return; }
     if (b.id === "hit" || b.id === "hit2") return toggleHit();
     if (b.id === "talk" || b.id === "talk2") return talk();
+    if (b.id === "loop-btn" || b.id === "loop2") return toggleLoop();
     if (b.dataset.view) return setView(b.dataset.view);
     if (b.dataset.goto) return setView(b.dataset.goto);
     if (b.dataset.g != null) { gsel = +b.dataset.g; return render(); }
