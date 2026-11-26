@@ -584,7 +584,7 @@
     const setArt = (el, f) => { if (!el) return; const n = imgOf(f); el.style.setProperty("--m", IM[n] ? `url('${IM[n]}')` : "none"); };
     for (const box of $$("[data-fxbox]")) { const f = byKey.get(box.dataset.fxbox); if (!f) continue; setArt(box.querySelector(".lcd .art"), f); box.dataset.state = stateName(f); }
     for (const t of $$(".tile[data-fx]")) { const f = byKey.get(t.dataset.fx); if (f) setArt(t.querySelector(".art"), f); }
-    paintChrome();
+    paintChrome(); renderLcd();
   }
   function paintChrome() {
     const ready = L.ready;
@@ -985,6 +985,78 @@
     mirrorOn = !mirrorOn; store.set("mirror", mirrorOn); mirrorState = ""; paintMirror();
     toast(mirrorOn ? "The pedal's screen now follows the app (effect pages and Mix)." : "The pedal's screen no longer follows the app.", "", 2600);
     if (mirrorOn) mirrorTo(mirrorTarget());
+  }
+
+  // ── A copy of the Play Electric's screen (Pedal view) ──
+  // The pedal can't report its screen over USB, so the app follows it from the button presses: the app's own and the
+  // ones made on the unit (both come back as panel echoes). Menus reopen on the page used last and don't wrap, so the
+  // page is kept as a range [lo, hi] that ◀ / ▶ narrow: unknown at first (the whole menu), known once lo = hi.
+  // Soft buttons inside a page select a cell, so the menu buttons only open a menu from the preset screen.
+  const SCR_PAGES = { voz: ["HARMONY", "DOUBLE", "DELAY", "REVERB", "HARDTUNE", "TRANSDUCER", "uMOD"],
+    gtr: ["GUITAR AMP", "GUITAR COMPRESSOR", "GUITAR uMOD", "GUITAR DELAY", "GUITAR REVERB"], mix: ["MIX", "MIX"] };
+  const SCR_MENU = { 0x09: "voz", 0x08: "gtr", 0x07: "mix" }, SCR_NAME = { voz: "VOCAL FX", gtr: "GUITAR FX", mix: "MIX" };
+  let SCR = { at: "home", lo: 0, hi: 0 }, scrLast = {};
+  // the app's own presses: the real Electric doesn't echo injected events back (the simulator does, flagged self)
+  { const inject = L.inject; L.inject = (e0, e1, e2) => { const ok = inject(e0, e1, e2); if (ok && e0 === 0xDB && e2 === 0x00) scrPress(e1); return ok; }; }
+  const scrReset = () => { SCR = { at: "home", lo: 0, hi: 0 }; scrLast = {}; renderLcd(); };
+  function scrPress(code) {
+    if (MODE !== "pe") return;
+    const at = SCR.at, n = SCR_PAGES[at] ? SCR_PAGES[at].length : 0;
+    if (code === L.EVT.back) { if (n) scrLast[at] = [SCR.lo, SCR.hi]; SCR = { at: "home", lo: 0, hi: 0 }; }
+    else if (at === "home" && SCR_MENU[code]) { const m = SCR_MENU[code], r = scrLast[m] || [0, SCR_PAGES[m].length - 1]; SCR = { at: m, lo: r[0], hi: r[1] }; }
+    else if (at === "home" && code === 0x02) SCR = { at: "setup", lo: 0, hi: 0 };
+    else if (code === 0x01 && (at === "home" || at === "genre")) SCR = { at: at === "home" ? "genre" : "home", lo: 0, hi: 0 };
+    else if (code === L.EVT.store && (at === "home" || at === "store")) SCR = { at: at === "home" ? "store" : "home", lo: 0, hi: 0 };
+    else if (n && (code === L.EVT.next || code === L.EVT.prev)) {
+      const d = code === L.EVT.next ? 1 : -1, cl = x => Math.max(0, Math.min(n - 1, x));
+      SCR.lo = cl(SCR.lo + d); SCR.hi = cl(SCR.hi + d); scrLast[at] = [SCR.lo, SCR.hi];
+    } else return;
+    renderLcd();
+  }
+  // a level bar like the pedal's: from the left, or from a centre tick when the range crosses 0
+  function lcdBar(c, v) {
+    const span = Math.max(1, c.max - c.min), cl = x => Math.max(0, Math.min(1, x));
+    if (c.min < 0 && c.max > 0) { const z = cl(-c.min / span), cur = v == null ? z : cl((v - c.min) / span), a = Math.min(z, cur), w = Math.abs(cur - z);
+      return `<span class="lbar ctr" style="--z:${(z * 100).toFixed(1)}%"><i style="left:${(a * 100).toFixed(1)}%;width:${(w * 100).toFixed(1)}%"></i></span>`; }
+    return `<span class="lbar"><i style="width:${(v == null ? 0 : cl((v - c.min) / span) * 100).toFixed(1)}%"></i></span>`;
+  }
+  const lcdVal = c => { const id = c && rid(c); return id == null ? undefined : V.get(id); };
+  function lcdCell(c, cls = "") {
+    if (!c) return `<div class="lc empty ${cls}"></div>`;
+    const v = lcdVal(c), lab = esc(c.label);
+    if (c.values) return `<div class="lc txt ${cls}"><b>${esc(fmt(c, v))}</b><span>${lab}</span></div>`;
+    return `<div class="lc ${cls}">${lcdBar(c, v)}<span>${lab}</span><small>${esc(fmt(c, v))}</small></div>`;
+  }
+  const lcdMsg = text => `<p>${esc(text)}</p>`;
+  function renderLcd() {
+    const box = $("#plcd"); if (!box) return;
+    box.hidden = MODE !== "pe";
+    if (box.hidden || view !== "pedal") return;
+    const t = $("#plcd-t"), b = $("#plcd-b"), n = SCR_PAGES[SCR.at] ? SCR_PAGES[SCR.at].length : 0, known = n && SCR.lo === SCR.hi;
+    let title = "", body = "", cls = "lcd-msg";
+    if (!L.ready) body = lcdMsg("Not connected");
+    else if (SCR.at === "home") { cls = "lcd-home"; body = `<div class="pn">${esc(P.name || "…")}</div><div class="pnum">${P.num ?? "—"}</div>`; }
+    else if (n && !known) { title = `${SCR_NAME[SCR.at]} ?/${n}`; body = lcdMsg("Page not known yet. Press ◀ or ▶ until the first or last page, or open an effect with the Pedal button on."); }
+    else if (n) {
+      const p = SCR.lo; title = `${p > 0 ? "◀ " : ""}${SCR_PAGES[SCR.at][p]} ${p + 1}/${n}${p < n - 1 ? " ▶" : ""}`;
+      if (SCR.at === "mix") {
+        const pg = M.MIX.pages.filter(visible)[p]; cls = "lcd-grid";
+        body = pg ? pg.rows.map(r => r.map(c => lcdCell(c && rid(c) != null ? c : null)).join("")).join("") : "";
+      } else {
+        const id = PE_PAGES[SCR.at][p], f = fxList().find(x => x.key === SCR.at + "-" + id);
+        if (f) {
+          cls = "lcd-fx"; const n0 = imgOf(f), right = (f.groups[0] ? f.groups[0][1] : []).slice(0, 2);
+          while (right.length < 2) right.push(null);
+          body = `<i class="pimg" style="--m:${IM[n0] ? `url('${IM[n0]}')` : "none"}"></i><div class="pright">${right.map(c => lcdCell(c)).join("")}${lcdCell(f.control, "big")}</div>`
+            + `<div class="pstyle">${f.style ? "STYLE: " + esc(fmt(f.style, lcdVal(f.style))) : ""}</div>`;
+        }
+      }
+    }
+    else if (SCR.at === "setup") { title = "SETUP"; body = lcdMsg("The app doesn't follow the Setup pages."); }
+    else body = lcdMsg("Not sure what the pedal shows now. Press BACK.");
+    t.textContent = title; t.hidden = !title; b.className = "plcd-b " + cls;
+    b.setAttribute("translate", cls === "lcd-msg" ? "yes" : "no");   // the pedal's own words stay as on its screen; the app's notes are translated
+    if (b.innerHTML !== body) b.innerHTML = body;
   }
 
   // ── Save: store the edited preset on the pedal, in its own place ──
@@ -1446,7 +1518,7 @@ ${JSON.stringify(data, null, 1)}
     // remembered per adapter (port name).
     const unconfirmed = !L.identityMsg && L.pid !== 0x71, trusted = unconfirmed && !!(store.get("trust-pa", {})[L.out && L.out.name]);
     const confirmedPA = L.pid === 0x70 && (!!L.identityMsg || trusted);
-    MODE = confirmedPA ? "pa" : "pe"; loadMap(); loadLib(); walking = false; lastProg = null; fresh = false; talkOn = false; pedalTalk = false; loopOn = false; paintLoop();
+    MODE = confirmedPA ? "pa" : "pe"; loadMap(); loadLib(); walking = false; lastProg = null; fresh = false; talkOn = false; pedalTalk = false; loopOn = false; paintLoop(); scrReset();
     gen++; resetWrites(); V.clear(); P.num = null; P.name = null; P.edited = false; clearHistory(); ab = null;
     MAPS.base.clear(); MAPS.changes.clear(); MAPS.stop = false; MAPS.again = false;
     $("#midi-alarm").hidden = true;
@@ -1466,6 +1538,7 @@ ${JSON.stringify(data, null, 1)}
   const NAV = new Set([L.EVT.next, L.EVT.prev, L.EVT.fswUp, L.EVT.fswDown]);
   let hitT = 0, guardT = 0;
   L.on("panel", e => {
+    if (e.e0 === 0xDB && e.e2 === 0x00 && !e.self) scrPress(e.e1);   // a button pressed on the unit itself: follow the pedal's screen
     if (e.e0 === 0xDB && e.e1 === L.EVT.store && e.e2 === 0x00) { lib.storeAt = Date.now(); saveLib(); paintPicker(); }   // STORE may change any preset
     if (e.self || walking) return;
     if (!(e.e0 === 0xDB && (NAV.has(e.e1) || e.e1 === L.EVT.hit))) fresh = false;   // something changed on the unit
@@ -1649,6 +1722,7 @@ ${JSON.stringify(data, null, 1)}
     for (const s of $$(".view")) s.hidden = s.id !== "v-" + v;
     updateFades();
     if (v === "mapa") renderMapper();
+    if (v === "pedal") renderLcd();
   }
   document.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b || b.disabled) return;

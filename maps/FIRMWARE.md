@@ -95,3 +95,5 @@ The Play Acoustic's 0x278–0x27C are different things on the Electric. They sta
   - The pages don't wrap: ▶ on uMOD stays on uMOD.
   - So BACK, BACK, menu button, ◀ × (pages − 1), ▶ × index always lands on the right page. Confirmed for DOUBLE and GUITAR REVERB.
   - The app's "Pedal" toggle (Effects view) does exactly this. It never presses the knob or SETUP. It checks 0x282 around the first arrow, and doesn't press arrows while the preset has unsaved edits.
+- **Panel echo on the Electric** (with `55 01 01` on): buttons pressed on the unit come back as `55` events (press 00, held 02, release 01). Events the app injects with `55 02` are **not** echoed back; the simulator does echo them. So the app's screen copy (Pedal view) counts its own presses where it sends them, and the echoes only for presses made on the unit. Confirmed: ▶ pressed on the pedal moved the copy from HARMONY to DOUBLE.
+- Once, the Electric stopped answering on USB even though Windows still listed its ports (no reply even to an identity request). Re-plugging the USB didn't help; switching the pedal off and on did.

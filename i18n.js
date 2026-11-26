@@ -21,6 +21,10 @@
     "The pedal's screen no longer follows the app.": "A tela do pedal não acompanha mais o app.",
     "Unsaved edits: the pedal only opens the menu (an arrow could lose them). Save to mirror the exact page.": "Edições não salvas: o pedal só abre o menu (uma seta poderia perdê-las). Salve pra espelhar a página exata.",
     "The pedal didn't open its effect pages, so the arrow changed the preset; sent it back.": "O pedal não abriu as páginas de efeito, então a seta trocou o preset; mandei de volta.",
+    "A copy of the pedal's screen, followed from the button presses": "Cópia da tela do pedal, acompanhada pelos botões apertados",
+    "Page not known yet. Press ◀ or ▶ until the first or last page, or open an effect with the Pedal button on.": "Página ainda desconhecida. Aperte ◀ ou ▶ até a primeira ou a última página, ou abra um efeito com o botão Pedal ligado.",
+    "The app doesn't follow the Setup pages.": "O app não acompanha as páginas do Setup.",
+    "Not sure what the pedal shows now. Press BACK.": "Não sei o que o pedal mostra agora. Aperte BACK.",
     "Language": "Idioma", "Close": "Fechar", "Edit effect": "Editar efeito",
     // effects / stage
     "Vocal": "Voz", "Guitar": "Guitarra", "vocal": "voz", "guitar": "guitarra", "Vocal effects": "Efeitos de voz", "Guitar effects": "Efeitos de guitarra",
