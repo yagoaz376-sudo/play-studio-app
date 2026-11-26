@@ -6,7 +6,7 @@
 <title>Play Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=202611252245">
+<link rel="stylesheet" href="styles.css?v=202611252310">
 </head>
 <body data-view="palco">
 <div class="app">
@@ -32,7 +32,7 @@
         <button class="arrow" data-step="1" aria-label="Next preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
       <div class="tools">
-        <button type="button" class="savebtn" data-save="1" hidden title="Save this preset on the pedal (presses STORE, then STORE again to confirm)"><span class="sv-ico" aria-hidden="true"><svg class="ic-save" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 15.5V18a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2.5"/></svg><svg class="ic-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><i class="sv-spin"></i></span><span class="sv-lbl">Save</span><i class="sv-dot" aria-hidden="true"></i></button>
+        <button type="button" class="abpill" data-ab="1" hidden aria-pressed="false" aria-label="A/B compare" translate="no"><span class="ab-a">A</span><span class="ab-b">B</span></button><button type="button" class="savebtn" data-save="1" hidden title="Save this preset on the pedal (presses STORE, then STORE again to confirm)"><span class="sv-ico" aria-hidden="true"><svg class="ic-save" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 15.5V18a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2.5"/></svg><svg class="ic-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><i class="sv-spin"></i></span><span class="sv-lbl">Save</span><i class="sv-dot" aria-hidden="true"></i></button>
         <div class="lang-seg" role="group" aria-label="Language" translate="no"><button type="button" data-lang="en" aria-pressed="true" title="English">EN</button><button type="button" data-lang="pt" aria-pressed="false" title="Português">PT</button></div>
         <button class="icon-btn" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
         <button class="icon-btn" id="theme" title="Light / dark theme" aria-label="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
@@ -105,7 +105,7 @@
       <div class="stage-preset">
         <button class="big-arrow" data-step="-1" aria-label="Previous preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
         <div class="stage-mid"><button type="button" class="stage-name" id="open-picker2" title="All presets"><div class="num mono" id="s-num">—</div><div class="name" id="s-name" translate="no">Not connected</div></button>
-          <div class="stage-edit" id="s-edit" hidden><button type="button" class="favpill" data-fav="1" aria-pressed="false" title="Favorite (presses the pedal's FAVORITE button)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg><span>Favorite</span></button><button type="button" class="savebtn" data-save="1" title="Save this preset on the pedal (presses STORE, then STORE again to confirm)"><span class="sv-ico" aria-hidden="true"><svg class="ic-save" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 15.5V18a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2.5"/></svg><svg class="ic-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><i class="sv-spin"></i></span><span class="sv-lbl">Save</span><i class="sv-dot" aria-hidden="true"></i></button></div></div>
+          <div class="stage-edit" id="s-edit" hidden><button type="button" class="favpill" data-fav="1" aria-pressed="false" title="Favorite (presses the pedal's FAVORITE button)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg><span>Favorite</span></button><button type="button" class="abpill" data-ab="1" hidden aria-pressed="false" aria-label="A/B compare" translate="no"><span class="ab-a">A</span><span class="ab-b">B</span></button><button type="button" class="savebtn" data-save="1" title="Save this preset on the pedal (presses STORE, then STORE again to confirm)"><span class="sv-ico" aria-hidden="true"><svg class="ic-save" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 15.5V18a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2.5"/></svg><svg class="ic-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><i class="sv-spin"></i></span><span class="sv-lbl">Save</span><i class="sv-dot" aria-hidden="true"></i></button></div></div>
         <button class="big-arrow" data-step="1" aria-label="Next preset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
       <div class="tiles" id="tiles"></div>
@@ -198,15 +198,15 @@
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="vendor/pa-menus.js?v=202611252245"></script>
-<script src="vendor/pa-images.js?v=202611252245"></script>
-<script src="maps/pe-images.js?v=202611252245"></script>
-<script src="maps/pe-menus.js?v=202611252245"></script>
-<script src="vendor/pa-params.js?v=202611252245"></script>
-<script src="maps/builtin-maps.js?v=202611252245"></script>
-<script>if (new URLSearchParams(location.search).has("sim")) document.write('<script src="vendor/sim-pedal.js?v=202611252245"><\/script>');</script>
-<script src="vendor/pa-link.js?v=202611252245"></script>
-<script src="i18n.js?v=202611252245"></script>
-<script src="app.js?v=202611252245"></script>
+<script src="vendor/pa-menus.js?v=202611252310"></script>
+<script src="vendor/pa-images.js?v=202611252310"></script>
+<script src="maps/pe-images.js?v=202611252310"></script>
+<script src="maps/pe-menus.js?v=202611252310"></script>
+<script src="vendor/pa-params.js?v=202611252310"></script>
+<script src="maps/builtin-maps.js?v=202611252310"></script>
+<script>if (new URLSearchParams(location.search).has("sim")) document.write('<script src="vendor/sim-pedal.js?v=202611252310"><\/script>');</script>
+<script src="vendor/pa-link.js?v=202611252310"></script>
+<script src="i18n.js?v=202611252310"></script>
+<script src="app.js?v=202611252310"></script>
 </body>
 </html>

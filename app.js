@@ -269,6 +269,7 @@
     v = clamp(c, v);
     if (!Number.isFinite(v) || V.get(id) === v) return;
     if (undoable) record(c, id);
+    if (ab) abEnd();
     V.set(id, v); touched.set(id, performance.now());
     pending.set(id, v); if (!flushT) flushT = setTimeout(flush, 30);
     const paId = hex(c.param);
@@ -497,6 +498,8 @@
     // once something was edited here.
     $("#s-edit").hidden = !ready;
     for (const b of $$("[data-fav]")) { b.hidden = !ready || P.name == null; b.setAttribute("aria-pressed", String(P.fav === true)); b.classList.toggle("busy", favBusy); }
+    for (const b of $$("[data-ab]")) { b.hidden = !ready || !(P.edited || ab); const side = ab ? ab.side : "B"; b.dataset.side = side; b.classList.toggle("busy", abBusy);
+      b.setAttribute("aria-pressed", String(side === "A")); b.title = side === "A" ? "Playing A, the saved preset. Tap for B, your edit." : "Playing B, your edit. Tap for A, the saved preset."; }
     for (const b of $$("[data-save]")) { b.hidden = b.closest("#s-edit") ? false : !ready; b.classList.toggle("dirty", P.edited && !saving && !justSaved); b.classList.toggle("saving", saving); b.classList.toggle("done", justSaved && !saving); b.disabled = saving;
       const lb = b.querySelector(".sv-lbl"); if (lb) lb.textContent = saving ? "Saving…" : justSaved ? "Saved" : "Save"; }
     const hitC = CELLS.get(ID.HIT), hitId = rid(hitC), hv = hitId == null ? undefined : V.get(hitId);
@@ -615,7 +618,7 @@
   // a preset change on the pedal: show it from the saved list at once when its number is known (from the Program
   // Change, or because the app went there itself), else "··"; then read it from the pedal to confirm
   function presetChanged(prog, knownNum = null) {
-    gen++; resetWrites(); P.edited = false; P.name = null; clearHistory(); fresh = true; lastOn.clear(); numOk = true;
+    gen++; resetWrites(); P.edited = false; P.name = null; clearHistory(); fresh = true; lastOn.clear(); numOk = true; ab = null;
     const keep = new Set(presetIds());
     if (MODE === "pe" && valOf(0x286) === 1) for (const f of fxList()) if (f.side === "gtr")   // GLOBAL GUITAR FX on: guitar is global
       for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) { const id = c && rid(c); if (id != null) keep.delete(id); }
@@ -624,13 +627,47 @@
     const num = knownNum ?? (MODE === "pa" && prog != null && lib.pcOffset != null ? prog + lib.pcOffset : null), e = num != null ? libEntry(num) : null;
     if (num != null) P.num = num;
     P.fav = e ? e.fav : null;
-    const live = new Set();   // ids that a global setting overrides: don't show the preset's stored copy
-    if (valOf(0x286) === 1) for (const f of fxList()) if (f.side === "gtr")   // GLOBAL GUITAR FX on
-      for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) { const id = c && rid(c); if (id != null) live.add(id); }
-    if (valOf(0x287) === 1) { const k = CELLS.get(0x075), id = k && rid(k); if (id != null) live.add(id); }   // GLOBAL KEY on
+    const live = liveIds();   // ids that a global setting overrides: don't show the preset's stored copy
     if (e) { P.name = e.name; for (const [id, v] of e.vals) if (!live.has(id)) V.set(id, v); }
     render(); syncSoon(30);
   }
+  function liveIds() {
+    const live = new Set();
+    if (valOf(0x286) === 1) for (const f of fxList()) if (f.side === "gtr")   // GLOBAL GUITAR FX on
+      for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) { const id = c && rid(c); if (id != null) live.add(id); }
+    if (valOf(0x287) === 1) { const k = CELLS.get(0x075), id = k && rid(k); if (id != null) live.add(id); }   // GLOBAL KEY on
+    return live;
+  }
+
+  // ── A/B: hear the preset as it's stored on the pedal (A) against the edit (B) ──
+  // A reads the stored preset (45 bank num, which doesn't load it) and writes only the parameters that differ;
+  // B writes the edit back. Editing anything while comparing keeps what's playing and ends the comparison.
+  let ab = null, abBusy = false;   // ab = { side: "A" | "B", ids, stored: Map, edited: Map }
+  function abWrite(src) {
+    for (const id of ab.ids) { const v = src.get(id); V.set(id, v); touched.set(id, performance.now()); pending.set(id, v); }
+    flush(); render();
+  }
+  async function toggleAB() {
+    if (!L.ready) return notConnected(); if (abBusy || saving || walking || stepping) return;
+    abBusy = true; paintChrome();
+    try {
+      if (!ab) {
+        if (!P.edited || P.num == null) return toast("Edit something first: A/B compares your edit with the saved preset");
+        const n = P.num, g = gen, info = await L.presetInfo(n, 1200, true);
+        if (g !== gen || P.num !== n) return;
+        if (!info || !info.data) return toast("Couldn't read the saved preset. Try again.", "warn");
+        const stored = new Map(decodeSlots(info.data)), live = liveIds();
+        const ids = [...stored.keys()].filter(id => !live.has(id) && writable(id) && V.get(id) != null && V.get(id) !== stored.get(id));
+        if (!ids.length) return toast("Your edit sounds the same as the saved preset");
+        ab = { side: "B", ids, stored, edited: new Map(ids.map(id => [id, V.get(id)])) };
+      }
+      ab.side = ab.side === "B" ? "A" : "B";
+      abWrite(ab.side === "A" ? ab.stored : ab.edited);
+      toast(ab.side === "A" ? "A · the saved preset" : "B · your edit", "", 1400);
+    } finally { abBusy = false; paintChrome(); }
+  }
+  const abEnd = () => { if (ab) { ab = null; paintChrome(); } };
+
   let stepping = false;
   // a preset step confirmed: Program Change on the Acoustic; on the Electric (which sends none) the register moves
   const armStep = (prev, ms) => MODE === "pa" ? waitProgram(ms) : (async () => {
@@ -799,7 +836,7 @@
       await L.press(L.EVT.store); await delay(700);
       await L.press(L.EVT.store); await delay(700);
       await L.press(L.EVT.back); await delay(300);
-      P.edited = false; fresh = true; clearHistory();
+      P.edited = false; fresh = true; clearHistory(); ab = null;
       lib.storeAt = Date.now(); saveLib();
       justSaved = true; clearTimeout(justSavedT); justSavedT = setTimeout(() => { justSaved = false; paintChrome(); }, 1800);
       toast("Saved on the pedal (STORE, STORE). Check the pedal's screen.", "", 3500);   // confirmed on a real Electric: the stored preset changes
@@ -1221,7 +1258,7 @@ ${JSON.stringify(data, null, 1)}
     // A Play Electric, or a link with no identity reply (e.g. Bluetooth "unconfirmed"), gets the protected mode.
     const confirmedPA = L.pid === 0x70 && !!L.identityMsg;
     MODE = confirmedPA ? "pa" : "pe"; loadMap(); loadLib(); walking = false; lastProg = null; fresh = false; talkOn = false; pedalTalk = false; loopOn = false; paintLoop();
-    gen++; resetWrites(); V.clear(); P.num = null; P.name = null; P.edited = false; clearHistory();
+    gen++; resetWrites(); V.clear(); P.num = null; P.name = null; P.edited = false; clearHistory(); ab = null;
     MAPS.base.clear(); MAPS.changes.clear(); MAPS.stop = false; MAPS.again = false;
     $("#midi-alarm").hidden = true;
     render(true); syncAll(); checkMidiGuard(); renderMapper(); renderDrawer();
@@ -1442,6 +1479,7 @@ ${JSON.stringify(data, null, 1)}
     }
     if (b.dataset.step) { if (b.__held) { b.__held = false; return; } return stepPreset(+b.dataset.step); }
     if (b.dataset.save) return savePreset();
+    if (b.dataset.ab) return toggleAB();
     if (b.dataset.preset != null) return gotoPreset(+b.dataset.preset);
     if (b.id === "open-picker" || b.id === "open-picker2") return openPicker();
     if (b.id === "pick-close") { $("#picker").hidden = true; return; }
