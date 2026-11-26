@@ -18,10 +18,6 @@
       "pa": "0x06B",
       "name": "HARMONY STYLE (Vocal)"
     },
-    "119": {
-      "pa": "0x071",
-      "name": "HARMONY HUMANIZE (Vocal, firmware)"
-    },
     "123": {
       "pa": "0x075",
       "name": "HARMONY KEY (Vocal)"
@@ -477,6 +473,14 @@
     "826": {
       "pa": "0x39F",
       "name": "FOOTSWITCH (Setup)"
+    },
+    "833": {
+      "pa": "0x071",
+      "name": "HARMONY HUMANIZE (Vocal, firmware preset table)"
+    },
+    "834": {
+      "pa": "0x093",
+      "name": "HARMONY PORTAMENTO (Vocal, firmware preset table)"
     },
     "842": {
       "pa": "0x393",

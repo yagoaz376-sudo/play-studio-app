@@ -66,3 +66,9 @@ The Play Acoustic's 0x278–0x27C are different things on the Electric. They sta
   - `PE_SLOTS` in app.js maps each slot to its ID. All 47 mapped preset values decode, and were checked on 3 presets.
   - `45 00 00` returns the edit buffer, unsaved edits included.
 - Not mapped yet: PORTAMENTO (0x342?), SWITCH-6, MP75 CONTROL (0x27C, blocked by pa-link because the Acoustic uses that ID for SYSEXID).
+
+## The preset parameter table (found 2026-11-25)
+- The firmware holds the list of parameters a preset stores, in packet order. On PE 1.3.00 it sits at X:441933C and has 79 IDs:
+  0x000, 0x02F, 0x03F, 0x045, 0x050, 0x065, 0x071, 0x07B, 0x07E, 0x0A3, 0x0C2 … 0x32D, 0x340–0x349.
+- It agrees with every slot found by matching presets on the unit, and app.js uses it as PE_SLOT_IDS.
+- It also corrects HUMANIZE: the stored one is 0x341 (0x077 "HUMANIZE AMOUNT" isn't stored). It adds PORTAMENTO at 0x342.
