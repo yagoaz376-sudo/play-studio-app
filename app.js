@@ -1011,7 +1011,27 @@
       const d = code === L.EVT.next ? 1 : -1, cl = x => Math.max(0, Math.min(n - 1, x));
       SCR.lo = cl(SCR.lo + d); SCR.hi = cl(SCR.hi + d); scrLast[at] = [SCR.lo, SCR.hi];
     } else return;
+    if (SCR_PAGES[SCR.at] && SCR.lo !== SCR.hi) { clearTimeout(scrHomeT); scrHomeT = setTimeout(scrHome, 600); }
     renderLcd();
+  }
+  // A menu opened on a page the app doesn't know (the pedal reopens the last one): press ◀ (pages − 1) times, which
+  // always lands on page 1 (HARMONY / GUITAR AMP / MIX 1) because the pages don't wrap. Not while the "Pedal" mirror is
+  // already walking the pages. Same guard as the mirror: if the first ◀ changed the preset number, the pedal was on
+  // its preset screen after all, so it is undone with ▶ and the copy goes back to the preset screen.
+  let scrHomeT = 0, scrHoming = false;
+  async function scrHome() {
+    scrHomeT = 0;
+    if (scrHoming || MODE !== "pe" || !L.ready || walking || saving || stepping || loopOn || loopBusy || mirrorState === "busy") return;
+    const m = SCR.at; if (!SCR_PAGES[m] || SCR.lo === SCR.hi) return;
+    scrHoming = true;
+    try {
+      const r0 = await L.get(0x282);
+      for (let i = 0; i < SCR_PAGES[m].length - 1 && SCR.at === m && SCR.lo !== SCR.hi; i++) {
+        await L.press(L.EVT.prev); await delay(i === 0 ? 300 : 180);
+        if (i === 0) { const r1 = await L.get(0x282);
+          if (r0 != null && r1 != null && r1 !== r0) { await L.press(L.EVT.next); SCR = { at: "home", lo: 0, hi: 0 }; renderLcd(); return; } }
+      }
+    } finally { scrHoming = false; }
   }
   // a level bar like the pedal's: from the left, or from a centre tick when the range crosses 0
   function lcdBar(c, v) {
@@ -1036,7 +1056,7 @@
     let title = "", body = "", cls = "lcd-msg";
     if (!L.ready) body = lcdMsg("Not connected");
     else if (SCR.at === "home") { cls = "lcd-home"; body = `<div class="pn">${esc(P.name || "…")}</div><div class="pnum">${P.num ?? "—"}</div>`; }
-    else if (n && !known) { title = `${SCR_NAME[SCR.at]} ?/${n}`; body = lcdMsg("Page not known yet. Press ◀ or ▶ until the first or last page, or open an effect with the Pedal button on."); }
+    else if (n && !known) { title = `${SCR_NAME[SCR.at]} ?/${n}`; body = lcdMsg(scrHoming || scrHomeT ? "Finding the page: going back to the first one…" : "Page not known yet. Press ◀ or ▶ until the first or last page, or open an effect with the Pedal button on."); }
     else if (n) {
       const p = SCR.lo; title = `${p > 0 ? "◀ " : ""}${SCR_PAGES[SCR.at][p]} ${p + 1}/${n}${p < n - 1 ? " ▶" : ""}`;
       if (SCR.at === "mix") {

@@ -23,6 +23,7 @@
     "The pedal didn't open its effect pages, so the arrow changed the preset; sent it back.": "O pedal não abriu as páginas de efeito, então a seta trocou o preset; mandei de volta.",
     "A copy of the pedal's screen, followed from the button presses": "Cópia da tela do pedal, acompanhada pelos botões apertados",
     "Page not known yet. Press ◀ or ▶ until the first or last page, or open an effect with the Pedal button on.": "Página ainda desconhecida. Aperte ◀ ou ▶ até a primeira ou a última página, ou abra um efeito com o botão Pedal ligado.",
+    "Finding the page: going back to the first one…": "Achando a página: voltando pra primeira…",
     "The app doesn't follow the Setup pages.": "O app não acompanha as páginas do Setup.",
     "Not sure what the pedal shows now. Press BACK.": "Não sei o que o pedal mostra agora. Aperte BACK.",
     "Language": "Idioma", "Close": "Fechar", "Edit effect": "Editar efeito",
