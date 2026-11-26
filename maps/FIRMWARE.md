@@ -54,3 +54,15 @@ These are enforced in app.js as `NEVER_PE`:
 - 0x2D7–0x2DA, the send/erase preset and clean-bank commands.
 
 The Play Acoustic's 0x278–0x27C are different things on the Electric. They stay blocked too, through pa-link.
+
+## Added later (2026-11-25, on the user's Play Electric)
+- Advanced parameters taken from the firmware table and checked by reading them on the pedal. They also match the preset data where the preset stores them.
+  - Voice: HARMONY SCALE 0x07E, HUMANIZE 0x077, DELAY FILTER 0x167, TRANSDUCER ROUTING 0x227 / GAIN 0x22C / GATE THRESHOLD 0x065.
+  - Guitar: REVERB PRE DLY 0x181, DELAY FILTER 0x168, uMOD DEPTH 0x126, uMOD LEVEL 0x0DF.
+- SWITCH-3 SWITCH 1/2/3 = **0x34A / 0x34B / 0x34C**.
+  - These are the registers the pedal shows. 0x331–0x333 are copies: writing 0x331 alone doesn't change the screen.
+  - They take the Electric's 31-item list, LOOP REC/PLAY … MIDI CC 107.
+- Preset data (`45 bank num`) is a header plus 4 packets. Each packet holds a chunk byte, 25 values of 4 bytes (encode28) and a checksum.
+  - `PE_SLOTS` in app.js maps each slot to its ID. All 47 mapped preset values decode, and were checked on 3 presets.
+  - `45 00 00` returns the edit buffer, unsaved edits included.
+- Not mapped yet: PORTAMENTO (0x342?), SWITCH-6, MP75 CONTROL (0x27C, blocked by pa-link because the Acoustic uses that ID for SYSEXID).

@@ -10,13 +10,25 @@
       "pa": "0x1000",
       "name": "AMP STYLE (Guitar, Electric)"
     },
+    "101": {
+      "pa": "0x05E",
+      "name": "TRANSDUCER GATE THRESHOLD (Vocal, firmware)"
+    },
     "113": {
       "pa": "0x06B",
       "name": "HARMONY STYLE (Vocal)"
     },
+    "119": {
+      "pa": "0x071",
+      "name": "HARMONY HUMANIZE (Vocal, firmware)"
+    },
     "123": {
       "pa": "0x075",
       "name": "HARMONY KEY (Vocal)"
+    },
+    "126": {
+      "pa": "0x078",
+      "name": "HARMONY SCALE (Vocal, firmware)"
     },
     "163": {
       "pa": "0x09D",
@@ -71,6 +83,10 @@
       "pa": "0x0D5",
       "name": "REVERB LEVEL (Vocal)"
     },
+    "223": {
+      "pa": "0x0D6",
+      "name": "GUITAR uMOD LEVEL (Guitar, firmware)"
+    },
     "224": {
       "pa": "0x0D7",
       "name": "GUITAR DELAY LEVEL (Guitar)"
@@ -115,6 +131,10 @@
         "TREMOLO",
         "AUTO FILTER"
       ]
+    },
+    "294": {
+      "pa": "0x12C",
+      "name": "GUITAR uMOD DEPTH (Guitar, firmware)"
     },
     "297": {
       "pa": "0x130",
@@ -164,6 +184,14 @@
     "345": {
       "pa": "0x168",
       "name": "GUITAR DELAY FEEDBACK (Guitar)"
+    },
+    "359": {
+      "pa": "0x17D",
+      "name": "DELAY FILTER (Vocal, firmware)"
+    },
+    "360": {
+      "pa": "0x17E",
+      "name": "GUITAR DELAY FILTER (Guitar, firmware)"
     },
     "376": {
       "pa": "0x19A",
@@ -235,13 +263,25 @@
         "unit": "s"
       }
     },
+    "385": {
+      "pa": "0x1A3",
+      "name": "GUITAR REVERB PRE DLY (Guitar, firmware)"
+    },
     "550": {
       "pa": "0x249",
       "name": "TRANSDUCER STYLE (Vocal)"
     },
+    "551": {
+      "pa": "0x24A",
+      "name": "TRANSDUCER ROUTING (Vocal, firmware)"
+    },
     "552": {
       "pa": "0x24B",
       "name": "TRANSDUCER DRIVE (Vocal)"
+    },
+    "556": {
+      "pa": "0x24F",
+      "name": "TRANSDUCER GAIN (Vocal, firmware)"
     },
     "576": {
       "pa": "0x263",
@@ -438,6 +478,117 @@
       "pa": "0x39F",
       "name": "FOOTSWITCH (Setup)"
     },
+    "842": {
+      "pa": "0x393",
+      "name": "SWITCH-3 SWITCH 1 (Setup; the pedal shows this copy)",
+      "values": [
+        "LOOP REC/PLAY",
+        "LOOP STOP/CLEAR",
+        "LOOP UNDO",
+        "LOOP START/STOP",
+        "1 BTN LOOPER",
+        "TAP TEMPO",
+        "SET KEY",
+        "PRESET DOWN",
+        "PRESET UP",
+        "HIT",
+        "HARMONY",
+        "HARM MOMENT",
+        "DOUBLING",
+        "DELAY",
+        "DELAY MOMENT",
+        "REVERB",
+        "HARDTUNE",
+        "TRANSDUCER",
+        "uMOD",
+        "GTR AMP",
+        "GTR BOOST",
+        "GTR COMPRESSOR",
+        "GTR uMOD",
+        "GTR DELAY",
+        "GTR REVERB",
+        "MIDI CC 102",
+        "MIDI CC 103",
+        "MIDI CC 104",
+        "MIDI CC 105",
+        "MIDI CC 106",
+        "MIDI CC 107"
+      ]
+    },
+    "843": {
+      "pa": "0x394",
+      "name": "SWITCH-3 SWITCH 2 (Setup; the pedal shows this copy)",
+      "values": [
+        "LOOP REC/PLAY",
+        "LOOP STOP/CLEAR",
+        "LOOP UNDO",
+        "LOOP START/STOP",
+        "1 BTN LOOPER",
+        "TAP TEMPO",
+        "SET KEY",
+        "PRESET DOWN",
+        "PRESET UP",
+        "HIT",
+        "HARMONY",
+        "HARM MOMENT",
+        "DOUBLING",
+        "DELAY",
+        "DELAY MOMENT",
+        "REVERB",
+        "HARDTUNE",
+        "TRANSDUCER",
+        "uMOD",
+        "GTR AMP",
+        "GTR BOOST",
+        "GTR COMPRESSOR",
+        "GTR uMOD",
+        "GTR DELAY",
+        "GTR REVERB",
+        "MIDI CC 102",
+        "MIDI CC 103",
+        "MIDI CC 104",
+        "MIDI CC 105",
+        "MIDI CC 106",
+        "MIDI CC 107"
+      ]
+    },
+    "844": {
+      "pa": "0x395",
+      "name": "SWITCH-3 SWITCH 3 (Setup; the pedal shows this copy)",
+      "values": [
+        "LOOP REC/PLAY",
+        "LOOP STOP/CLEAR",
+        "LOOP UNDO",
+        "LOOP START/STOP",
+        "1 BTN LOOPER",
+        "TAP TEMPO",
+        "SET KEY",
+        "PRESET DOWN",
+        "PRESET UP",
+        "HIT",
+        "HARMONY",
+        "HARM MOMENT",
+        "DOUBLING",
+        "DELAY",
+        "DELAY MOMENT",
+        "REVERB",
+        "HARDTUNE",
+        "TRANSDUCER",
+        "uMOD",
+        "GTR AMP",
+        "GTR BOOST",
+        "GTR COMPRESSOR",
+        "GTR uMOD",
+        "GTR DELAY",
+        "GTR REVERB",
+        "MIDI CC 102",
+        "MIDI CC 103",
+        "MIDI CC 104",
+        "MIDI CC 105",
+        "MIDI CC 106",
+        "MIDI CC 107"
+      ]
+    },
     "845": {
       "pa": "0x39B",
       "name": "MP76 RIGHT (Setup)"
@@ -486,7 +637,6 @@
     580,
     553,
     554,
-    556,
     557,
     572,
     573,
@@ -529,12 +679,10 @@
     401,
     288,
     299,
-    294,
     296,
     301,
     309,
     311,
-    385,
     395,
     295
   ]
