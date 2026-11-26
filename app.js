@@ -1770,7 +1770,8 @@ ${JSON.stringify(data, null, 1)}
   // ── UI wiring ───────────────────────────────────────────────────────────
   function setView(v) {
     const was = view; view = v;
-    if (was !== v && v !== "pedal" && v !== "mapa") mirrorTo(v === "editor" ? selKey : v === "mix" ? "mix" : "home");   // never SETUP: Setup and Stage go back to the preset screen store.set("view", v); document.body.dataset.view = v;
+    if (was !== v && v !== "pedal" && v !== "mapa") mirrorTo(v === "editor" ? selKey : v === "mix" ? "mix" : "home");   // never SETUP: Setup and Stage go back to the preset screen
+    store.set("view", v); document.body.dataset.view = v;
     for (const b of $$(".rail nav button")) { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }
     for (const s of $$(".view")) s.hidden = s.id !== "v-" + v;
     updateFades();
