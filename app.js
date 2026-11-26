@@ -939,9 +939,12 @@
       if (roundTrip && !(P.genre > 0) && Math.abs(d) > span / 2) d = d > 0 ? d - span : d + span;
       $("#lib-status").textContent = `Going to preset ${n}… (now ${cur})`;
       // The knob steps presets on the preset screen like the arrows, but one event per click, so it can go ~10x
-      // faster (real Electric: 20 presets in ~0.5 s). Inside a menu the knob would change a value, so BACK first.
+      // faster. Inside a menu the knob would change a value, so BACK first.
+      // Spacing: the pedal ACCELERATES knob clicks that come faster than ~20 ms apart (real Electric, 2026-11-25:
+      // 10 clicks 12 ms apart moved 15 presets, and a 71-preset jump overshot 49 → 140 → 110 → 125 before landing).
+      // 25 ms apart moved exactly 70 of 70, both ways (~1.8 s), so a jump lands in one burst.
       if (round === 0) { await L.press(L.EVT.back); await delay(250); }
-      for (let i = 0; i < Math.abs(d) && !LIB.cancel && L.ready; i++) { L.inject(0xAE, 0x00, d > 0 ? 0x01 : 0x00); await delay(12); }
+      for (let i = 0; i < Math.abs(d) && !LIB.cancel && L.ready; i++) { L.inject(0xAE, 0x00, d > 0 ? 0x01 : 0x00); await delay(25); }
       // the number register catches up a moment later: wait until it stops moving
       let last = null;
       for (let k = 0; k < 20 && L.ready; k++) { await delay(150); const v = await L.get(PRESET_REG()); if (v != null && v === last) break; last = v; }
