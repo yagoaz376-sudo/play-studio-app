@@ -404,10 +404,10 @@
   function buildSetup() {
     const groups = setupGroups(); if (gsel >= groups.length) gsel = 0;
     $("#groups").innerHTML = groups.map(([t, cs], i) => `<button type="button" role="tab" aria-selected="${i === gsel}" data-g="${i}">${esc(t)} <span class="cap-lbl" style="float:right">${cs.length}</span></button>`).join("")
-      + `<div class="locked"><b>MIDI locked</b>MIDI CTRL, FILTER, SYSEXID and the channels are left out on purpose: changing them can lock out USB control.</div>`;
+      + (MODE === "pe" ? "" : `<div class="locked"><b>MIDI locked</b>MIDI CTRL, FILTER, SYSEXID and the channels are left out on purpose: changing them can lock out USB control.</div>`);   // the Electric has no MIDI page
     const [t, cs] = groups[gsel];
     $("#group").innerHTML = `<h2>${esc(t)} <span class="cap-lbl" style="margin-left:8px">global</span></h2><div class="rows">${cs.map(rowHTML).join("")}</div>`
-      + `<p class="locked-sm"><b>MIDI locked:</b> MIDI CTRL, FILTER, SYSEXID and the channels are left out on purpose.</p>`;   // phones (the side card is hidden there)
+      + (MODE === "pe" ? "" : `<p class="locked-sm"><b>MIDI locked:</b> MIDI CTRL, FILTER, SYSEXID and the channels are left out on purpose.</p>`);   // phones (the side card is hidden there)
     const selBtn = $("#groups [aria-selected='true']"); if (selBtn && selBtn.scrollIntoView && innerWidth <= 700) selBtn.scrollIntoView({ block: "nearest", inline: "nearest" });
   }
   function buildStage() {
@@ -417,7 +417,8 @@
     const pad = f => !f.control ? `<button type="button" class="tile always" data-always="1" data-fx="${f.key}" aria-pressed="true" title="${esc(f.name)}: always on · drag sideways = ${esc(levelCell(f).label)}" style="--fx:var(--c-${f.id})"><span class="tflag"><small>ON</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`
       : `<button type="button" class="tile" data-kind="tile" data-fx="${f.key}" data-param="${f.control.param}" aria-pressed="false" title="${esc(f.name)}: tap = on/off · hold = on only while held · drag sideways = its main control" style="--fx:var(--c-${f.id})"><span class="tflag"><small>··</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`;
     $("#tiles").innerHTML = [["Vocal", "voz"], ["Guitar", "gtr"]].map(([label, side]) =>
-      `<div class="stage-row"><span class="cap-lbl">${label}</span><div class="stage-links">${fx.filter(f => f.side === side).map(pad).join("")}</div></div>`).join("")
+      { const row = fx.filter(f => f.side === side), n = row.length <= 5 ? row.length : Math.ceil(row.length / 2);   // phones: up to 5 in one row, else two rows
+        return `<div class="stage-row"><span class="cap-lbl">${label}</span><div class="stage-links" style="--n:${n}">${row.map(pad).join("")}</div></div>`; }).join("")
       + `<div class="stage-row"><span class="cap-lbl">Footswitch</span><div class="stage-links"><button type="button" class="hitbar" id="hit2" aria-pressed="false"><i></i>HIT</button>`
       + `<button type="button" class="hitbar talkbar tapbar" id="tap2" title="Tap the beat: sets the preset's TEMPO, which every tempo-synced effect follows"><span class="tk"><i></i>TAP</span><small></small></button>`
       + `<button type="button" class="hitbar talkbar" id="talk2" aria-pressed="false" title="Each tap holds HIT for 1.3 s, like holding the footswitch"><span class="tk"><i></i>TALK</span><small></small></button>`
@@ -560,7 +561,7 @@
     const tb = $("#tap2"); if (tb) { const bpm = valOf(TEMPO); tb.querySelector("small").textContent = tapHint || (bpm == null ? "TAP TEMPO" : bpm + " BPM"); }
     for (const b of [$("#talk"), $("#talk2")]) if (b) { b.setAttribute("aria-pressed", talkOn); popOnChange(b, String(talkOn)); b.classList.toggle("sending", talkSending); const s = b.querySelector("small"); if (s) s.textContent = talkOn ? "FX MUTED · TAP TO SING" : "MUTE FX BETWEEN SONGS"; }
     $("#undo").setAttribute("aria-disabled", history.length ? "false" : "true");
-    $("#pe-note").hidden = MODE !== "pe";
+    paintNote(); document.body.dataset.mode = MODE || "";
     $("#gate").hidden = ready;
     const short = !ready ? "Offline" : MODE === "pe" ? "Play Electric" : "Play Acoustic";
     $("#conn-name").innerHTML = esc(short).replace(" ", "<br>");
@@ -1315,11 +1316,33 @@ ${JSON.stringify(data, null, 1)}
   }
   function openClaude() { if (!L.ready) return notConnected(); $("#picker").hidden = true; $("#claude").hidden = false; $("#claude-copied").textContent = ""; $("#claude-out").hidden = true; }
 
+  // the protected-mode note (Effects, Mix, Setup, Pedal): a real Play Electric can dismiss it for good; a link that
+  // didn't identify the pedal (a Bluetooth adapter) offers "It's a Play Acoustic", which unlocks full editing
+  function paintNote() {
+    const n = $("#pe-note"), unid = L.ready && MODE === "pe" && !L.identityMsg && L.pid !== 0x71;
+    n.hidden = !L.ready || MODE !== "pe" || (!unid && store.get("pe-note-off", false));
+    if (n.hidden) return;
+    n.classList.toggle("warn", unid);
+    $("#pe-note-t").textContent = unid ? "Pedal not identified · protected mode." : "Play Electric · protected mode.";
+    $("#pe-note-s").textContent = unid ? "A Bluetooth adapter can hide which pedal it is. If it's a Play Acoustic, say so to edit everything." : "Only parameters confirmed in the Mapper can be changed; everything else is read-only.";
+    $("#pe-note-go").textContent = unid ? "It's a Play Acoustic" : "Open Mapper";
+    $("#pe-note-x").hidden = unid;
+  }
+  function trustAcoustic() {
+    if (!L.out || !L.inp) return;
+    const t = store.get("trust-pa", {}); t[L.out.name] = true; store.set("trust-pa", t);
+    toast("Remembered: this adapter is a Play Acoustic. Reconnecting…", "", 2500);
+    L.use(L.out.id, L.inp.id, L.ble);   // reconnects; the ready handler now trusts it
+  }
+
   // ── link events ─────────────────────────────────────────────────────────
   L.on("ready", () => {
     // Full Acoustic editing only for a pedal that really identified itself as a Play Acoustic.
     // A Play Electric, or a link with no identity reply (e.g. Bluetooth "unconfirmed"), gets the protected mode.
-    const confirmedPA = L.pid === 0x70 && !!L.identityMsg;
+    // A Bluetooth adapter (WIDI…) can swallow the identity reply: the user can say once that it's a Play Acoustic,
+    // remembered per adapter (port name).
+    const unconfirmed = !L.identityMsg && L.pid !== 0x71, trusted = unconfirmed && !!(store.get("trust-pa", {})[L.out && L.out.name]);
+    const confirmedPA = L.pid === 0x70 && (!!L.identityMsg || trusted);
     MODE = confirmedPA ? "pa" : "pe"; loadMap(); loadLib(); walking = false; lastProg = null; fresh = false; talkOn = false; pedalTalk = false; loopOn = false; paintLoop();
     gen++; resetWrites(); V.clear(); P.num = null; P.name = null; P.edited = false; clearHistory(); ab = null;
     MAPS.base.clear(); MAPS.changes.clear(); MAPS.stop = false; MAPS.again = false;
@@ -1332,7 +1355,7 @@ ${JSON.stringify(data, null, 1)}
     if (confirmedPA || L.pid === 0x71) {
       setTimeout(() => { if (conn === connN && L.ready && !walking && !stepping) scanPresets(); }, 1500);
     }
-    toast(L.pid === 0x71 ? "Connected: Play Electric (protected mode)" : confirmedPA ? "Connected: Play Acoustic" : "Connected, but the pedal didn't identify itself: protected mode", confirmedPA || L.pid === 0x71 ? "" : "warn", 4000);
+    toast(L.pid === 0x71 ? "Connected: Play Electric (protected mode)" : confirmedPA ? (trusted ? "Connected: Play Acoustic (you confirmed it)" : "Connected: Play Acoustic") : "Connected, but the pedal didn't identify itself: protected mode", confirmedPA || L.pid === 0x71 ? "" : "warn", 4000);
   });
   L.on("status", () => { $("#gate-status").textContent = L.message; paintChrome(); renderDrawer(); if (!L.ready) { MAPS.stop = true; resetWrites(); $("#midi-alarm").hidden = true; paint(); } });
   L.on("ports", () => renderDrawer());
@@ -1545,6 +1568,8 @@ ${JSON.stringify(data, null, 1)}
     }
     if (b.dataset.step) { if (b.__held) { b.__held = false; return; } return stepPreset(+b.dataset.step); }
     if (b.dataset.save) return savePreset();
+    if (b.id === "pe-note-x") { store.set("pe-note-off", true); return paintNote(); }
+    if (b.id === "pe-note-go") { if (!L.identityMsg && L.pid !== 0x71) return trustAcoustic(); return setView("mapa"); }
     if (b.dataset.ab) return toggleAB();
     if (b.dataset.preset != null) return gotoPreset(+b.dataset.preset);
     if (b.id === "open-picker" || b.id === "open-picker2") return openPicker();
