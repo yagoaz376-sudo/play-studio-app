@@ -33,6 +33,8 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
 - **Aviso vermelho de MIDI:** depois de usar os controles do pedal, o app confere o MIDI CTRL e o FILTER. Se algum estiver num valor que trava a USB, aparece um aviso pra voltar o valor antes de desligar o pedal.
 - **Mapper:** descobre quais parâmetros o Play Electric usa.
 - **Nome do preset, no topo ou na Stage:** abre a **lista de presets**.
+  - **Buscar:** digite parte do nome ou o número; Enter vai pro primeiro resultado.
+  - **Segurar ◀ ou ▶** (meio segundo) pula 10 presets da lista; um toque passa um.
   - **Read all presets** pede ao pedal a lista de presets por número (nome, ★ e gêneros), **sem trocar o preset do pedal** e sem mudar o som: uns 5 segundos pra 178 presets. O app faz isso sozinho a cada conexão.
   - A lista mostra os presets do **gênero** escolhido no pedal (Todos, ★ Favoritos…). Toque num preset pra ir até ele: o pedal passa pelos presets do caminho com as setas (não existe comando de ir direto).
   - O app ainda relê o pedal em seguida, pra confirmar os valores.

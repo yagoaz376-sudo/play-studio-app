@@ -163,15 +163,20 @@
   // PLAY STUDIO: presetInfo also returns the header's flags word (bytes 26-29; bit 0 = Favorite, per docs/SYSEX.md)
   // PLAY STUDIO: n = 0 is the current edit buffer; n = 1… asks for that stored preset (bank n>>7, number n&127),
   // which the pedal answers without loading it (checked on a real Play Electric: 25 ms each, no reply past the last).
-  L.presetInfo = (n = 0, timeout = 1000) => queue(async () => {
+  // withData: also collect the data packets (21: chunk byte + 25 values × 4 bytes + checksum; 4 on the Electric)
+  L.presetInfo = (n = 0, timeout = 1000, withData = false) => queue(async () => {
     if (!L.ready) return null;
-    const p = collect(timeout, 1, m => m[0] === 0xF0 && m[3] === 0x38 && m[6] === 0x20 && m.length >= 31);
+    const K = L.pid === 0x71 ? 4 : 5;
+    const p = collect(timeout, withData ? 1 + K : 1, m => m[0] === 0xF0 && m[3] === 0x38 && (m[6] === 0x20 && m.length >= 31 || withData && m[6] === 0x21 && m.length >= 109));
     L.out.send([...hdr(), 0x45, (n >> 7) & 0x7F, n & 0x7F, 0xF7]);
     const r = await p; if (!r.length) return null;
-    const raw = [...r[0].slice(11, 26)], end = raw.indexOf(0);
+    const h0 = r.find(m => m[6] === 0x20) || r[0], raw = [...h0.slice(11, 26)], end = raw.indexOf(0);
     const name = String.fromCharCode(...(end < 0 ? raw : raw.slice(0, end)).filter(c => c >= 0x20 && c < 0x7F)).trim();
-    const flags = dec28(r[0], 26);
-    return { name, flags, fav: (flags & 1) === 1 };
+    const hd = r.find(m => m[6] === 0x20); if (!hd) return null;
+    const flags = dec28(hd, 26);
+    let data = null;
+    if (withData) { data = []; for (const m of r) if (m[6] === 0x21) data[m[7]] = Array.from({ length: 25 }, (_, j) => dec28(m, 8 + 4 * j)); }
+    return { name, flags, fav: (flags & 1) === 1, data };
   });
   L.presetName = async () => { const i = await L.presetInfo(); return i ? i.name : null; };
   // Panel events, as if a control on the unit was used. Our own echoes are flagged self:true on the "panel" event.

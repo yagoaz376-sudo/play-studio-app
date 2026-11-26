@@ -616,6 +616,8 @@
   function presetChanged(prog, knownNum = null) {
     gen++; resetWrites(); P.edited = false; P.name = null; clearHistory(); fresh = true; lastOn.clear(); numOk = true;
     const keep = new Set(presetIds());
+    if (MODE === "pe" && valOf(0x286) === 1) for (const f of fxList()) if (f.side === "gtr")   // GLOBAL GUITAR FX on: guitar is global
+      for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) { const id = c && rid(c); if (id != null) keep.delete(id); }
     for (const id of [...V.keys()]) if (keep.has(id) || MODE !== "pe" && !GLOBAL.has(id)) V.delete(id);
     P.num = null;
     const num = knownNum ?? (MODE === "pa" && prog != null && lib.pcOffset != null ? prog + lib.pcOffset : null), e = num != null ? libEntry(num) : null;
@@ -651,14 +653,23 @@
     if (!L.ready) return notConnected(); if (stepping || walking) return; stepping = true;
     try {
       const code = d > 0 ? L.EVT.next : L.EVT.prev;
-      // Play Acoustic: a Program Change confirms the step. Play Electric sends none, so compare the preset name.
+      // Play Acoustic: its Program Change confirms the step. Play Electric sends none: its preset-number register
+      // moves instead (~0.1–0.3 s; waiting for a Program Change cost 0.9 s per step). The name is the last check,
+      // for the rare case where a stale register already held the new number.
       const name0 = MODE === "pe" ? await L.presetName() : null;
-      const changed = async w => { if ((await w) != null) return true; if (MODE !== "pe") return false; const n = await L.presetName(); return n != null && n !== name0; };
-      let w = waitProgram(900); await L.press(code);
-      if (await changed(w)) { if (MODE === "pe") presetChanged(null, await L.get(PRESET_REG())); return; }
+      const once = async (pre) => {
+        const r0 = MODE === "pe" ? await L.get(PRESET_REG()) : null;
+        const w = MODE === "pe" ? armStep(r0, 1200) : waitProgram(900);
+        if (pre) { await L.press(L.EVT.back); await delay(150); }
+        await L.press(code);
+        const got = await w; if (got != null) return MODE === "pe" ? got : true;
+        if (MODE !== "pe") return null;
+        const n = await L.presetName(); return n != null && n !== name0 ? await L.get(PRESET_REG()) : null;
+      };
+      let r = await once(false);
       // no preset change: the pedal is probably inside a menu, where ◀ ▶ change pages. BACK, then try once more.
-      w = waitProgram(900); await L.press(L.EVT.back); await delay(150); await L.press(code);
-      if (await changed(w)) { if (MODE === "pe") presetChanged(null, await L.get(PRESET_REG())); return; }
+      if (r == null) r = await once(true);
+      if (r != null) { if (MODE === "pe") presetChanged(null, r); return; }
       toast("The pedal didn't change preset. Is it on its preset screen?", "warn", 3500);
     } finally { stepping = false; }
   }
@@ -842,6 +853,19 @@
   // Read every preset's name (and, on the Play Acoustic, all its values) by stepping with ▶ until the list comes
   // round to the start, or, on a pedal that stops at its last preset, until the end and then with ◀ from the start
   // down to the first one. Then back to the start. Unsaved edits on the current preset are lost.
+  // Play Electric preset data: slot (25 per packet, packets in order) → parameter id. Found on a real unit
+  // (2026-11-25) by comparing the packets of all 178 presets with values read one by one: every vocal parameter
+  // below matched in 178 of 178 presets. The guitar slots aren't used: with GLOBAL GUITAR FX on, the live guitar
+  // values are global, so they are read from the pedal as before.
+  const PE_SLOTS = { 6: 0x071, 9: 0x0A3, 10: 0x0C2, 11: 0x0C3, 12: 0x0DC, 13: 0x0DD, 14: 0x0DE, 22: 0x11E, 24: 0x129, 26: 0x148,
+    28: 0x14D, 33: 0x158, 37: 0x178, 39: 0x17D, 41: 0x226, 43: 0x228, 45: 0x240, 46: 0x243, 47: 0x248, 48: 0x24E,
+    50: 0x29E, 51: 0x29F, 52: 0x2A0, 53: 0x2A1, 54: 0x2A2, 55: 0x2A3, 56: 0x2A4 };
+  function decodeSlots(data) {
+    if (MODE !== "pe" || !Array.isArray(data)) return [];
+    const flat = data.flatMap(p => p || []), ok = new Set(presetIds()), out = [];
+    for (const [s, id] of Object.entries(PE_SLOTS)) if (ok.has(id) && flat[+s] != null) out.push([id, flat[+s]]);
+    return out;
+  }
   // The list: ask the pedal for each stored preset's header by number (name, ★, genres). The pedal stays where it
   // is and nothing is heard; ~25 ms per preset. Values already saved for a preset are kept when its name is the same.
   async function scanPresets() {
@@ -850,11 +874,14 @@
     const t0 = performance.now(), found = {}; let misses = 0, count = 0;
     try {
       for (let n = 1; n <= 512 && misses < 3 && !LIB.cancel && L.ready; n++) {
-        const info = await L.presetInfo(n, misses ? 400 : 700);
+        const info = await L.presetInfo(n, misses ? 400 : 700, MODE === "pe");
         if (!info) { misses++; continue; }
         misses = 0; count++;
         const old = lib.presets[n];
-        found[n] = { name: info.name, t: Date.now(), fav: info.fav, flags: info.flags, vals: old && old.name === info.name ? old.vals : [] };
+        // values: the decoded vocal values (Electric), on top of anything saved earlier for this preset
+        const keep = new Map(old && old.name === info.name ? old.vals : []);
+        for (const [id, v] of decodeSlots(info.data)) keep.set(id, v);
+        found[n] = { name: info.name, t: Date.now(), fav: info.fav, flags: info.flags, vals: [...keep] };
         if (count % 20 === 0) $("#lib-status").textContent = `Reading presets… ${count}`;
       }
       if (count && !LIB.cancel) { lib.presets = found; lib.readAt = Date.now(); lib.storeAt = Math.min(lib.storeAt, lib.readAt - 1); saveLib(); }
@@ -957,7 +984,7 @@
   }
   function paintPicker() {
     const pk = $("#picker"); if (!pk || pk.hidden) return;
-    const pa = !!MODE, ents = Object.entries(lib.presets).map(([n, e]) => [+n, e]).filter(([, e]) => inGenre(e)).sort((a, b) => a[0] - b[0]);
+    let ents; const pa = !!MODE; ents = Object.entries(lib.presets).map(([n, e]) => [+n, e]).filter(([, e]) => inGenre(e)).sort((a, b) => a[0] - b[0]);
     const stale = ents.filter(([n]) => !libEntry(n)).length;
     $("#lib-info").textContent = !pa ? "" : ents.length ? `${ents.length} presets${stale ? ` · ${stale} may be outdated` : ""}${lib.readAt ? " · read " + new Date(lib.readAt).toLocaleDateString() : ""}` : "no presets read yet";
     $("#lib-read").hidden = !pa || LIB.busy;
@@ -975,6 +1002,10 @@
       return;
     }
     if (!LIB.busy) $("#lib-status").textContent = ents.length ? "Tap a preset to go to it." : "Read all presets once (about 2 s each) to see every preset here and switch instantly.";
+    const q = ($("#plist-q")?.value || "").trim().toUpperCase();
+    $(".psearch").hidden = !Object.keys(lib.presets).length;
+    if (q) ents = ents.filter(([n, e]) => String(n) === q || (e.name || "").toUpperCase().includes(q));
+    if (q && !ents.length) { $("#plist").innerHTML = `<p class="plist-empty">No preset matches “${esc(q)}”.</p>`; return; }
     $("#plist").innerHTML = ents.map(([n, e]) => `<button type="button" class="pitem" data-preset="${n}" ${n === P.num ? 'aria-current="true"' : ""} ${LIB.busy ? "disabled" : ""}>
       <span class="mono">${n}</span><b>${esc(e.name || "(no name)")}</b>${e.fav ? '<i class="fav" title="Favorite">★</i>' : ""}${libEntry(n) ? "" : `<small class="badge">outdated</small>`}</button>`).join("");
   }
@@ -1367,7 +1398,7 @@ ${JSON.stringify(data, null, 1)}
       if (v > 0) { lastOn.set(hex(c.param), v); return setParam(c, 0); }
       return setParam(c, lastOn.get(hex(c.param)) ?? 1);
     }
-    if (b.dataset.step) return stepPreset(+b.dataset.step);
+    if (b.dataset.step) { if (b.__held) { b.__held = false; return; } return stepPreset(+b.dataset.step); }
     if (b.dataset.save) return savePreset();
     if (b.dataset.preset != null) return gotoPreset(+b.dataset.preset);
     if (b.id === "open-picker" || b.id === "open-picker2") return openPicker();
@@ -1431,6 +1462,31 @@ ${JSON.stringify(data, null, 1)}
   $("#picker").addEventListener("click", e => { if (e.target === e.currentTarget && !LIB.busy) e.currentTarget.hidden = true; });
   $("#genre-sel").addEventListener("change", e => { const t = +e.target.value; if (t !== P.genre) setGenre(t); });
   $("#export-sheet").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
+  // search: type to filter, Enter goes to the first match
+  $("#plist-q").addEventListener("input", () => paintPicker());
+  $("#plist-q").addEventListener("keydown", e => {
+    if (e.key === "Enter") { const b = $("#plist .pitem"); if (b) { e.preventDefault(); b.click(); } }
+    if (e.key === "Escape" && e.target.value) { e.stopPropagation(); e.target.value = ""; paintPicker(); }
+  });
+  // hold a preset arrow (top bar or Stage) for half a second: jump 10 presets in the current list
+  for (const b of $$("[data-step]")) {
+    let t = 0;
+    const cancel = () => clearTimeout(t);
+    b.addEventListener("pointerdown", e => {
+      if (e.button > 0) return; b.__held = false; cancel();
+      t = setTimeout(async () => {
+        b.__held = true;
+        if (!L.ready || walking || stepping) return;
+        let cur = P.num;
+        if (cur == null) { if (!(await refreshNum())) return; cur = await L.get(PRESET_REG()); }   // number not known yet: confirm it first
+        const vis = visibleNums(), i = vis.indexOf(cur); if (i < 0 || !vis.length) return;
+        const j = Math.max(0, Math.min(vis.length - 1, i + 10 * +b.dataset.step));
+        if (j !== i) { toast(`Going to preset ${vis[j]}…`, "", 1500); gotoPreset(vis[j]); }
+      }, 500);
+    });
+    for (const ev of ["pointerup", "pointerleave", "pointercancel"]) b.addEventListener(ev, cancel);
+    b.addEventListener("contextmenu", e => e.preventDefault());
+  }
   $("#claude").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
   $("#fxpop").addEventListener("click", e => { if (e.target === e.currentTarget) closePop(); });
 

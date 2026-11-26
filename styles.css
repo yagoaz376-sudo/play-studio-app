@@ -907,3 +907,13 @@ body.talking #talk2[aria-pressed="true"] { box-shadow: var(--hl), 0 0 0 2px var(
 .plist-loading small { font-size: 12.5px; color: var(--muted); max-width: 320px; }
 .pl-spin { width: 30px; height: 30px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--accent) 22%, transparent); border-top-color: var(--accent); animation: svspin .8s linear infinite; margin-bottom: 4px; }
 @media (prefers-reduced-motion: reduce) { .pl-spin { animation-duration: 2s; } }
+
+/* Preset search */
+.psearch { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 999px; background: var(--glass-in, var(--glass));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 12%, transparent); color: var(--muted); }
+.psearch[hidden] { display: none; }
+.psearch svg { flex: none; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.psearch input { flex: 1; min-width: 0; border: 0; background: none; color: var(--text); font: 500 14px/1 inherit; outline: none; }
+.psearch input::placeholder { color: var(--faint); }
+.psearch:focus-within { box-shadow: inset 0 0 0 2px var(--accent); color: var(--accent); }
+.plist-empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 10px; margin: 0; }
