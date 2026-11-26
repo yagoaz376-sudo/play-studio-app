@@ -26,7 +26,11 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
 - **Setup:** os ajustes globais.
 - **Stage:** botões grandes para usar ao vivo (presets, efeitos, HIT e TALK). Cada efeito mostra a imagem dele.
   - **Toque:** liga ou desliga. Um efeito em modo **HIT** alterna só entre HIT e OFF, nunca vira ON.
-  - **Segurar:** abre um popup para editar só aquele efeito.
+  - **Segurar:** efeito momentâneo. O efeito inverte (desligado liga, ligado desliga) só enquanto o dedo estiver em cima, e volta ao soltar. Não conta como edição.
+  - **Arrastar para o lado:** muda o nível (LEVEL) do efeito, com uma barra mostrando o valor. Direita = mais alto, esquerda = mais baixo. Conta como edição (aperte Save pra guardar).
+  - Para editar o resto do efeito, use a aba **Efeitos**.
+- **A/B:** depois de editar, o botão **A | B** ao lado do Save alterna entre o preset salvo (A) e a sua edição (B). O Save grava o que estiver tocando.
+- **LOOP:** na fila do HIT/TAP/TALK (e na tela Pedal). Um toque entra no modo Loop (segura ▼+▲); outro toque sai (manda HIT, que é o EXIT no Loop). O pedal não informa se está em Loop, então se você sair pelo pedal, o botão pode ficar errado.
   - **TAP:** toque no ritmo da música (2 toques ou mais). Define o TEMPO do preset, que o delay da voz e o da guitarra seguem. Fica marcado como editado: aperte Save pra guardar no preset. Com GLOBAL TEMPO ligado no Setup, vale pra todos os presets.
 - **Pedal:** os botões do próprio pedal (STORE, BACK, setas, knob, VOCAL FX, GUITAR FX, MIX, FAVORITE, GENRE, SETUP e os footswitches), apertados pela USB. Útil se algum botão do pedal estiver quebrado. Segurar no app é segurar no pedal.
 - **Save:** fica sempre no topo e na Stage enquanto o pedal está conectado. Quando você edita alguma coisa pelo app, ele fica azul e aparece **edited**. O Save aperta STORE duas vezes pra salvar no mesmo preset; também serve pra salvar o que foi mudado no próprio pedal.

@@ -412,7 +412,7 @@
   }
   function buildStage() {
     const fx = fxList().filter(f => f.control);
-    const pad = f => `<button type="button" class="tile" data-kind="tile" data-fx="${f.key}" data-param="${f.control.param}" aria-pressed="false" title="${esc(f.name)}: tap = on/off · hold = edit" style="--fx:var(--c-${f.id})"><span class="tflag"><small>··</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`;
+    const pad = f => `<button type="button" class="tile" data-kind="tile" data-fx="${f.key}" data-param="${f.control.param}" aria-pressed="false" title="${esc(f.name)}: tap = on/off · hold = on only while held · drag sideways = level" style="--fx:var(--c-${f.id})"><span class="tflag"><small>··</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`;
     $("#tiles").innerHTML = [["Vocal", "voz"], ["Guitar", "gtr"]].map(([label, side]) =>
       `<div class="stage-row"><span class="cap-lbl">${label}</span><div class="stage-links">${fx.filter(f => f.side === side).map(pad).join("")}</div></div>`).join("")
       + `<div class="stage-row"><span class="cap-lbl">Footswitch</span><div class="stage-links"><button type="button" class="hitbar" id="hit2" aria-pressed="false"><i></i>HIT</button>`
@@ -421,21 +421,67 @@
       + `<button type="button" class="hitbar talkbar loopbar" id="loop2" aria-pressed="false"></button></div></div>`;
     $("#tap2").addEventListener("pointerdown", e => { if (e.button > 0) return; e.preventDefault(); tapTempo(); });   // on touch-down: taps land on the beat
     $("#tap2").addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); tapTempo(); } }); paintLoop();
-    // tap = on/off (the click handler); hold 450 ms = open this effect's editor. A hold never also toggles.
+    // Stage gestures (editing lives in Effects):
+    //   tap = on/off (the click handler)
+    //   hold = momentary: the effect flips while the finger stays down and flips back on release (no undo step, and
+    //          it doesn't count as an edit)
+    //   drag sideways = the effect's level, with a bar on the tile (one undo step per drag)
+    // A hold or a drag never also toggles. Vertical moves are left to page scrolling (touch-action: pan-y).
     for (const t of $$("#tiles .tile")) {
-      let timer = 0, x0 = 0, y0 = 0;
-      const cancel = () => clearTimeout(timer);
+      let timer = 0, x0 = 0, y0 = 0, mode = null, orig = null, wasEdited = false, lvl = null, lv0 = 0;
+      const fxOf = () => fxList().find(x => x.key === t.dataset.fx);
       t.addEventListener("pointerdown", e => {
-        if (e.button > 0) return; t.__held = false; x0 = e.clientX; y0 = e.clientY;
-        timer = setTimeout(() => { t.__held = true; openPop(t.dataset.fx); }, 450);
+        if (e.button > 0 || !L.ready) return; t.__held = false; x0 = e.clientX; y0 = e.clientY; mode = "press";
+        timer = setTimeout(() => {
+          if (mode !== "press") return;
+          const c = cellOf(t), id = c && rid(c), v = id == null ? undefined : V.get(id); if (v == null) return;
+          mode = "momentary"; t.__held = true; orig = v; wasEdited = P.edited; t.classList.add("momentary");
+          setParam(c, v > 0 ? 0 : (lastOn.get(hex(c.param)) ?? 1), { undoable: false });
+        }, 220);
       });
-      t.addEventListener("pointermove", e => { if (Math.hypot(e.clientX - x0, e.clientY - y0) > 10) cancel(); });
-      t.addEventListener("pointerup", cancel); t.addEventListener("pointercancel", cancel); t.addEventListener("pointerleave", cancel);
+      t.addEventListener("pointermove", e => {
+        if (!mode) return;
+        const dx = e.clientX - x0, dy = e.clientY - y0;
+        if (mode === "press" && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+          clearTimeout(timer);
+          const f = fxOf(); lvl = f && levelCell(f); const id = lvl && rid(lvl);
+          if (!lvl || id == null || V.get(id) == null) { mode = null; t.__held = true; return toast("This effect has no level to drag", "", 1600); }
+          mode = "level"; t.__held = true; lv0 = V.get(id); x0 = e.clientX;
+          try { t.setPointerCapture(e.pointerId); } catch {}
+          t.classList.add("leveling"); showLevel(t, lvl);
+        } else if (mode === "press" && Math.abs(dy) > 10) { clearTimeout(timer); mode = null; }
+        if (mode === "level") {
+          const span = (lvl.max - lvl.min) || 1, w = Math.max(180, t.offsetWidth * 1.5);
+          setParam(lvl, Math.round(lv0 + (e.clientX - x0) / w * span)); showLevel(t, lvl);
+        }
+      });
+      const end = () => {
+        clearTimeout(timer);
+        if (mode === "momentary") { setParam(cellOf(t), orig, { undoable: false }); P.edited = wasEdited; paintChrome(); }
+        if (mode === "level") hideLevelSoon(t);
+        mode = null; t.classList.remove("momentary", "leveling");
+      };
+      t.addEventListener("pointerup", end); t.addEventListener("pointercancel", end);
+      t.addEventListener("pointerleave", () => { if (mode !== "level") end(); });
       t.addEventListener("contextmenu", e => e.preventDefault());   // no long-press menu on touch screens
       t.addEventListener("keydown", e => { if ((e.key === "e" || e.key === "E" || (e.key === "Enter" && e.shiftKey))) { e.preventDefault(); openPop(t.dataset.fx); } });   // keyboard: E or Shift+Enter edits
     }
   }
-  // the effect editor popup (Stage → hold a tile)
+  // the effect's level for the Stage drag: LEVEL, else a …LEVEL, MIX or AMOUNT control (numbers only, no lists)
+  function levelCell(f) {
+    const cs = f.groups.flatMap(g => g[1]).filter(c => c && !(c.values && c.values.length) && rid(c) != null);
+    return cs.find(c => c.label === "LEVEL") || cs.find(c => /LEVEL$/.test(c.label)) || cs.find(c => c.label === "MIX") || cs.find(c => c.label === "AMOUNT") || null;
+  }
+  function showLevel(t, c) {
+    let o = t.querySelector(".tlevel");
+    if (!o) { o = document.createElement("span"); o.className = "tlevel"; o.innerHTML = "<i></i><em></em>"; t.appendChild(o); }
+    clearTimeout(t.__lvT); o.classList.add("show");
+    const v = V.get(rid(c)), p = v == null ? 0 : (v - c.min) / ((c.max - c.min) || 1);
+    o.querySelector("i").style.width = (p * 100).toFixed(1) + "%";
+    o.querySelector("em").textContent = c.label + " " + fmt(c, v);
+  }
+  function hideLevelSoon(t) { clearTimeout(t.__lvT); t.__lvT = setTimeout(() => { const o = t.querySelector(".tlevel"); if (o) o.classList.remove("show"); }, 900); }
+  // the effect editor popup (keyboard: E on a Stage tile)
   let popKey = null;
   // CONTROL value an effect had when it was last on (1 = ON, 2 = HIT), per menu control id; reset per preset
   const lastOn = new Map();
@@ -1477,7 +1523,7 @@ ${JSON.stringify(data, null, 1)}
       const n = c.max - c.min + 1; return setParam(c, c.min + ((v - c.min + +b.dataset.d) % n + n) % n);
     }
     if (b.dataset.kind === "chip") { selKey = b.dataset.fx; store.set("sel", selKey); return render(); }
-    if (b.dataset.kind === "tile" && b.__held) { b.__held = false; return; }   // that was a hold: the editor opened
+    if (b.dataset.kind === "tile" && b.__held) { b.__held = false; return; }   // that was a hold or a level drag, not a tap
     if (b.dataset.kind === "tile") {
       // tap = on/off, but an effect set to HIT stays a HIT effect: it goes HIT ↔ OFF, never to plain ON
       const c = cellOf(b), id = rid(c), v = id == null ? undefined : V.get(id);

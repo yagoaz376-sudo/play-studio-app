@@ -441,7 +441,15 @@ body { background: var(--wash), var(--bg); background-attachment: fixed; }
 .tile, .hitbar, .fx, .pitem { -webkit-user-select: none; user-select: none; }
 
 /* Stage tiles: the effect's picture, the name small underneath */
-.tile { gap: 4px; padding: 12px 8px 10px; -webkit-touch-callout: none; }
+.tile { gap: 4px; padding: 12px 8px 10px; -webkit-touch-callout: none; touch-action: pan-y; }
+/* Stage gestures: a hold (momentary) glows the tile; a sideways drag shows the level bar */
+.tile.momentary { outline: 2px solid color-mix(in srgb, var(--fx, var(--on)) 70%, transparent); outline-offset: 2px; }
+.tile.leveling { transform: none !important; }
+.tile .tlevel { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 26px; border-radius: 999px; overflow: hidden; pointer-events: none;
+  background: rgba(0, 0, 0, .45); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
+.tile .tlevel.show { opacity: 1; transform: none; }
+.tile .tlevel i { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--fx, var(--on)) 75%, transparent); transition: width .06s linear; }
+.tile .tlevel em { position: relative; display: grid; place-items: center; height: 100%; font: 800 11px/1 inherit; font-style: normal; letter-spacing: .06em; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tile .art { flex: 1 1 auto; width: min(82%, 120px); min-height: 0; max-height: 64%; aspect-ratio: auto; transition: opacity .2s; }
 .tile[aria-pressed="false"] .art { background: var(--faint); opacity: .4; }
 .tile .tname { display: flex; align-items: baseline; justify-content: center; gap: 6px; max-width: 100%; min-width: 0; }
