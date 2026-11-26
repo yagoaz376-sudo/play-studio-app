@@ -623,7 +623,11 @@
     const num = knownNum ?? (MODE === "pa" && prog != null && lib.pcOffset != null ? prog + lib.pcOffset : null), e = num != null ? libEntry(num) : null;
     if (num != null) P.num = num;
     P.fav = e ? e.fav : null;
-    if (e) { P.name = e.name; for (const [id, v] of e.vals) V.set(id, v); }
+    const live = new Set();   // ids that a global setting overrides: don't show the preset's stored copy
+    if (MODE === "pe" && valOf(0x286) === 1) for (const f of fxList()) if (f.side === "gtr")
+      for (const c of [f.control, f.style, ...f.groups.flatMap(g => g[1])]) { const id = c && rid(c); if (id != null) live.add(id); }
+    if (MODE === "pe" && valOf(0x287) === 1) live.add(0x07B);
+    if (e) { P.name = e.name; for (const [id, v] of e.vals) if (!live.has(id)) V.set(id, v); }
     render(); syncSoon(30);
   }
   let stepping = false;
@@ -853,13 +857,14 @@
   // Read every preset's name (and, on the Play Acoustic, all its values) by stepping with ▶ until the list comes
   // round to the start, or, on a pedal that stops at its last preset, until the end and then with ◀ from the start
   // down to the first one. Then back to the start. Unsaved edits on the current preset are lost.
-  // Play Electric preset data: slot (25 per packet, packets in order) → parameter id. Found on a real unit
-  // (2026-11-25) by comparing the packets of all 178 presets with values read one by one: every vocal parameter
-  // below matched in 178 of 178 presets. The guitar slots aren't used: with GLOBAL GUITAR FX on, the live guitar
-  // values are global, so they are read from the pedal as before.
-  const PE_SLOTS = { 6: 0x071, 9: 0x0A3, 10: 0x0C2, 11: 0x0C3, 12: 0x0DC, 13: 0x0DD, 14: 0x0DE, 22: 0x11E, 24: 0x129, 26: 0x148,
-    28: 0x14D, 33: 0x158, 37: 0x178, 39: 0x17D, 41: 0x226, 43: 0x228, 45: 0x240, 46: 0x243, 47: 0x248, 48: 0x24E,
-    50: 0x29E, 51: 0x29F, 52: 0x2A0, 53: 0x2A1, 54: 0x2A2, 55: 0x2A3, 56: 0x2A4 };
+  // Play Electric preset data: slot (25 per packet, packets in order) → parameter id, in increasing id order. Found on a
+  // real unit (2026-11-25): vocal slots matched in 178 of 178 presets; guitar slots in 10 of 10 presets read with
+  // GLOBAL GUITAR FX off; KEY (slot 7) by changing it and watching the edit buffer (45 00 00 includes unsaved edits).
+  const PE_SLOTS = { 0: 0x000, 6: 0x071, 7: 0x07B, 9: 0x0A3, 10: 0x0C2, 11: 0x0C3, 12: 0x0DC, 13: 0x0DD, 14: 0x0DE, 15: 0x0E0, 16: 0x0E1,
+    22: 0x11E, 23: 0x11F, 24: 0x129, 25: 0x12A, 26: 0x148, 27: 0x149, 28: 0x14D, 33: 0x158, 34: 0x159, 37: 0x178, 38: 0x179,
+    39: 0x17D, 40: 0x17E, 41: 0x226, 43: 0x228, 45: 0x240, 46: 0x243, 47: 0x248, 48: 0x24E,
+    50: 0x29E, 51: 0x29F, 52: 0x2A0, 53: 0x2A1, 54: 0x2A2, 55: 0x2A3, 56: 0x2A4,
+    57: 0x2FA, 58: 0x2FC, 59: 0x300, 60: 0x313, 61: 0x315, 64: 0x325, 65: 0x327, 66: 0x329, 67: 0x32B, 68: 0x32D };
   function decodeSlots(data) {
     if (MODE !== "pe" || !Array.isArray(data)) return [];
     const flat = data.flatMap(p => p || []), ok = new Set(presetIds()), out = [];
