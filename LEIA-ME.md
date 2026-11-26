@@ -27,7 +27,7 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
 - **Stage:** botões grandes para usar ao vivo (presets, efeitos, HIT e TALK). Cada efeito mostra a imagem dele.
   - **Toque:** liga ou desliga. Um efeito em modo **HIT** alterna só entre HIT e OFF, nunca vira ON.
   - **Segurar:** efeito momentâneo. O efeito inverte (desligado liga, ligado desliga) só enquanto o dedo estiver em cima, e volta ao soltar. Não conta como edição.
-  - **Arrastar para o lado:** muda o ajuste principal do efeito, com uma barra mostrando o valor: HardTune = SHIFT, Transducer = DRIVE, Amp = DRIVE, Comp = AMOUNT; os outros = LEVEL. Direita = mais alto, esquerda = mais baixo. Conta como edição (aperte Save pra guardar).
+  - **Arrastar para o lado:** muda o ajuste principal do efeito, com uma barra mostrando o valor: HardTune = SHIFT, Transducer = DRIVE, Amp = DRIVE, Comp = AMOUNT; os outros = LEVEL. No Play Acoustic, o BodyRez (AMOUNT) e o Comp (MAKEUP GAIN) também aparecem: ficam sempre ligados, então só arrastam. Direita = mais alto, esquerda = mais baixo. Conta como edição (aperte Save pra guardar).
   - Para editar o resto do efeito, use a aba **Efeitos**.
 - **A/B:** depois de editar, o botão **A | B** ao lado do Save alterna entre o preset salvo (A) e a sua edição (B). O Save grava o que estiver tocando.
 - **LOOP:** na fila do HIT/TAP/TALK (e na tela Pedal). Um toque entra no modo Loop (segura ▼+▲); outro toque sai (manda HIT, que é o EXIT no Loop). O pedal não informa se está em Loop, então se você sair pelo pedal, o botão pode ficar errado.

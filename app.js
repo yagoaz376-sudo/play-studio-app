@@ -411,8 +411,11 @@
     const selBtn = $("#groups [aria-selected='true']"); if (selBtn && selBtn.scrollIntoView && innerWidth <= 700) selBtn.scrollIntoView({ block: "nearest", inline: "nearest" });
   }
   function buildStage() {
-    const fx = fxList().filter(f => f.control);
-    const pad = f => `<button type="button" class="tile" data-kind="tile" data-fx="${f.key}" data-param="${f.control.param}" aria-pressed="false" title="${esc(f.name)}: tap = on/off · hold = on only while held · drag sideways = its main control" style="--fx:var(--c-${f.id})"><span class="tflag"><small>··</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`;
+    // effects with an on/off, plus the always-on ones that have something to drag (the Acoustic's BodyRez and Comp,
+    // as in open-acoustic's Stage): those can't be switched or held, only dragged
+    const fx = fxList().filter(f => f.control || levelCell(f));
+    const pad = f => !f.control ? `<button type="button" class="tile always" data-always="1" data-fx="${f.key}" aria-pressed="true" title="${esc(f.name)}: always on · drag sideways = ${esc(levelCell(f).label)}" style="--fx:var(--c-${f.id})"><span class="tflag"><small>ON</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`
+      : `<button type="button" class="tile" data-kind="tile" data-fx="${f.key}" data-param="${f.control.param}" aria-pressed="false" title="${esc(f.name)}: tap = on/off · hold = on only while held · drag sideways = its main control" style="--fx:var(--c-${f.id})"><span class="tflag"><small>··</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`;
     $("#tiles").innerHTML = [["Vocal", "voz"], ["Guitar", "gtr"]].map(([label, side]) =>
       `<div class="stage-row"><span class="cap-lbl">${label}</span><div class="stage-links">${fx.filter(f => f.side === side).map(pad).join("")}</div></div>`).join("")
       + `<div class="stage-row"><span class="cap-lbl">Footswitch</span><div class="stage-links"><button type="button" class="hitbar" id="hit2" aria-pressed="false"><i></i>HIT</button>`
@@ -433,7 +436,7 @@
       t.addEventListener("pointerdown", e => {
         if (e.button > 0 || !L.ready) return; t.__held = false; x0 = e.clientX; y0 = e.clientY; mode = "press";
         timer = setTimeout(() => {
-          if (mode !== "press") return;
+          if (mode !== "press" || t.dataset.always) return;   // always-on effects have no on/off to hold
           const c = cellOf(t), id = c && rid(c), v = id == null ? undefined : V.get(id); if (v == null) return;
           mode = "momentary"; t.__held = true; orig = v; wasEdited = P.edited; t.classList.add("momentary");
           setParam(c, v > 0 ? 0 : (lastOn.get(hex(c.param)) ?? 1), { undoable: false });
@@ -1530,6 +1533,9 @@ ${JSON.stringify(data, null, 1)}
     }
     if (b.dataset.kind === "chip") { selKey = b.dataset.fx; store.set("sel", selKey); return render(); }
     if (b.dataset.kind === "tile" && b.__held) { b.__held = false; return; }   // that was a hold or a level drag, not a tap
+    if (b.dataset.always) { if (b.__held) { b.__held = false; return; }
+      const f = fxList().find(x => x.key === b.dataset.fx), c = f && levelCell(f);
+      return toast(`${f ? f.name : "This effect"} is always on. Drag sideways to change ${c ? c.label : "it"}.`, "", 2200); }
     if (b.dataset.kind === "tile") {
       // tap = on/off, but an effect set to HIT stays a HIT effect: it goes HIT ↔ OFF, never to plain ON
       const c = cellOf(b), id = rid(c), v = id == null ? undefined : V.get(id);

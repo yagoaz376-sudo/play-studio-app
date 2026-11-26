@@ -141,7 +141,9 @@
   };
   const RX = [
     [/^(\d+) not mapped$/, "$1 sem mapa"],
-    [/^(.+): tap = on\/off · hold = edit$/, "$1: toque = liga/desliga · segure = editar"],
+    [/^(.+): tap = on\/off · hold = on only while held · drag sideways = its main control$/, "$1: toque = liga/desliga · segure = só enquanto segura · arraste pro lado = ajuste principal"],
+    [/^(.+): always on · drag sideways = (.+)$/, "$1: sempre ligado · arraste pro lado = $2"],
+    [/^(.+) is always on\. Drag sideways to change (.+)\.$/, "$1 fica sempre ligado. Arraste pro lado pra mudar $2."],
     [/^Going to preset (.+)… \(now (.+)\)$/, "Indo para o preset $1… (agora $2)"],
     [/^Reading presets…(.*)$/, (m, rest) => "Lendo presets…" + rest.replace(/ left$/, " restantes")],
     [/^Reading (\S+) of (\S+)… (\d+) answered · ~(\d+) s left$/, "Lendo $1 de $2… $3 responderam · ~$4 s restantes"],
