@@ -36,7 +36,9 @@
     "knob": "knob", "Footswitches": "Footswitches", "hold = TALK": "segurar = TALK", "▼ + ▲ hold": "segurar ▼ + ▲",
     "Front left arrow": "Seta esquerda", "Front right arrow": "Seta direita", "Control knob: drag, scroll or use the arrow keys": "Knob: arraste, role ou use as setas",
     "Knob one step left": "Knob um passo para a esquerda", "Knob one step right": "Knob um passo para a direita",
-    "Holds ▼ and ▲ together (enter / leave Loop mode)": "Segura ▼ e ▲ juntos (entra / sai do modo Loop)",
+    "Holds ▼ and ▲ together (enters Loop mode)": "Segura ▼ e ▲ juntos (entra no modo Loop)",
+    "EXIT LOOP": "SAIR DO LOOP", "sends HIT": "envia HIT",
+    "In Loop mode: HIT is EXIT. Left Loop on the pedal? Tap HIT on the pedal instead.": "Em modo Loop: HIT é o EXIT. Saiu do Loop no pedal? Então toque HIT no pedal.",
     // mix / setup
     "global · applies to every preset": "global · vale para todos os presets", "Setup groups": "Grupos de ajustes",
     // connect gate + drawer

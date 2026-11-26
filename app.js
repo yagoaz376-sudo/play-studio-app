@@ -746,19 +746,34 @@
     k.addEventListener("wheel", e => { e.preventDefault(); turn(e.deltaY < 0 ? 1 : -1); }, { passive: false });
     k.addEventListener("keydown", e => { const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[e.key]; if (d) { e.preventDefault(); turn(d); } });
     for (const b of $$("#v-pedal [data-knob]")) b.addEventListener("click", () => turn(+b.dataset.knob));
-    // LOOP: per the manual, hold DOWN and UP together to enter / leave Loop mode. Sends both presses, the "held"
-    // stream for both for 1.5 s, then both releases. In Loop mode ▼ = play/rec/overdub (hold: undo), ▲ = stop (hold: erase).
+    // LOOP: hold DOWN and UP together to enter Loop mode (sends both presses, the "held" stream for both for 1.5 s,
+    // then both releases). In Loop mode ▼ = play/rec/overdub (hold: undo), ▲ = stop (hold: erase), and HIT is EXIT:
+    // holding ▼+▲ again does NOT leave (seen on a real Electric, 2026-11-25). The pedal doesn't report Loop mode over
+    // USB (no register, no message), so the app keeps the state itself: the second tap sends HIT to leave.
     const lb = $("#loop-btn");
     if (lb) lb.addEventListener("click", async () => {
       if (!L.ready) return notConnected(); if (walking || lb.classList.contains("down")) return;
       lb.classList.add("down");
-      L.inject(0xDB, L.EVT.fswDown, 0x00); L.inject(0xDB, L.EVT.fswUp, 0x00);
-      const t = setInterval(() => { L.inject(0xDB, L.EVT.fswDown, 0x02); L.inject(0xDB, L.EVT.fswUp, 0x02); }, 200);
-      try { await delay(1500); } finally { clearInterval(t); L.inject(0xDB, L.EVT.fswDown, 0x01); L.inject(0xDB, L.EVT.fswUp, 0x01); lb.classList.remove("down"); }
+      try {
+        if (loopOn) { await L.press(L.EVT.hit); loopOn = false; }
+        else {
+          L.inject(0xDB, L.EVT.fswDown, 0x00); L.inject(0xDB, L.EVT.fswUp, 0x00);
+          const t = setInterval(() => { L.inject(0xDB, L.EVT.fswDown, 0x02); L.inject(0xDB, L.EVT.fswUp, 0x02); }, 200);
+          try { await delay(1500); } finally { clearInterval(t); L.inject(0xDB, L.EVT.fswDown, 0x01); L.inject(0xDB, L.EVT.fswUp, 0x01); }
+          loopOn = true;
+        }
+      } finally { lb.classList.remove("down"); paintLoop(); }
       afterPanel(null);
     });
   }
   // after using the pedal's controls: re-read (a knob turn inside a menu changes a value) and check the MIDI guard
+  let loopOn = false;   // Loop mode, as far as the app knows (the pedal doesn't say)
+  function paintLoop() {
+    const b = $("#loop-btn"); if (!b) return;
+    b.setAttribute("aria-pressed", loopOn);
+    b.innerHTML = loopOn ? 'EXIT LOOP <small>sends HIT</small>' : 'LOOP <small>▼ + ▲ hold</small>';
+    b.title = loopOn ? "In Loop mode: HIT is EXIT. Left Loop on the pedal? Tap HIT on the pedal instead." : "Holds ▼ and ▲ together (enters Loop mode)";
+  }
   let afterT = 0;
   function afterPanel(code) {
     if (code === L.EVT.store) { lib.storeAt = Date.now(); saveLib(); }
@@ -1200,7 +1215,7 @@ ${JSON.stringify(data, null, 1)}
     // Full Acoustic editing only for a pedal that really identified itself as a Play Acoustic.
     // A Play Electric, or a link with no identity reply (e.g. Bluetooth "unconfirmed"), gets the protected mode.
     const confirmedPA = L.pid === 0x70 && !!L.identityMsg;
-    MODE = confirmedPA ? "pa" : "pe"; loadMap(); loadLib(); walking = false; lastProg = null; fresh = false; talkOn = false; pedalTalk = false;
+    MODE = confirmedPA ? "pa" : "pe"; loadMap(); loadLib(); walking = false; lastProg = null; fresh = false; talkOn = false; pedalTalk = false; loopOn = false; paintLoop();
     gen++; resetWrites(); V.clear(); P.num = null; P.name = null; P.edited = false; clearHistory();
     MAPS.base.clear(); MAPS.changes.clear(); MAPS.stop = false; MAPS.again = false;
     $("#midi-alarm").hidden = true;
