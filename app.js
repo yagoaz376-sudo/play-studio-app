@@ -447,6 +447,9 @@
       const cs = cellsOf(p).filter(c => (MODE !== "pe" || rid(c) != null) && !seen.has(hex(c.param)) && seen.add(hex(c.param))); if (!cs.length) continue;
       const g = out.find(o => o[0] === p.title); g ? g[1].push(...cs) : out.push([p.title, cs]);
     }
+    // the Electric keeps USB OUT LEVEL on SETUP › OUTPUT, after VOCAL CANCEL (PE firmware menu tables; see PE_NOT_MIX)
+    const usb = MODE === "pe" && CELLS.get(0x0BD), og = out.find(o => o[0] === "OUTPUT");
+    if (usb && og && rid(usb) != null && !seen.has(0x0BD)) { const i = og[1].findIndex(c => hex(c.param) === 0x317); og[1].splice(i < 0 ? og[1].length : i + 1, 0, usb); }
     return out;
   }
   function buildSetup() {
