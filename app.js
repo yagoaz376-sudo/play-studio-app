@@ -1841,6 +1841,13 @@ ${JSON.stringify(data, null, 1)}
   });
   document.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); undo(); }
+    // ← → on the keyboard: previous / next preset (not while typing, on a knob or slider, or with a sheet open)
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !e.defaultPrevented && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+      const a = document.activeElement;
+      const busy = a && (/INPUT|SELECT|TEXTAREA/.test(a.tagName) || a.isContentEditable || a.closest("[role='slider']"));
+      const sheet = ["#picker", "#drawer", "#claude", "#export-sheet"].some(s => { const el = $(s); return el && !el.hidden; }) || popKey;
+      if (!busy && !sheet) { e.preventDefault(); stepPreset(e.key === "ArrowRight" ? 1 : -1); }
+    }
     if (e.key === "Escape") { $("#export-sheet").hidden = true; $("#drawer").hidden = true; $("#claude").hidden = true; if (!LIB.busy) $("#picker").hidden = true; if (popKey) closePop(); }
   });
   $("#picker").addEventListener("click", e => { if (e.target === e.currentTarget && !LIB.busy) e.currentTarget.hidden = true; });
