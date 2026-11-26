@@ -387,7 +387,7 @@
     d.innerHTML = `<div class="d-side">
         <div class="d-title"><i class="sw"></i><h2>${esc(f.name)}</h2><small class="cap-lbl">${f.side === "voz" ? "vocal" : "guitar"}</small></div>
         ${unmapped ? `<span class="badge" title="Confirm these in the Mapper to edit them">${unmapped} not mapped</span>` : ""}
-        <div class="lcd">${art(imgOf(f))}</div>${state}${style}
+        <div class="lcd">${art(imgOf(f))}${mirrorBtn()}</div>${state}${style}
         ${f.id === "bodyrez" ? eqHTML() : ""}
         <p class="hint">Drag or scroll the knobs. Shift = fine. Double-click = default.</p></div>
       <div class="d-params">${f.groups.map(([t, cs]) => { const nums = cs.filter(c => !c.values), lists = cs.filter(c => c.values);
@@ -541,8 +541,8 @@
     if (!f) { closePop(); return; }
     fillDetail($("#pop-detail"), f);
   }
-  function openPop(key) { if (!L.ready) return notConnected(); popKey = key; $("#fxpop").hidden = false; buildPop(); paint(); }
-  function closePop() { popKey = null; $("#fxpop").hidden = true; $("#pop-detail").innerHTML = ""; delete $("#pop-detail").dataset.fxbox; }
+  function openPop(key) { if (!L.ready) return notConnected(); popKey = key; $("#fxpop").hidden = false; buildPop(); paint(); mirrorTo(key); }
+  function closePop() { if (popKey) mirrorTo("home"); popKey = null; $("#fxpop").hidden = true; $("#pop-detail").innerHTML = ""; delete $("#pop-detail").dataset.fxbox; }
 
   // paint: push current values into whatever is on screen
   function paint() {
@@ -927,6 +927,64 @@
     if (code === L.EVT.store) { lib.storeAt = Date.now(); saveLib(); }
     if (code !== L.EVT.hit) fresh = false;
     clearTimeout(afterT); afterT = setTimeout(() => { syncSoon(10); checkMidiGuard(); }, 700);
+  }
+
+  // ── Mirror the Play Electric's screen: opening an effect in the app opens the same page on the pedal ──
+  // Page order from the PE 1.3.00 firmware menu tables (page data at load X:4372DB, run = load + 0x3ADE96;
+  // see maps/FIRMWARE.md). Only BACK, VOCAL FX / GUITAR FX / MIX and ▶ are pressed: never the knob (inside a page
+  // it changes values) and never SETUP. Off by default. If VOCAL FX were missed, ▶ on the preset screen would step
+  // the preset: the preset number is read before and after the first ▶, and a change is undone with ◀.
+  const PE_PAGES = { voz: ["harmony", "double", "delay", "reverb", "hardtune", "transducer", "umod"], gtr: ["amp", "comp", "umod", "delay", "reverb"] };
+  const PE_MENU_BTN = { voz: 0x09, gtr: 0x08, mix: 0x07 };
+  let mirrorEditHint = false, mirrorOn = store.get("mirror", false), mirrorReq = 0, mirrorChain = Promise.resolve(), mirrorState = "", mirrorT = 0;
+  const mirrorBtn = () => MODE !== "pe" ? "" : `<button type="button" class="mirror" data-mirror="1" aria-pressed="${mirrorOn}" data-st="${mirrorState}" title="Show this page on the pedal's screen too (presses BACK, VOCAL FX / GUITAR FX and ▶ for you)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 20h8M12 17v3"/></svg><span>Pedal</span></button>`;
+  const paintMirror = () => { for (const b of $$("[data-mirror]")) { b.setAttribute("aria-pressed", mirrorOn); b.dataset.st = mirrorState; } };
+  const mirrorBlocked = () => !mirrorOn || MODE !== "pe" || !L.ready || walking || saving || stepping || loopOn || loopBusy;
+  // target: an effect key ("voz-double"), "mix", or "home" (back to the preset screen)
+  function mirrorTo(target) {
+    if (mirrorBlocked() || !target) return;
+    const my = ++mirrorReq; clearTimeout(mirrorT);
+    mirrorT = setTimeout(() => { mirrorChain = mirrorChain.then(() => runMirror(my, target)).catch(() => {}); }, 250);   // quick taps on the chips: only the last one is sent
+  }
+  async function runMirror(my, target) {
+    if (my !== mirrorReq || mirrorBlocked()) return;
+    const [side, id] = target.split("-"), idx = PE_PAGES[side] ? PE_PAGES[side].indexOf(id) : 0;
+    if (target !== "home" && target !== "mix" && idx < 0) return;
+    mirrorState = "busy"; paintMirror();
+    try {
+      await L.press(L.EVT.back); await delay(220);
+      await L.press(L.EVT.back); await delay(220);    // a second BACK: from an inner page; harmless on the preset screen
+      if (target === "home") return;
+      // The pedal reopens a menu on the page used last (seen: VOCAL FX → uMOD), and the pages don't wrap (▶ on uMOD
+      // stays there; real Electric, 2026-11-26). So: ◀ (pages − 1) times always lands on page 1, then ▶ idx times.
+      const pages = target === "mix" ? 2 : PE_PAGES[side].length;
+      await L.press(PE_MENU_BTN[target === "mix" ? "mix" : side]); await delay(450);
+      // unsaved edits: a missed menu press would make an arrow change the preset and lose them, so stay where it opened
+      if (P.edited) { mirrorState = "part"; if (!mirrorEditHint) { mirrorEditHint = true; toast("Unsaved edits: the pedal only opens the menu (an arrow could lose them). Save to mirror the exact page.", "", 4500); } return; }
+      const r0 = await L.get(0x282);
+      const steps = [...Array(pages - 1).fill(L.EVT.prev), ...Array(idx).fill(L.EVT.next)];
+      for (let i = 0; i < steps.length; i++) {
+        if (my !== mirrorReq || mirrorBlocked()) return;
+        await L.press(steps[i]); await delay(i === 0 ? 300 : 180);
+        if (i === 0) {
+          const r1 = await L.get(0x282);
+          if (r0 != null && r1 != null && r1 !== r0) {   // it was on the preset screen: the arrow stepped the preset
+            await L.press(steps[0] === L.EVT.prev ? L.EVT.next : L.EVT.prev); mirrorState = "fail";
+            toast("The pedal didn't open its effect pages, so the arrow changed the preset; sent it back.", "warn", 5000);
+            return;
+          }
+        }
+      }
+      mirrorState = "ok";
+    } finally { if (mirrorState === "busy") mirrorState = "ok"; paintMirror(); }
+  }
+  // what the app is showing right now, as a mirror target
+  const mirrorTarget = () => popKey || (view === "editor" ? selKey : view === "mix" ? "mix" : "home");
+  function toggleMirror() {
+    if (MODE !== "pe") return;
+    mirrorOn = !mirrorOn; store.set("mirror", mirrorOn); mirrorState = ""; paintMirror();
+    toast(mirrorOn ? "The pedal's screen now follows the app (effect pages and Mix)." : "The pedal's screen no longer follows the app.", "", 2600);
+    if (mirrorOn) mirrorTo(mirrorTarget());
   }
 
   // ── Save: store the edited preset on the pedal, in its own place ──
@@ -1585,7 +1643,8 @@ ${JSON.stringify(data, null, 1)}
 
   // ── UI wiring ───────────────────────────────────────────────────────────
   function setView(v) {
-    view = v; store.set("view", v); document.body.dataset.view = v;
+    const was = view; view = v;
+    if (was !== v && v !== "pedal" && v !== "mapa") mirrorTo(v === "editor" ? selKey : v === "mix" ? "mix" : "home");   // never SETUP: Setup and Stage go back to the preset screen store.set("view", v); document.body.dataset.view = v;
     for (const b of $$(".rail nav button")) { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }
     for (const s of $$(".view")) s.hidden = s.id !== "v-" + v;
     updateFades();
@@ -1599,7 +1658,8 @@ ${JSON.stringify(data, null, 1)}
       const c = cellOf(host), id = rid(c), v = id == null ? undefined : V.get(id); if (v == null) return;
       const n = c.max - c.min + 1; return setParam(c, c.min + ((v - c.min + +b.dataset.d) % n + n) % n);
     }
-    if (b.dataset.kind === "chip") { selKey = b.dataset.fx; store.set("sel", selKey); return render(); }
+    if (b.dataset.kind === "chip") { selKey = b.dataset.fx; store.set("sel", selKey); render(); return mirrorTo(selKey); }
+    if (b.dataset.mirror) return toggleMirror();
     if (b.dataset.kind === "tile" && b.__held) { b.__held = false; return; }   // that was a hold or a level drag, not a tap
     if (b.dataset.always) { if (b.__held) { b.__held = false; return; }
       const f = fxList().find(x => x.key === b.dataset.fx), c = f && levelCell(f);

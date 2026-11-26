@@ -16,6 +16,11 @@
     "All presets": "Todos os presets", "Next preset": "Próximo preset",
     "Save this preset on the pedal (presses STORE, then STORE again to confirm)": "Salvar este preset no pedal (aperta STORE e STORE de novo pra confirmar)",
     "Undo (Ctrl+Z)": "Desfazer (Ctrl+Z)", "Undo": "Desfazer", "Light / dark theme": "Tema claro / escuro", "Toggle theme": "Trocar tema",
+    "Pedal": "Pedal", "Show this page on the pedal's screen too (presses BACK, VOCAL FX / GUITAR FX and ▶ for you)": "Mostrar esta página também na tela do pedal (aperta BACK, VOCAL FX / GUITAR FX e ▶ pra você)",
+    "The pedal's screen now follows the app (effect pages and Mix).": "A tela do pedal agora acompanha o app (páginas de efeito e Mix).",
+    "The pedal's screen no longer follows the app.": "A tela do pedal não acompanha mais o app.",
+    "Unsaved edits: the pedal only opens the menu (an arrow could lose them). Save to mirror the exact page.": "Edições não salvas: o pedal só abre o menu (uma seta poderia perdê-las). Salve pra espelhar a página exata.",
+    "The pedal didn't open its effect pages, so the arrow changed the preset; sent it back.": "O pedal não abriu as páginas de efeito, então a seta trocou o preset; mandei de volta.",
     "Language": "Idioma", "Close": "Fechar", "Edit effect": "Editar efeito",
     // effects / stage
     "Vocal": "Voz", "Guitar": "Guitarra", "vocal": "voz", "guitar": "guitarra", "Vocal effects": "Efeitos de voz", "Guitar effects": "Efeitos de guitarra",

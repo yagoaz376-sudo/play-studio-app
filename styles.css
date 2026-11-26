@@ -116,6 +116,15 @@ button { cursor: pointer; border: 0; background: none; -webkit-tap-highlight-col
 .d-title small { margin-left: auto; }
 .lcd { border-radius: 14px; box-shadow: var(--inset-sm); height: 64px; display: grid; place-items: center; }
 .lcd .art { width: 92px; }
+/* "Pedal" toggle in the screen box: the pedal's own screen follows the app (Play Electric) */
+.lcd { position: relative; }
+.mirror { position: absolute; top: 6px; right: 6px; display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px 0 6px; border-radius: 8px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); box-shadow: var(--raise-sm); background: var(--bg-2); }
+.mirror svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.mirror[aria-pressed="true"] { color: var(--accent); box-shadow: var(--inset-sm); background: transparent; }
+.mirror[aria-pressed="true"][data-st="busy"] svg { animation: mirror-pulse .8s ease-in-out infinite; }
+.mirror[aria-pressed="true"][data-st="fail"] { color: var(--hit); }
+@keyframes mirror-pulse { 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .mirror[data-st="busy"] svg { animation: none; } }
 .detail[data-state="off"] .lcd .art { background: var(--faint); opacity: .5; }
 .seg { display: flex; padding: 4px; border-radius: 12px; box-shadow: var(--inset-sm); gap: 2px; }
 .seg button { flex: 1; padding: 8px 0; border-radius: 9px; font-size: 12px; font-weight: 700; letter-spacing: .05em; color: var(--faint); }

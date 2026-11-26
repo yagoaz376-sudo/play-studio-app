@@ -74,3 +74,24 @@ The Play Acoustic's 0x278–0x27C are different things on the Electric. They sta
 - It also corrects HUMANIZE: the stored one is 0x341 (0x077 "HUMANIZE AMOUNT" isn't stored). It adds PORTAMENTO at 0x342.
 - **Play Acoustic**: the same table in PA 1.3.00 at X:436842. It has 118 IDs (5 packets) and app.js uses it as PA_SLOT_IDS.
   It was found from its likeness to the Electric's table. It hasn't been checked on a real Acoustic yet.
+
+## Frequency controls 0..240 (2026-11-26)
+- LOW / HI / PARA FREQ (BodyRez), AutoShape LB/HB, MID FREQ and other 0..240 "frequency table" controls have 241 steps from 20 Hz to 20 kHz. That's 3 decades × 80, which is 1/24 octave per step: **f = 20 × 10^(v/80)**.
+- The firmware has no stored table to confirm this. It formats the value at run time ("%4.0f Hz", " KHz").
+- The Electric's amp MID FREQ range 87..174 comes out as 244 Hz … 2.95 kHz, a typical amp mid band. So the formula is likely right.
+- It hasn't been read off a pedal's screen yet, so the app shows these values as "≈".
+- The BodyRez PARA WIDTH list is in octaves (NARROW, 0.11 … 8.77, WIDE). The app's EQ curve uses Q = √(2^bw) / (2^bw − 1).
+
+## Menu tables and the pedal's own pages (2026-11-26)
+- The menu tree of PE 1.3.00 is a 4-word top-level list at load X:43749B: `{title, page data, 0, 0}`. Page data starts at X:4372DB and holds 8-word sub-page entries `{title, item list, variant, 0, flags, …}`. Item lists are 18 words (3 rows × `{row, 0, param L, param R, -, -}`); **0x35D = empty cell**. These are run addresses: **run = load + 0x3ADE96** in this record. Titles are strings at run − 0x2A270, like the parameter names.
+- Pages in the order ◀ ▶ walk them (entries with the same title are variants the pedal picks between, and take one place):
+  - **Effects (VOCAL FX):** HARMONY, DOUBLE, DELAY (×2: TEMPO / DELAY TIME advanced), REVERB, HARDTUNE, TRANSDUCER, uMOD. EffectsAdvanced has the same 8 entries.
+  - **GuitarFX:** GUITAR AMP (or GUITAR AMP (BOOST), with DRIVE 0x317 / LEVEL 0x319), GUITAR COMPRESSOR, GUITAR uMOD (MIX 0x28D, SPEED 0x12A), GUITAR DELAY (×2), GUITAR REVERB. GuitarAdvanced: AMP = TREBLE 0x05F, MID 0x05D, MID FREQ 0x05E, BASS 0x05C; DELAY = TEMPO or DELAY TIME, DLY FILTER STYLE 0x168, DIVISION 0x340.
+  - **Mixer:** MIX 1/2 (LEVEL 0x0C4, HEADPHONE LEVEL 0x0B2, LOOP LEVEL 0x290, AUX 0x252 or ROOMSENSE 0x253 or none, OUT LEVEL 0x0B1) and MIX 2/2 (0x0C8, 0x0CA, 0x0C9). There are 3 variants of the block, like on the Acoustic.
+  - **Setup:** INPUT, OUTPUT, GUITAR, SYSTEM (page 2 shows SWITCH-6 MODE or SWITCH-3 MODE), SWITCH-3 / SWITCH-6, MIC CONTROL (MP76 CONTROL 0x339, MP75 CONTROL 0x27C, MP76 TOP/BOTTOM/LEFT/RIGHT 0x350/0x34E/0x34F/0x34D), LOOP, PRODUCT INFO.
+  - Others: Home, Splash, FrontTest, SetKey, Looper, Genre, Store, practice, Tuner.
+- Seen on the user's Electric:
+  - A menu button reopens the page used last: VOCAL FX opened on uMOD.
+  - The pages don't wrap: ▶ on uMOD stays on uMOD.
+  - So BACK, BACK, menu button, ◀ × (pages − 1), ▶ × index always lands on the right page. Confirmed for DOUBLE and GUITAR REVERB.
+  - The app's "Pedal" toggle (Effects view) does exactly this. It never presses the knob or SETUP. It checks 0x282 around the first arrow, and doesn't press arrows while the preset has unsaved edits.
