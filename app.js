@@ -599,6 +599,7 @@
     $("#p-num").textContent = num; $("#s-num").textContent = num; $("#p-num").hidden = !num; $("#s-num").hidden = !num;
     $("#p-name").textContent = name; $("#s-name").textContent = name;
     $("#p-edited").hidden = !P.edited;
+    for (const b of $$("[data-step]")) b.classList.toggle("at-end", ready && atEnd(+b.dataset.step));
     // Save is always there while connected (edits made on the pedal itself aren't seen by the app); it stands out
     // once something was edited here.
     $("#s-edit").hidden = !ready;
@@ -804,9 +805,29 @@
     return false;
   }
   const waitProgram = ms => new Promise(res => { const off = L.on("program", p => { off(); clearTimeout(t); res(p); }); const t = setTimeout(() => { off(); res(null); }, ms); });
+  // At the first / last preset of the list (in the current genre) on a pedal that doesn't wrap: there's nowhere to go.
+  // The Play Electric stops there, so pressing the arrow would only wait for a preset change that never comes.
+  function atEnd(d, n = P.num) {
+    if (n == null || lib.wraps === true || LIB.busy) return false;
+    const vis = visibleNums(); if (!vis.length || !vis.includes(n)) return false;
+    return d > 0 ? n === vis[vis.length - 1] : n === vis[0];
+  }
+  const bumpArrow = d => { for (const b of $$(`[data-step="${d > 0 ? 1 : -1}"]`)) { b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); } };
   async function stepPreset(d) {
-    if (!L.ready) return notConnected(); if (stepping || walking) return; stepping = true;
+    if (!L.ready) return notConnected(); if (stepping || walking) return;
+    if (atEnd(d)) return bumpArrow(d);
+    stepping = true;
     try {
+      // Play Electric right after connecting: its number register isn't trusted yet (numOk). If it says we're at the
+      // end of the list, one quick press settles it: no move = really the end (no BACK retry, no warning, no wait).
+      if (MODE === "pe" && !numOk) {
+        const r0 = await L.get(PRESET_REG());
+        if (atEnd(d, r0)) {
+          const w = armStep(r0, 600); await L.press(d > 0 ? L.EVT.next : L.EVT.prev);
+          const got = await w; if (got != null) { presetChanged(null, got); return; }
+          if (await L.get(PRESET_REG()) === r0) { numOk = true; P.num = r0; paintChrome(); return bumpArrow(d); }
+        }
+      }
       const code = d > 0 ? L.EVT.next : L.EVT.prev;
       // Play Acoustic: its Program Change confirms the step. Play Electric sends none: its preset-number register
       // moves instead (~0.1–0.3 s; waiting for a Program Change cost 0.9 s per step). The name is the last check,
@@ -1949,3 +1970,4 @@ ${JSON.stringify(data, null, 1)}
   window.PlayStudio = { V, P, get MODE() { return MODE; }, MAPS, MAPD: () => MAPD, render, syncAll, fxList: () => fxList(), rid: c => rid(c),
     saveMap: () => { saveMap(); render(true); renderMapper(); } };   // apply a map edited from the console without reloading   // for debugging in the console
 })();
+

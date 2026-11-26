@@ -1048,3 +1048,9 @@ body[data-mode="pe"] .pa-only { display: none; }
 .plcd-b.lcd-grid .lc:nth-child(odd) { border-right: 2px solid currentColor; }
 .plcd-b.lcd-grid .lc:nth-child(-n+2) { border-top: 0; }
 .plcd-b.lcd-grid .lc.empty { visibility: visible; }
+
+/* first / last preset: the arrow that leads nowhere fades, and nudges if pressed anyway */
+.arrow.at-end, .big-arrow.at-end { opacity: .35; }
+.arrow.bump, .big-arrow.bump { animation: bump .28s ease; }
+@keyframes bump { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .arrow.bump, .big-arrow.bump { animation: none; } }
