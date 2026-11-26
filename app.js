@@ -782,7 +782,7 @@
       P.edited = false; fresh = true; clearHistory();
       lib.storeAt = Date.now(); saveLib();
       justSaved = true; clearTimeout(justSavedT); justSavedT = setTimeout(() => { justSaved = false; paintChrome(); }, 1800);
-      toast(MODE === "pe" ? "Saved: pressed STORE twice (experimental on the Play Electric). Check the pedal's screen." : "Saved on the pedal (STORE, STORE). Check the pedal's screen.", "", 3500);
+      toast("Saved on the pedal (STORE, STORE). Check the pedal's screen.", "", 3500);   // confirmed on a real Electric: the stored preset changes
       syncSoon(50);   // re-read; a fresh, unedited read also refreshes this preset in the library
     } finally { saving = false; paintChrome(); }
   }
