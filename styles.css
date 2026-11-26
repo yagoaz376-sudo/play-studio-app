@@ -311,6 +311,17 @@ body { background: var(--wash), var(--bg); background-attachment: fixed; }
 .pe-x:hover { color: var(--text); background: var(--glass); }
 .pe-x svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
 .pe-x[hidden] { display: none; }
+/* BodyRez EQ curve (Play Acoustic) */
+.eqgraph { margin: 4px 0 0; padding: 8px 8px 6px; border-radius: 16px; box-shadow: var(--inset); background: color-mix(in srgb, var(--fx, var(--accent)) 6%, transparent); }
+.eqgraph svg { display: block; width: 100%; height: 110px; overflow: visible; }
+.eqgraph .eq-grid line { stroke: var(--stroke-2, rgba(127, 127, 127, .25)); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.eqgraph .eq-grid line.zero { stroke-dasharray: 3 4; }
+.eqgraph .eq-grid text { font: 600 8px/1 inherit; fill: var(--faint); }
+.eqgraph .eq-line { fill: none; stroke: var(--fx, var(--accent)); stroke-width: 2.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.eqgraph .eq-fill { fill: color-mix(in srgb, var(--fx, var(--accent)) 22%, transparent); stroke: none; }
+.eqgraph .eq-dots circle { fill: var(--bg-2, #222); stroke: var(--fx, var(--accent)); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.eqgraph figcaption { margin-top: 4px; font-size: 10.5px; color: var(--faint); text-align: right; }
+.eqgraph.unk .eq-line, .eqgraph.unk .eq-fill { opacity: 0; }
 @media (max-width: 700px) { .pe-note { font-size: 11.5px; padding: 6px 6px 6px 12px; gap: 8px; } .pe-note span { display: none; } .pe-note .btn { padding: 6px 12px; font-size: 12px; } }
 
 /* connect screen: covers the views until the pedal has answered */

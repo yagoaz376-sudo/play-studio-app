@@ -38,6 +38,7 @@
     "Connected: Play Acoustic (you confirmed it)": "Conectado: Play Acoustic (confirmado por você)",
     "Remembered: this adapter is a Play Acoustic. Reconnecting…": "Anotado: este adaptador é um Play Acoustic. Reconectando…",
     "Dismiss": "Fechar",
+    "EQ ≈ (approximate curve)": "EQ ≈ (curva aproximada)", "EQ curve": "Curva de EQ",
     // pedal view
     "The pedal's own buttons.": "Os botões do próprio pedal.",
     "Each one presses the real button over USB (hold = hold). Watch the pedal's screen.": "Cada um aperta o botão de verdade pela USB (segurar = segurar). Acompanhe a tela do pedal.", "In SETUP, stay away from the MIDI settings.": "No SETUP, não mexa nos ajustes de MIDI.",

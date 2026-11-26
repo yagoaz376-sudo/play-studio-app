@@ -29,6 +29,8 @@ Se o navegador recusar abrir direto do disco, rode `node serve.js` dentro da pas
   - **Segurar:** efeito momentâneo. O efeito inverte (desligado liga, ligado desliga) só enquanto o dedo estiver em cima, e volta ao soltar. Não conta como edição.
   - **Arrastar para o lado:** muda o ajuste principal do efeito, com uma barra mostrando o valor: HardTune = SHIFT, Transducer = DRIVE, Amp = DRIVE, Comp = AMOUNT; os outros = LEVEL. No Play Acoustic, o BodyRez (AMOUNT) e o Comp (MAKEUP GAIN) também aparecem: ficam sempre ligados, então só arrastam. Direita = mais alto, esquerda = mais baixo. Conta como edição (aperte Save pra guardar).
   - Para editar o resto do efeito, use a aba **Efeitos**.
+- **BodyRez (Play Acoustic):** na aba Efeitos aparece a curva do EQ (shelf grave/agudo + 2 bandas paramétricas), que muda na hora quando você gira os knobs. As frequências aparecem em Hz com "≈" porque a conversão ainda não foi conferida na tela do pedal.
+- **Bluetooth (WIDI):** se o adaptador esconder qual pedal é, o app abre em modo protegido e mostra o botão **É um Play Acoustic**. O app lembra disso para aquele adaptador.
 - **A/B:** depois de editar, o botão **A | B** ao lado do Save alterna entre o preset salvo (A) e a sua edição (B). O Save grava o que estiver tocando.
 - **LOOP:** na fila do HIT/TAP/TALK (e na tela Pedal). Um toque entra no modo Loop (segura ▼+▲); outro toque sai (manda HIT, que é o EXIT no Loop). O pedal não informa se está em Loop, então se você sair pelo pedal, o botão pode ficar errado.
   - **TAP:** toque no ritmo da música (2 toques ou mais). Define o TEMPO do preset, que o delay da voz e o da guitarra seguem. Fica marcado como editado: aperte Save pra guardar no preset. Com GLOBAL TEMPO ligado no Setup, vale pra todos os presets.

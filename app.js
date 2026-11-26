@@ -128,9 +128,16 @@
     for (let i = 1; i < pts.length; i++) if (v <= pts[i][0]) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; return y0 + (y1 - y0) * (v - x0) / (x1 - x0); }
     return pts[pts.length - 1][1];
   }
+  // The 0..240 frequency controls (BodyRez LOW / HI / PARA FREQ, the Electric's AutoShape and MID FREQ…) step 1/24
+  // octave from 20 Hz to 20 kHz: 241 values = 3 decades × 80. Not read off a pedal's screen yet, hence the "≈".
+  // (Check: the Electric's amp MID FREQ range 87..174 comes out as 244 Hz..2.95 kHz, a typical amp mid band.)
+  const freqOf = v => 20 * Math.pow(10, v / 80);
+  const hzText = f => f >= 1000 ? trim(f / 1000, f >= 10000 ? 1 : 2) + " kHz" : Math.round(f) + " Hz";
+  const isFreq = c => c && !c.values && c.min === 0 && c.max === 240 && /FREQ$/.test(c.label);
   function fmt(c, v) {
     if (v == null) return "··";
     if (c.values) return c.values[v - c.min] ?? String(v);
+    if (isFreq(c)) return "≈" + hzText(freqOf(v));
     const o = c.fmt || {};
     switch (c.format) {
       case "dB": return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + " dB";
@@ -381,11 +388,48 @@
         <div class="d-title"><i class="sw"></i><h2>${esc(f.name)}</h2><small class="cap-lbl">${f.side === "voz" ? "vocal" : "guitar"}</small></div>
         ${unmapped ? `<span class="badge" title="Confirm these in the Mapper to edit them">${unmapped} not mapped</span>` : ""}
         <div class="lcd">${art(imgOf(f))}</div>${state}${style}
+        ${f.id === "bodyrez" ? eqHTML() : ""}
         <p class="hint">Drag or scroll the knobs. Shift = fine. Double-click = default.</p></div>
       <div class="d-params">${f.groups.map(([t, cs]) => { const nums = cs.filter(c => !c.values), lists = cs.filter(c => c.values);
         return `${f.groups.length > 1 ? `<div class="group-lbl cap-lbl">${esc(t)}</div>` : ""}${nums.length ? `<div class="knobs">${nums.map(knobHTML).join("")}</div>` : ""}${lists.length ? `<div class="rows">${lists.map(rowHTML).join("")}</div>` : ""}`; }).join("")}</div>`;
     d.dataset.fxbox = f.key;   // paint() keeps the picture and the state of this box up to date
     wireKnobs(d);
+  }
+  // ── BodyRez EQ curve (Play Acoustic): low + high shelf and two peaking bands, RBJ biquads at 48 kHz ──
+  const EQ_W = 300, EQ_H = 120, EQ_DB = 15;
+  const eqX = f => Math.log10(f / 20) / 3 * EQ_W, eqY = db => EQ_H / 2 - db / EQ_DB * (EQ_H / 2 - 6);
+  function eqHTML() {
+    const grid = [100, 1000, 10000].map(f => `<line x1="${eqX(f)}" x2="${eqX(f)}" y1="0" y2="${EQ_H}"/><text x="${eqX(f) + 3}" y="${EQ_H - 4}">${f >= 1000 ? f / 1000 + "k" : f}</text>`).join("");
+    return `<figure class="eqgraph" data-eq="1" aria-label="EQ curve"><svg viewBox="0 0 ${EQ_W} ${EQ_H}" preserveAspectRatio="none"><g class="eq-grid">${grid}<line class="zero" x1="0" x2="${EQ_W}" y1="${eqY(0)}" y2="${eqY(0)}"/></g><path class="eq-fill"/><path class="eq-line"/><g class="eq-dots"></g></svg><figcaption>EQ ≈ (approximate curve)</figcaption></figure>`;
+  }
+  function biquad(type, f0, db, q) {
+    const A = Math.pow(10, db / 40), w0 = 2 * Math.PI * f0 / 48000, cw = Math.cos(w0), sw = Math.sin(w0);
+    if (type === "peak") { const al = sw / (2 * q); return [1 + al * A, -2 * cw, 1 - al * A, 1 + al / A, -2 * cw, 1 - al / A]; }
+    const al = sw / 2 * Math.SQRT2, sA = 2 * Math.sqrt(A) * al;
+    if (type === "low") return [A * ((A + 1) - (A - 1) * cw + sA), 2 * A * ((A - 1) - (A + 1) * cw), A * ((A + 1) - (A - 1) * cw - sA), (A + 1) + (A - 1) * cw + sA, -2 * ((A - 1) + (A + 1) * cw), (A + 1) + (A - 1) * cw - sA];
+    return [A * ((A + 1) + (A - 1) * cw + sA), -2 * A * ((A - 1) + (A + 1) * cw), A * ((A + 1) + (A - 1) * cw - sA), (A + 1) - (A - 1) * cw + sA, 2 * ((A - 1) - (A + 1) * cw), (A + 1) - (A - 1) * cw - sA];
+  }
+  function magDb([b0, b1, b2, a0, a1, a2], f) {
+    const w = 2 * Math.PI * f / 48000, c1 = Math.cos(w), s1 = Math.sin(w), c2 = Math.cos(2 * w), s2 = Math.sin(2 * w);
+    const nr = b0 + b1 * c1 + b2 * c2, ni = -(b1 * s1 + b2 * s2), dr = a0 + a1 * c1 + a2 * c2, di = -(a1 * s1 + a2 * s2);
+    return 10 * Math.log10((nr * nr + ni * ni) / (dr * dr + di * di));
+  }
+  function drawEqs() {
+    const box = $(".eqgraph[data-eq]"); if (!box) return;
+    const f = fxList().find(x => x.id === "bodyrez"); if (!f) return;
+    const cs = f.groups.flatMap(g => g[1]), cell = l => cs.find(c => c.label === l), val = l => { const c = cell(l), id = c && rid(c); return id == null ? null : V.get(id); };
+    const oct = l => { const c = cell(l), v = val(l); if (!c || v == null) return 1; const t = c.values[v - c.min]; return t === "NARROW" ? .1 : t === "WIDE" ? 10 : parseFloat(t) || 1; };
+    const qOf = bw => Math.sqrt(Math.pow(2, bw)) / (Math.pow(2, bw) - 1);
+    const bands = [["low", "LOW FREQ", "LOW GAIN"], ["high", "HI FREQ", "HI GAIN"], ["peak", "PARA 1 FREQ", "PARA 1 GAIN", "PARA 1 WIDTH"], ["peak", "PARA 2 FREQ", "PARA 2 GAIN", "PARA 2 WIDTH"]]
+      .map(([t, fl, gl, wl]) => { const fv = val(fl), g = val(gl); return fv == null || g == null ? null : { t, f0: freqOf(fv), g, q: wl ? qOf(oct(wl)) : .707 }; }).filter(Boolean);
+    box.classList.toggle("unk", !bands.length);
+    const pts = []; for (let i = 0; i <= 120; i++) { const fr = 20 * Math.pow(10, 3 * i / 120);
+      let db = 0; for (const b of bands) db += magDb(biquad(b.t, b.f0, b.g, b.q), fr);
+      pts.push([eqX(fr), eqY(Math.max(-EQ_DB, Math.min(EQ_DB, db)))]); }
+    const line = "M" + pts.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L");
+    box.querySelector(".eq-line").setAttribute("d", line);
+    box.querySelector(".eq-fill").setAttribute("d", line + ` L${EQ_W} ${eqY(0)} L0 ${eqY(0)} Z`);
+    box.querySelector(".eq-dots").innerHTML = bands.map(b => `<circle cx="${eqX(b.f0).toFixed(1)}" cy="${eqY(Math.max(-EQ_DB, Math.min(EQ_DB, b.g))).toFixed(1)}" r="3.2"/>`).join("");
   }
   function buildMix() {
     const cs = [...new Map(M.MIX.pages.filter(visible).flatMap(cellsOf).map(c => [hex(c.param), c])).values()]
@@ -502,6 +546,7 @@
 
   // paint: push current values into whatever is on screen
   function paint() {
+    drawEqs();
     for (const el of $$("[data-kind]")) {
       const kind = el.dataset.kind;
       if (kind === "chip" && !el.dataset.param) { el.dataset.state = "always"; continue; }
