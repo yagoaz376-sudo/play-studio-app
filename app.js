@@ -718,6 +718,14 @@
     paintChrome();
     const got = await L.getBatch(readIds(), { alive, each: (id, v) => { if (!recent(id)) { V.set(id, v); schedulePaint(); } } });
     if (got && alive() && fresh && n != null) libPut(n, P.name, presetVals(), info ? info.fav : null);   // keep it for next time
+    // Electric, number still unknown because several saved presets share this name: compare the live values with each
+    // of them. If the register's number is the one that matches best (and alone), show it.
+    if (got && alive() && MODE === "pe" && !numOk && P.num == null && nm) {
+      const n0 = await L.get(PRESET_REG()); if (!alive() || n0 == null) return;
+      const miss = e => e.vals.reduce((m, [id, v]) => m + (V.has(id) && V.get(id) !== v ? 1 : 0), 0);
+      const sc = Object.entries(lib.presets).filter(([, e]) => e.name === nm && e.vals && e.vals.length).map(([k, e]) => [+k, miss(e)]).sort((a, b) => a[1] - b[1]);
+      if (sc.length && sc[0][0] === n0 && (sc.length === 1 || sc[1][1] > sc[0][1])) { P.num = n0; paintChrome(); }
+    }
   }
   let syncT = 0; const syncSoon = ms => { clearTimeout(syncT); syncT = setTimeout(syncAll, ms); };
   // a preset change on the pedal: show it from the library if we have it, else "··"; then read it from the pedal
