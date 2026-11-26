@@ -23,7 +23,9 @@
   const enc28 = v => { if (v < 0) v += (1 << 28); return [(v >> 21) & 0x7f, (v >> 14) & 0x7f, (v >> 7) & 0x7f, v & 0x7f]; };
   const dec28 = (p, o) => { let v = (p[o] << 21) | (p[o + 1] << 14) | (p[o + 2] << 7) | p[o + 3]; if (v >= (1 << 27)) v -= (1 << 28); return v; };
   const PID = new URLSearchParams(location.search).get("sim") === "pe" ? 0x71 : 0x70;   // PLAY STUDIO
-  const SIM_NAME = PID === 0x71 ? "Play Electric (simulated)" : "Play Acoustic (simulated)";   // PLAY STUDIO
+  // PLAY STUDIO: ?sim&port=USB%20MIDI renames the pedal's ports and adds a silent "Network Session 1" (like an iPad)
+  const PORT = new URLSearchParams(location.search).get("port");
+  const SIM_NAME = PORT || (PID === 0x71 ? "Play Electric (simulated)" : "Play Acoustic (simulated)");   // PLAY STUDIO
   const input = { id: "sim-in", name: SIM_NAME, state: "connected", onmidimessage: null };
   // replies arrive on a message channel, not setTimeout: background tabs throttle timers to 1 s
   const ch = new MessageChannel(); ch.port1.onmessage = e => input.onmidimessage && input.onmidimessage({ data: Uint8Array.from(e.data) });
@@ -83,5 +85,8 @@
   window.simPedal = { reads: 0, turn(id, d) { set(id, get(id) + d); if (tunnel) reply([...H, 0x55, ...enc28(0xAE0001), 0xF7]); }, next() { cur = (cur + 1) % NAMES.length; reply([0xC0, cur]); },
     // press the ▲ footswitch on the unit: press echo, Program Change, release echo (like the hardware)
     footswitchUp() { if (tunnel) reply([...H, 0x55, ...enc28(0xDB0C00), 0xF7]); cur = (cur + 1) % NAMES.length; reply([0xC0, cur]); if (tunnel) reply([...H, 0x55, ...enc28(0xDB0C01), 0xF7]); }, get, P };
-  navigator.requestMIDIAccess = async () => ({ inputs: new Map([[input.id, input]]), outputs: new Map([[output.id, output]]), onstatechange: null });
+  const netIn = { id: "net-in", name: "Network Session 1", state: "connected", onmidimessage: null }, netOut = { id: "net-out", name: "Network Session 1", state: "connected", send() {} };
+  navigator.requestMIDIAccess = async () => PORT
+    ? { inputs: new Map([[netIn.id, netIn], [input.id, input]]), outputs: new Map([[netOut.id, netOut], [output.id, output]]), onstatechange: null }
+    : { inputs: new Map([[input.id, input]]), outputs: new Map([[output.id, output]]), onstatechange: null };
 })();

@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 // Copied from github.com/michaelbeyhs/open-acoustic (tools/pa-link.js, commit 79a6e8d, 2026-11-19).
 // Play Studio patches, each marked "PLAY STUDIO": a "raw" event for the MIDI monitor (in + out),
-// the raw identity reply kept in L.identityMsg, and MIDI CHAN / CC CHAN / SYSEXID added to BLOCKED.
+// the raw identity reply kept in L.identityMsg, MIDI CHAN / CC CHAN / SYSEXID added to BLOCKED, and L.scan
+// (ask every MIDI port for its identity when no port name matches).
 // Everything else is unchanged.
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 // Play Acoustic link: Web MIDI + the firmware's built-in SysEx commands, with no UI.
@@ -78,13 +79,37 @@
     };
     autoPick(); return true;
   };
-  function autoPick() {
+  // PLAY STUDIO: when no port has a known name (an iPad or an interface can rename it), ask every port who it is.
+  async function autoPick() {
     const saved = store.get("pa-ports") || {};
     const pick = (list, savedId) => list.find(p => p.id === savedId) || list.find(p => PA_PORT.test(p.name)) || list.find(p => BLE_PORT.test(p.name)) || null;
     const { outputs, inputs } = L.ports(), o = pick(outputs, saved.out), i = pick(inputs, saved.inp);
-    if (!o || !i) { say("off", outputs.length ? "Choose the Play Acoustic's MIDI ports" : "No MIDI ports: connect the pedal by USB"); emit("ports", L.ports()); return; }
-    L.use(o.id, i.id, saved.ble ?? (BLE_PORT.test(o.name) || BLE_PORT.test(i.name)));
+    if (!outputs.length || !inputs.length) { say("off", "No MIDI ports: connect the pedal by USB"); emit("ports", L.ports()); return; }
+    if (o && i) { const gen = bindGen + 1; await L.use(o.id, i.id, saved.ble ?? (BLE_PORT.test(o.name) || BLE_PORT.test(i.name))); if (L.ready || gen !== bindGen) return; }
+    await L.scan();
   }
+  // Send the standard identity request (F0 7E 7F 06 01 F7, harmless for any MIDI device) to one output at a time
+  // and listen on every input; the first input that answers like a Play pedal is paired with that output.
+  L.scan = async () => {
+    const gen = ++bindGen;
+    if (L.inp) L.inp.onmidimessage = null;
+    L.ready = false; L.out = L.inp = null;
+    const outs = [...L.access.outputs.values()], ins = [...L.access.inputs.values()];
+    say("connecting", "Looking for the pedal on every MIDI port…");
+    let hit = null;
+    for (const inp of ins) inp.onmidimessage = e => { if (!hit && e.data && readIdentity(e.data)) hit = inp; };
+    const stop = () => { for (const inp of ins) inp.onmidimessage = null; };
+    for (const out of outs) {
+      if (gen !== bindGen) return stop();
+      hit = null;
+      try { out.send([0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7]); } catch { continue; }
+      const ble = BLE_PORT.test(out.name), t = performance.now();
+      while (!hit && performance.now() - t < (ble ? 2200 : 900) && gen === bindGen) await delay(20);
+      if (hit && gen === bindGen) { stop(); return L.use(out.id, hit.id, ble || BLE_PORT.test(hit.name)); }
+    }
+    stop();
+    if (gen === bindGen) { say("off", "No pedal answered on any MIDI port"); emit("ports", L.ports()); }
+  };
   let bindGen = 0;
   L.use = async (outId, inId, ble) => {
     const gen = ++bindGen;

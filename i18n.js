@@ -84,6 +84,8 @@
     "simulated pedal": "pedal simulado", "real pedal": "pedal real",
     "Pedal disconnected": "Pedal desconectado", "Choose the Play Acoustic's MIDI ports": "Escolha as portas MIDI do pedal",
     "No MIDI ports: connect the pedal by USB": "Nenhuma porta MIDI: ligue o pedal pela USB",
+    "Looking for the pedal on every MIDI port…": "Procurando o pedal em todas as portas MIDI…", "No pedal answered on any MIDI port": "Nenhum pedal respondeu em nenhuma porta MIDI",
+    "No MIDI ports found": "Nenhuma porta MIDI encontrada", "Choose the port myself": "Escolher a porta manualmente",
     "No Web MIDI in this browser (iPad: use a Web MIDI browser app)": "Este navegador não tem Web MIDI (iPad: use um app de navegador com Web MIDI)",
     "Connected, but the pedal didn't identify itself: protected mode": "Conectado, mas o pedal não se identificou: modo protegido",
     // edit with Claude
@@ -175,6 +177,7 @@
     [/^Remove (\S+) from the map\?$/, "Remover $1 do mapa?"],
     [/^No Play Acoustic answered on (.+)$/, "Nenhum pedal respondeu em $1"],
     [/^Checking (.+)…$/, "Verificando $1…"],
+    [/^MIDI ports found: (.+)$/, "Portas MIDI encontradas: $1"],
     [/^MIDI access refused: (.*)$/, "Acesso ao MIDI recusado: $1"],
     [/^Play Electric \(0x71\) · protected$/, "Play Electric (0x71) · protegido"],
     [/^Connected: Play Electric \(protected mode\)$/, "Conectado: Play Electric (modo protegido)"],

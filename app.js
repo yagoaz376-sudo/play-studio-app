@@ -1611,6 +1611,11 @@ ${JSON.stringify(data, null, 1)}
       ["SysEx channel", L.ready ? hx(L.ch).replace("0x0", "0x") : "—"], ["Identity", L.identityMsg ? hexs(L.identityMsg) : "—"],
       ["Round trip", L.readMs != null ? L.readMs.toFixed(1) + " ms" : "—"], ["Mode", SIM ? "simulated pedal" : "real pedal"]];
     $("#drw-kv").innerHTML = rows.map(([k, v]) => `<span>${esc(k)}</span><span class="${k === "Identity" ? "mono" : ""}">${esc(v)}</span>`).join("");
+    // the connect screen lists every MIDI port the device sees, so "the iPad doesn't see the pedal" is obvious
+    const names = [...new Set([...ports.outputs, ...ports.inputs].map(p => p.name))], gp = $("#gate-ports");
+    gp.hidden = L.ready || !L.access || L.status === "connecting";
+    $("#gate-ports-list").textContent = names.length ? `MIDI ports found: ${names.join(", ")}` : "No MIDI ports found";
+    $("#gate-ports-btn").hidden = !names.length;
   }
 
   // ── Mapper ──────────────────────────────────────────────────────────────
@@ -1806,6 +1811,7 @@ ${JSON.stringify(data, null, 1)}
       case "theme": { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; try { localStorage.setItem("ps-theme", r.dataset.theme); } catch {} return; }
       case "gate-connect": return connect();
       case "conn-btn": $("#drawer").hidden = !$("#drawer").hidden; renderDrawer(); paintLog(); return;
+      case "gate-ports-btn": $("#drawer").hidden = false; renderDrawer(); paintLog(); return;
       case "drw-close": $("#drawer").hidden = true; return;
       case "drw-connect": {
         const o = $("#port-out").value, i = $("#port-in").value, ble = /widi|bluetooth|\bble\b/i.test($("#port-out").selectedOptions[0]?.text + " " + $("#port-in").selectedOptions[0]?.text);
