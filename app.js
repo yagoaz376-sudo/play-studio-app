@@ -412,7 +412,7 @@
   }
   function buildStage() {
     const fx = fxList().filter(f => f.control);
-    const pad = f => `<button type="button" class="tile" data-kind="tile" data-fx="${f.key}" data-param="${f.control.param}" aria-pressed="false" title="${esc(f.name)}: tap = on/off · hold = on only while held · drag sideways = level" style="--fx:var(--c-${f.id})"><span class="tflag"><small>··</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`;
+    const pad = f => `<button type="button" class="tile" data-kind="tile" data-fx="${f.key}" data-param="${f.control.param}" aria-pressed="false" title="${esc(f.name)}: tap = on/off · hold = on only while held · drag sideways = its main control" style="--fx:var(--c-${f.id})"><span class="tflag"><small>··</small><span class="tl"></span></span>${art(imgOf(f))}<span class="tname"><b>${esc(f.name)}</b></span></button>`;
     $("#tiles").innerHTML = [["Vocal", "voz"], ["Guitar", "gtr"]].map(([label, side]) =>
       `<div class="stage-row"><span class="cap-lbl">${label}</span><div class="stage-links">${fx.filter(f => f.side === side).map(pad).join("")}</div></div>`).join("")
       + `<div class="stage-row"><span class="cap-lbl">Footswitch</span><div class="stage-links"><button type="button" class="hitbar" id="hit2" aria-pressed="false"><i></i>HIT</button>`
@@ -467,9 +467,12 @@
       t.addEventListener("keydown", e => { if ((e.key === "e" || e.key === "E" || (e.key === "Enter" && e.shiftKey))) { e.preventDefault(); openPop(t.dataset.fx); } });   // keyboard: E or Shift+Enter edits
     }
   }
-  // the effect's level for the Stage drag: LEVEL, else a …LEVEL, MIX or AMOUNT control (numbers only, no lists)
+  // the parameter a sideways drag changes on a Stage tile: each effect's most useful one live (as in open-acoustic's
+  // Stage SWIPE table: HardTune SHIFT, Transducer DRIVE; the Electric's Amp DRIVE and Comp AMOUNT), else its level
+  const SWIPE = { hardtune: ["SHIFT"], transducer: ["DRIVE"], amp: ["DRIVE"], comp: ["AMOUNT", "MAKEUP GAIN", "MAKEUP"], bodyrez: ["AMOUNT"] };
   function levelCell(f) {
     const cs = f.groups.flatMap(g => g[1]).filter(c => c && !(c.values && c.values.length) && rid(c) != null);
+    for (const label of SWIPE[f.id] || []) { const c = cs.find(x => x.label === label); if (c) return c; }
     return cs.find(c => c.label === "LEVEL") || cs.find(c => /LEVEL$/.test(c.label)) || cs.find(c => c.label === "MIX") || cs.find(c => c.label === "AMOUNT") || null;
   }
   function showLevel(t, c) {
@@ -1693,6 +1696,6 @@ ${JSON.stringify(data, null, 1)}
   if (SIM) connect(true);
   else if (navigator.permissions && navigator.requestMIDIAccess) navigator.permissions.query({ name: "midi", sysex: true }).then(r => { if (r.state === "granted") connect(true); }).catch(() => {});
   if (!navigator.requestMIDIAccess) $("#gate-status").textContent = "This browser has no Web MIDI. Use Chrome or Edge, or the MidiWeb app on iPad / iPhone.";
-  window.PlayStudio = { V, P, get MODE() { return MODE; }, MAPS, MAPD: () => MAPD, render, syncAll,
+  window.PlayStudio = { V, P, get MODE() { return MODE; }, MAPS, MAPD: () => MAPD, render, syncAll, fxList: () => fxList(), rid: c => rid(c),
     saveMap: () => { saveMap(); render(true); renderMapper(); } };   // apply a map edited from the console without reloading   // for debugging in the console
 })();
