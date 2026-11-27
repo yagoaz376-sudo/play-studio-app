@@ -66,7 +66,7 @@
   L.start = async ({ auto } = {}) => {
     if (!navigator.requestMIDIAccess) { say("nomidi", "No Web MIDI in this browser (iPad: use a Web MIDI browser app)"); return false; }
     try { L.access = await navigator.requestMIDIAccess({ sysex: true }); }
-    catch (e) { say("off", auto ? "Not connected" : "MIDI access refused: " + e.message); return false; }
+    catch (e) { say("denied", "MIDI access refused"); return false; }   // PLAY STUDIO: the app explains it and offers to ask again
     // PLAY STUDIO: a pedal switched off and on again must drop the link and reconnect. The original only re-picked
     // ports when ours were gone, and left L.ready true while the pedal was off (seen on a real Play Electric).
     let reT = 0;

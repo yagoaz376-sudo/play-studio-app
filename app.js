@@ -1936,6 +1936,11 @@ ${JSON.stringify(data, null, 1)}
     $("#gate-status").textContent = "Asking for MIDI access…";
     const ok = await L.start({ auto });
     if (!ok) $("#gate-status").textContent = L.message;
+    // refused (now or an earlier "no" the browser remembered): say so, and make the button ask again (some browsers
+    // only show the question again after a tap)
+    const denied = !ok && L.status === "denied";
+    if (denied) $("#gate-status").textContent = "The browser refused MIDI access with SysEx. Tap “Ask again” and choose Allow. If no question shows up: in MidiWeb, allow SysEx for this site, or delete and reinstall the app.";
+    $("#gate-connect").textContent = denied ? "Ask again" : "Connect";
     renderDrawer();
   }
 
@@ -1995,7 +2000,8 @@ ${JSON.stringify(data, null, 1)}
   try { const t = localStorage.getItem("ps-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}
   loadMap(); render(true); setView(["editor", "mix", "ajustes", "palco", "pedal", "mapa"].includes(view) ? view : "palco"); wirePedalPanel(); renderMapper(); renderDrawer();
   if (SIM) connect(true);
-  else if (navigator.permissions && navigator.requestMIDIAccess) navigator.permissions.query({ name: "midi", sysex: true }).then(r => { if (r.state === "granted") connect(true); }).catch(() => {});
+  // ask for MIDI every time the page opens: a browser that remembered a "no" gets asked again (and the page says so)
+  else if (navigator.requestMIDIAccess) connect(true);
   if (!navigator.requestMIDIAccess) $("#gate-status").textContent = "This browser has no Web MIDI. Use Chrome or Edge, or the MidiWeb app on iPad / iPhone.";
   window.PlayStudio = { V, P, get MODE() { return MODE; }, MAPS, MAPD: () => MAPD, render, syncAll, fxList: () => fxList(), rid: c => rid(c),
     saveMap: () => { saveMap(); render(true); renderMapper(); } };   // apply a map edited from the console without reloading   // for debugging in the console
